@@ -11,6 +11,7 @@
 		<module>ordogene-api</module>
 		<module>ordogene-algorithme</module>
 		<module>ordogene-file</module>
+		<module>ordogene-cli</module>
 	</modules>
 	<groupId>fr.ordogene</groupId>
 	<artifactId>ordogene-parent</artifactId>
