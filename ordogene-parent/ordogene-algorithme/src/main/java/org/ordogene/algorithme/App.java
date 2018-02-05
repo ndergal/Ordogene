@@ -1,5 +1,7 @@
 package org.ordogene.algorithme;
 
+import com.fasterxml.jackson.core.JsonFactory;
+
 /**
  * Hello world!
  *
