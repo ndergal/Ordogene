@@ -2,6 +2,7 @@ package org.ordogene.api;
 
 import java.util.Arrays;
 
+import org.ordogene.file.FileService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -28,6 +29,11 @@ public class Application {
             }
 
         };
+    }
+    
+    @Bean
+    public FileService buildFileService() {
+    	return new FileService();
     }
 
 }

@@ -21,7 +21,6 @@ public class Const {
 	static {
 
 		ClassLoader classLoader = Const.class.getClassLoader();
-		File file = new File(classLoader.getResource("config.json").getFile());
 		URL pathUrl = classLoader.getResource("config.json");
 		Path appPath;
 		Map<String, String> tmpResourcesMap;
