@@ -10,4 +10,12 @@ public class Input {
 		this.entity = Objects.requireNonNull(entity);
 		this.relation = Objects.requireNonNull(relation);
 	}
+
+	public Entity getEntity() {
+		return entity;
+	}
+
+	public Relation getRelation() {
+		return relation;
+	}
 }
