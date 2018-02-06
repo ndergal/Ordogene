@@ -4,6 +4,10 @@ import java.util.List;
 import java.util.Objects;
 
 public class Action {
+	public static Action EMPTY(int time) {
+		return new Action("EMPTY", time, new ArrayList<>(), new ArrayList<>());
+	}
+	
 	private final String name;
 	private final int time;
 	private final List<Input> inputs;
@@ -17,5 +21,21 @@ public class Action {
 		this.time = time;
 		this.inputs = Objects.requireNonNull(inputs);
 		this.outputs = Objects.requireNonNull(outputs);
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public int getTime() {
+		return time;
+	}
+
+	public ArrayList<Input> getInputs() {
+		return inputs;
+	}
+
+	public ArrayList<Entity> getOutputs() {
+		return outputs;
 	}
 }
