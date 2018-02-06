@@ -20,6 +20,7 @@ import org.ordogene.algorithme.models.Fitness;
 import org.ordogene.algorithme.models.Input;
 import org.ordogene.algorithme.models.Relation;
 import org.ordogene.algorithme.models.Type;
+import org.ordogene.algorithme.util.ActionSelector;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -31,14 +32,12 @@ public class Model {
 	private final int slots;
 	private final int execTime;
 	private final Environment startEnvironment;
-	private Environment currentEnvironment;
 	private final ArrayList<Action> actions;
-	private final Fitness fitness;
+	private final Fitness fitness;	
 	
-	private Long totalWeight = Long.valueOf(0);
-	private Long lowerWeight = Long.valueOf(0);
-	private HashMap<Action, Long> workableActionCache = new HashMap<>();
+	private Environment currentEnvironment;
 	
+	private ActionSelector actionSelector;
 	
 	private Model(Optional<List<Integer>> snaps, int slots, int execTime, Environment environment, ArrayList<Action> actions, Fitness fitness) {
 		if(slots <= 0) {
@@ -54,6 +53,7 @@ public class Model {
 		this.currentEnvironment = new Environment(environment.getEntities());
 		this.actions = Objects.requireNonNull(actions);
 		this.fitness = Objects.requireNonNull(fitness);
+		this.actionSelector = new ActionSelector();
 	}
 
 	public static Model createModel(Path jsonPath) throws IOException {
@@ -97,28 +97,17 @@ public class Model {
 	 */
 	//TODO add random
 	public Action getWorkableAction() {
-		if(!workableActionCache.isEmpty()) {
+		if(!actionSelector.isReset()) {
 			//Select one action here
-			return getOneActionInCache();
+			return actionSelector.select();
 		}
+		actionSelector.add(Action.EMPTY(1), -1);
 		for(Action a : actions) {
 			if(this.workable(a)) {
-				Long actionWeight = actionWeight(a);
-				totalWeight += actionWeight;
-				workableActionCache.put(a, actionWeight);
+				actionSelector.add(a, fitness.eval(a));
 			}
 		}
-		
-		return getOneActionInCache();
-	}
-	
-	private Long actionWeight(Action a) {
-		return fitness.eval(a);
-	}
-
-	private Action getOneActionInCache() {
-		// TODO Auto-generated method stub
-		return null;
+		return actionSelector.select();
 	}
 
 	public static void main(String[] args) {
