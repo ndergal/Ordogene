@@ -1,5 +1,6 @@
 package org.ordogene.algorithme.models;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,5 +20,9 @@ public class Environment {
 			throw new IllegalArgumentException("The entity asked don't exist");
 		}
 		return e;
+	}
+
+	public List<Entity> getEntities() {
+		return new ArrayList<>(entities.values());
 	}
 }
