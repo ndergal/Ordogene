@@ -1,14 +1,15 @@
 package org.ordogene.algorithme;
 
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -43,7 +44,7 @@ public class Model {
 		if(slots <= 0) {
 			throw new IllegalArgumentException("slots has to be a positive integer");
 		}
-		if(execTime <= 0) {
+		if (execTime <= 0) {
 			throw new IllegalArgumentException("execTime has to be a positive integer");
 		}
 		this.snaps = Objects.requireNonNull(snaps);
@@ -70,6 +71,7 @@ public class Model {
 		});
 		return myMap;
 	}
+
 	
 	/**
 	 * Check if the action can be done with the actual environment
@@ -156,5 +158,4 @@ public class Model {
 		}
 		
 	}
-	
 }
