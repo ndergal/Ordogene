@@ -46,8 +46,8 @@ public class Commands {
 	@ShellMethod(value = "Launch a calculation from a model")
 	private void launchCalculation(String model) {
 		Path path = Paths.get(model);
-		if(Files.exists(path)) {
-			System.err.println("The path does not exist. Try again.");
+		if(Files.notExists(path)) {
+			System.out.println("The path does not exist. Try again.");
 			return;
 		}
 
@@ -85,12 +85,14 @@ public class Commands {
 	private void resultCalculation(int id, String dst, @ShellOption(arity=0, defaultValue="false") boolean force) {
 		//HTTPRequest
 		Path path = Paths.get(dst);
-		if(Files.exists(path) && Files.isRegularFile(path) && Files.isWritable(path)) {
+		if(Files.exists(path)/* && Files.isRegularFile(path) && Files.isWritable(path)*/) {
 			if(force) {
 				System.out.println("calculation resulted");
 			} else {
 				System.out.println("A file already exists, use --force to overwrite.");
 			}
+		} else {
+			
 		}
 	}
 	
