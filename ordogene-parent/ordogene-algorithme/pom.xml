@@ -40,39 +40,72 @@
 			<artifactId>jacoco-maven-plugin</artifactId>
 			<version>0.7.9</version>
 		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<archive>
-						<manifest>
-							<addClasspath>true</addClasspath>
-							<mainClass>org.ordogene.algorithme.Main</mainClass>
-							<classpathPrefix>dependency-jars/</classpathPrefix>
-						</manifest>
-					</archive>
-				</configuration>
-			</plugin>
+			<!-- <plugin> -->
+			<!-- <groupId>org.apache.maven.plugins</groupId> -->
+			<!-- <artifactId>maven-jar-plugin</artifactId> -->
+			<!-- <configuration> -->
+			<!-- <archive> -->
+			<!-- <manifest> -->
+			<!-- <addClasspath>true</addClasspath> -->
+			<!-- <mainClass>org.ordogene.algorithme.Main</mainClass> -->
+			<!-- <classpathPrefix>dependency-jars/</classpathPrefix> -->
+			<!-- </manifest> -->
+			<!-- </archive> -->
+			<!-- </configuration> -->
+			<!-- </plugin> -->
+
+			<!-- <plugin> -->
+			<!-- <groupId>org.apache.maven.plugins</groupId> -->
+			<!-- <artifactId>maven-dependency-plugin</artifactId> -->
+			<!-- <executions> -->
+			<!-- <execution> -->
+			<!-- <id>copy-dependencies</id> -->
+			<!-- <phase>package</phase> -->
+			<!-- <goals> -->
+			<!-- <goal>copy-dependencies</goal> -->
+			<!-- </goals> -->
+			<!-- <configuration> -->
+			<!-- <outputDirectory> -->
+			<!-- ${project.build.directory}/dependency-jars/ -->
+			<!-- </outputDirectory> -->
+			<!-- </configuration> -->
+			<!-- </execution> -->
+			<!-- </executions> -->
+			<!-- </plugin> -->
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<!-- get all project dependencies -->
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+					<!-- MainClass in mainfest make a executable jar -->
+					<archive>
+						<manifest>
+							<mainClass>fr.ordogene.algorithme.Main</mainClass>
+						</manifest>
+					</archive>
+
+				</configuration>
 				<executions>
 					<execution>
-						<id>copy-dependencies</id>
-						<phase>post-package</phase>
+						<id>make-assembly</id>
+						<!-- bind to the packaging phase -->
+						<phase>package</phase>
 						<goals>
-							<goal>copy-dependencies</goal>
+							<goal>single</goal>
 						</goals>
-						<configuration>
-							<outputDirectory>
-								${project.build.directory}/dependency-jars/
-							</outputDirectory>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>
