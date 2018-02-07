@@ -1,13 +1,13 @@
 package org.ordogene.api;
 
+import java.util.List;
+
 import org.ordogene.file.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.ResponseEntity.BodyBuilder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,20 +30,11 @@ public class CalculationController {
 		if (!exist) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(id + " n'existe pas");
 		} else {
-			return ResponseEntity.ok().body(id + " existe");
+			List<String> calculations = fs.getUserCalculations(id);
+			StringBuilder sb = new StringBuilder();
+			calculations.forEach(c -> sb.append(c).append('\n'));
+			return ResponseEntity.ok().body(sb.toString());
 		}
 	}
 
-	@RequestMapping(method = RequestMethod.PUT, value = "/createUserId")
-	@ResponseBody
-	public ResponseEntity<String> create() {
-		String randomId = fs.generateRandomUserId(5);
-		while (fs.userExist(randomId)) {
-			randomId = fs.generateRandomUserId(5);
-		}
-		if(fs.addUser(randomId)) {
-			return ResponseEntity.ok().body(randomId);
-		}
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(randomId + " : erreur...");
-	}
 }

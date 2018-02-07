@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class Const {
 
 	private final static Map<String, String> resourcesMap;
+	private final static Map<String, String> unmodifiableResourcesMap;
 
 	static {
 
@@ -42,6 +43,7 @@ public class Const {
 			tmpResourcesMap = new HashMap<>();
 		}
 		resourcesMap = tmpResourcesMap;
+		unmodifiableResourcesMap = Collections.unmodifiableMap(resourcesMap);
 		String appliPath = resourcesMap.get("ApplicationPath");
 		if (appliPath == null) {
 			System.err.println("Erreur : 'ApplicationPath' est manquant dans config.json");
@@ -57,6 +59,6 @@ public class Const {
 	}
 
 	public static Map<String, String> getConst() {
-		return Collections.unmodifiableMap(resourcesMap);
+		return unmodifiableResourcesMap;
 	}
 }
