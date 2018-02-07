@@ -16,7 +16,7 @@ public class UserHandler {
 			return false;
 		} else {
 			Path path = Paths.get(Const.getConst().get("ApplicationPath") + File.separatorChar + username);
-			return (Files.exists(path));
+			return (path.toFile().exists());
 		}
 	}
 
