@@ -42,6 +42,18 @@ public class Const {
 			tmpResourcesMap = new HashMap<>();
 		}
 		resourcesMap = tmpResourcesMap;
+		String appliPath = resourcesMap.get("ApplicationPath");
+		if (appliPath == null) {
+			System.err.println("Erreur : 'ApplicationPath' est manquant dans config.json");
+		} else {
+			try {
+				Files.createDirectories(Paths.get(appliPath));
+			} catch (IOException e) {
+				System.err.println("échec de la création du dossier " + appliPath);
+				e.printStackTrace();
+			}
+		}
+
 	}
 
 	public static Map<String, String> getConst() {

@@ -1,4 +1,4 @@
 {
-	"ApplicationPath": "/home/$USER/testProjectFiles",
-	"JarAlgorithmPath": "/home/$USER/launchAlgorithme.jar"
+	"ApplicationPath": "~/testProjectFiles",
+	"JarAlgorithmPath": "~/launchAlgorithme.jar"
 }
