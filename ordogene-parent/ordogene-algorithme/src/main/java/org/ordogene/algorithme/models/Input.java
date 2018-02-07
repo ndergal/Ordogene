@@ -18,4 +18,9 @@ public class Input {
 	public Relation getRelation() {
 		return relation;
 	}
+
+	@Override
+	public String toString() {
+		return "Input [entity=" + entity + ", relation=" + relation + "]";
+	}
 }

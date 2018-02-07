@@ -31,15 +31,20 @@ public class ActionSelector {
 	}
 	
 	public Action select() {
+		if(actions.isEmpty()) {
+			throw new IllegalStateException("You can select in a empty selector");
+		}
+		
 		NavigableMap<Long, Action> map = new TreeMap<>();
 		long total = 0;
 		
 		for(SimpleEntry<Action, Long> e : actions) {
-			total += e.getValue() + lowerWeight;
+			Long weight = e.getValue();
+			total += weight + (Math.abs(lowerWeight) + 1);
 			map.put(total, e.getKey());
 		}
 		
-		long value = (random.nextLong()%total) + 1;
+		long value = (Math.abs(random.nextLong())%total) + 1;
 		return map.ceilingEntry(value).getValue();
 	}
 	

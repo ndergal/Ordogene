@@ -39,4 +39,9 @@ public class Action {
 	public List<Entity> getOutputs() {
 		return outputs;
 	}
+
+	@Override
+	public String toString() {
+		return "Action [name=" + name + ", time=" + time + ", inputs=" + inputs + ", outputs=" + outputs + "]";
+	}
 }
