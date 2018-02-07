@@ -16,10 +16,15 @@ public class Fitness {
 		int score = 0;
 		for(Input i : a.getInputs()) {
 			String entityName = i.getEntity().getName();
-			long coef = operands.get(entityName);
+			long coef = operands.getOrDefault(entityName, Long.valueOf(0));
 			long quantity = i.getEntity().getQuantity();
 			score += coef * quantity;
 		}
 		return score;
+	}
+
+	@Override
+	public String toString() {
+		return "Fitness [type=" + type + ", operands=" + operands + "]";
 	}
 }

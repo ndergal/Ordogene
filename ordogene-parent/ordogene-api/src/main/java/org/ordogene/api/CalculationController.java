@@ -12,16 +12,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class UserController {
+public class CalculationController {
 
 	@Autowired
 	FileService fs;
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{id}")
-	// @RequestMapping(value = "/checkUserId/{user_ID}", produces =
-	// "application/json")
+	@RequestMapping(value = "/{id}/calculations")
 	@ResponseBody
-	public ResponseEntity<String> exists(@PathVariable String id) {
+	public ResponseEntity<String> getUserCalculations(@PathVariable String id) {
 
 		if (id == null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(id + " n'existe pas");
@@ -36,31 +34,16 @@ public class UserController {
 		}
 	}
 
-	@RequestMapping(method = RequestMethod.PUT, value = "/{id}")
+	@RequestMapping(method = RequestMethod.PUT, value = "/createUserId")
 	@ResponseBody
-	public ResponseEntity<String> createUserGivenId(@PathVariable String id) {
-		if (id == null || id.equals("")) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("L'id ne peut pas être vide.");
-		}
-		if(fs.addUser(id)) {
-			return ResponseEntity.ok().body(id);
-		}
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(id + " : erreur...");
-	}
-	
-	@RequestMapping(method = RequestMethod.PUT, value = "/")
-	@ResponseBody
-	public ResponseEntity<String> createUserRandomId() {
-		int nbCharRandom = 7;
-		String randomId = fs.generateRandomUserId(nbCharRandom);
+	public ResponseEntity<String> create() {
+		String randomId = fs.generateRandomUserId(5);
 		while (fs.userExist(randomId)) {
-			randomId = fs.generateRandomUserId(nbCharRandom);
+			randomId = fs.generateRandomUserId(5);
 		}
 		if(fs.addUser(randomId)) {
 			return ResponseEntity.ok().body(randomId);
 		}
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(randomId + " : erreur...");
 	}
-	
- 
 }

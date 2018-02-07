@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
+import java.util.stream.Stream;
 
 public class UserHandler {
 
@@ -14,8 +15,8 @@ public class UserHandler {
 		if (username == null || username.equals("")) {
 			return false;
 		} else {
-			Path path = Paths.get(Const.resourcesMap.get("ApplicationPath") + File.separatorChar + username);
-			return (Files.exists(path));
+			Path path = Paths.get(Const.getConst().get("ApplicationPath") + File.separatorChar + username);
+			return (path.toFile().exists());
 		}
 	}
 
@@ -26,13 +27,13 @@ public class UserHandler {
 			try {
 				System.out.println("Création de l'utilisateur " + username);
 				Files.createDirectories(
-						Paths.get(Const.resourcesMap.get("ApplicationPath") + File.separatorChar + username));
+						Paths.get(Const.getConst().get("ApplicationPath") + File.separatorChar + username));
 			} catch (IOException e) {
 				System.err.println("... échec :");
 				e.printStackTrace();
 				return false;
 			}
-			return (Files.exists(Paths.get(Const.resourcesMap.get("ApplicationPath") + File.separatorChar + username)));
+			return (Files.exists(Paths.get(Const.getConst().get("ApplicationPath") + File.separatorChar + username)));
 		}
 	}
 
@@ -41,11 +42,12 @@ public class UserHandler {
 			return false;
 		} else {
 
-			Path rootPath = Paths.get(Const.resourcesMap.get("ApplicationPath") + File.separatorChar + username);
-			try {
+			Path rootPath = Paths.get(Const.getConst().get("ApplicationPath") + File.separatorChar + username);
+
+			try (Stream<Path> paths = Files.walk(rootPath, FileVisitOption.FOLLOW_LINKS)) {
 				System.out.println("Suppressions :");
-				Files.walk(rootPath, FileVisitOption.FOLLOW_LINKS).sorted(Comparator.reverseOrder()).map(Path::toFile)
-						.peek(System.out::println).forEach(File::delete);
+				paths.sorted(Comparator.reverseOrder()).map(Path::toFile).peek(System.out::println)
+						.forEach(File::delete);
 				return true;
 			} catch (IOException e) {
 				System.err.println("Erreur lors de la suppression de " + rootPath.toString());

@@ -1,3 +1,4 @@
 /target/*
 /.settings/*
 /.project
+/spring-shell.log

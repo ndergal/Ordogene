@@ -101,7 +101,7 @@ public class Model {
 			//Select one action here
 			return actionSelector.select();
 		}
-		actionSelector.add(Action.EMPTY(1), -1);
+		actionSelector.add(Action.EMPTY(1), 0);
 		for(Action a : actions) {
 			if(this.workable(a)) {
 				actionSelector.add(a, fitness.eval(a));
@@ -130,21 +130,20 @@ public class Model {
 		
 		Action a = new Action("1", 1, inputs, outputs);
 		
+		ArrayList<Action> actions = new ArrayList<>();
+		actions.add(a);
+		
 		HashMap<String,Long> h = new HashMap<>();
 		h.put("A", Long.valueOf(8));
 		
 		Fitness f = new Fitness(Type.max, h);
 		
-		Model m = new Model(Optional.empty(), 15, 1000, env, new ArrayList<>(), f);
+		Model m = new Model(Optional.empty(), 15, 1000, env, actions, f);
 		
 		System.out.println(m.workable(a));
 		
-		try {
-			System.out.println(Model.parseJsonFile(Paths.get("/home/ordogene/Documents/examples/fitness1.json")));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		System.out.println(m.getWorkableAction());
+		System.out.println(m.getWorkableAction());
 		
 	}
 }
