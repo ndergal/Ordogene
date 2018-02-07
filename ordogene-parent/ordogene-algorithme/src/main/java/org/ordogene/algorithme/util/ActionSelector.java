@@ -44,6 +44,10 @@ public class ActionSelector {
 			map.put(total, e.getKey());
 		}
 		
+		if(total == 0) {
+			throw new IllegalStateException("The ActionSelector have an problem with action's weight.");
+		}
+		
 		long value = (Math.abs(random.nextLong())%total) + 1;
 		return map.ceilingEntry(value).getValue();
 	}
