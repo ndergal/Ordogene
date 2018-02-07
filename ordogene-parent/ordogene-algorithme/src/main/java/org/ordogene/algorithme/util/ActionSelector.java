@@ -6,8 +6,6 @@ import java.util.NavigableMap;
 import java.util.Random;
 import java.util.TreeMap;
 
-import org.ordogene.algorithme.models.Action;
-
 import io.jenetics.util.RandomRegistry;
 
 public class ActionSelector {
