@@ -6,8 +6,6 @@ import java.util.NavigableMap;
 import java.util.Random;
 import java.util.TreeMap;
 
-import org.ordogene.algorithme.models.Action;
-
 import io.jenetics.util.RandomRegistry;
 
 public class ActionSelector {
@@ -31,15 +29,24 @@ public class ActionSelector {
 	}
 	
 	public Action select() {
+		if(actions.isEmpty()) {
+			throw new IllegalStateException("You can select in a empty selector");
+		}
+		
 		NavigableMap<Long, Action> map = new TreeMap<>();
 		long total = 0;
 		
 		for(SimpleEntry<Action, Long> e : actions) {
-			total += e.getValue() + lowerWeight;
+			Long weight = e.getValue();
+			total += weight + (Math.abs(lowerWeight) + 1);
 			map.put(total, e.getKey());
 		}
 		
-		long value = (random.nextLong()%total) + 1;
+		if(total == 0) {
+			throw new IllegalStateException("The ActionSelector have an problem with action's weight.");
+		}
+		
+		long value = (Math.abs(random.nextLong())%total) + 1;
 		return map.ceilingEntry(value).getValue();
 	}
 	
