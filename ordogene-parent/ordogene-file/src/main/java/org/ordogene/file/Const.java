@@ -8,6 +8,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,7 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Const {
 
-	public final static Map<String, String> resourcesMap;
+	private final static Map<String, String> resourcesMap;
 
 	static {
 
@@ -41,5 +42,9 @@ public class Const {
 			tmpResourcesMap = new HashMap<>();
 		}
 		resourcesMap = tmpResourcesMap;
+	}
+
+	public static Map<String, String> getConst() {
+		return Collections.unmodifiableMap(resourcesMap);
 	}
 }
