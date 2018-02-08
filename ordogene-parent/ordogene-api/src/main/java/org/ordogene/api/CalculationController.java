@@ -22,13 +22,13 @@ public class CalculationController {
 	public ResponseEntity<String> getUserCalculations(@PathVariable String id) {
 
 		if (id == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(id + " n'existe pas");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(id + " does not exist");
 		}
 
 		boolean exist = fs.userExist(id);
 
 		if (!exist) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(id + " n'existe pas");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(id + " does not exist");
 		} else {
 			List<String> calculations = fs.getUserCalculations(id);
 			StringBuilder sb = new StringBuilder();

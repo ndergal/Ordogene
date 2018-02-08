@@ -30,7 +30,7 @@ public class CalculationHandler {
 			});
 
 		} catch (IOException e) {
-			System.err.println("Erreur en parcourant le dossier "+userPath.toString());
+			System.err.println("Error while browsing the path "+userPath.toString());
 			e.printStackTrace();
 		}
 
@@ -59,7 +59,7 @@ public class CalculationHandler {
 		String jarPath = Const.getConst().get("JarAlgorithmPath");
 		Process launchedJarProcess;
 		if (jarPath == null) {
-			System.err.println("Erreur : le chemin vers l'algorithme (.jar) à lancer n'est défini dans config.json");
+			System.err.println("Error : The Algorithm path (in .jar) is not well defined in config.json");
 		}
 		cmd.add("java");
 		cmd.add("-jar");
