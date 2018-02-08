@@ -84,8 +84,8 @@
 								</goals>
 								<configuration>
 									<tasks>
-										<delete file="src/main/resources/config.json" />
-										<copy file="src/main/resources/config.test.json" tofile="src/main/resources/config.json" />
+										<delete file="${project.build.outputDirectory}/config.json" />
+										<copy file="src/main/resources/config.test.json" tofile="${project.build.outputDirectory}/config.json" />
 									</tasks>
 								</configuration>
 							</execution>
