@@ -31,7 +31,7 @@ public class Const {
 			appPath = Paths.get(pathUrl.toURI());
 			mapData = Files.readAllBytes(appPath);
 		} catch (URISyntaxException | IOException e1) {
-			System.err.println("Erreur : le fichier resources/config.json absent ou erroné.");
+			System.err.println("Error : the file resources/config.json is absent or invalid.");
 		}
 
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -39,19 +39,19 @@ public class Const {
 			tmpResourcesMap = objectMapper.readValue(mapData, new TypeReference<HashMap<String, String>>() {
 			});
 		} catch (IOException e) {
-			System.err.println("Erreur : le fichier resources/config.json invalide.");
+			System.err.println("Error : the file resources/config.json is not valid.");
 			tmpResourcesMap = new HashMap<>();
 		}
 		resourcesMap = tmpResourcesMap;
 		unmodifiableResourcesMap = Collections.unmodifiableMap(resourcesMap);
 		String appliPath = resourcesMap.get("ApplicationPath");
 		if (appliPath == null) {
-			System.err.println("Erreur : 'ApplicationPath' est manquant dans config.json");
+			System.err.println("Error : 'ApplicationPath' is missing config.json");
 		} else {
 			try {
 				Files.createDirectories(Paths.get(appliPath));
 			} catch (IOException e) {
-				System.err.println("échec de la création du dossier " + appliPath);
+				System.err.println("Error while creating the directory " + appliPath);
 				e.printStackTrace();
 			}
 		}
