@@ -32,6 +32,9 @@ public class Entity {
 	}
 
 	public void setQuantity(int quantity) {
+		if(quantity < 0) {
+			throw new IllegalArgumentException("The end quantity can't be negative.");
+		}
 		this.quantity = quantity;
 	}
 
