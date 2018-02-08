@@ -1,10 +1,8 @@
 package org.ordogene.file;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URI;
+import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -22,21 +20,15 @@ public class Const {
 
 	static {
 
-		ClassLoader classLoader = Const.class.getClassLoader();
-		URL configFileUrl = Thread.currentThread().getContextClassLoader().getResource("config.json");
-		Path configFilePath;
+		// URL configFileUrl =
+		// Thread.currentThread().getContextClassLoader().getResource("config.json");
+		InputStream configFile = Thread.currentThread().getContextClassLoader()
+				.getResourceAsStream("config.json");
 		Map<String, String> tmpResourcesMap;
-		byte[] mapData = null;
-		try {
-			configFilePath = Paths.get(configFileUrl.toURI());
-			mapData = Files.readAllBytes(configFilePath);
-		} catch (URISyntaxException | IOException e1) {
-			System.err.println("Error : the file resources/config.json is absent or invalid.");
-		}
 
 		ObjectMapper objectMapper = new ObjectMapper();
 		try {
-			tmpResourcesMap = objectMapper.readValue(mapData, new TypeReference<HashMap<String, String>>() {
+			tmpResourcesMap = objectMapper.readValue(configFile, new TypeReference<HashMap<String, String>>() {
 			});
 		} catch (IOException e) {
 			System.err.println("Error : the file resources/config.json is not valid.");
