@@ -17,6 +17,7 @@ public class Entity {
 	}
 	
 	public static Entity createEntity(JSONEntity je) {
+		Objects.requireNonNull(je);
 		return new Entity(je.getName(),je.getQuantity());
 	}
 

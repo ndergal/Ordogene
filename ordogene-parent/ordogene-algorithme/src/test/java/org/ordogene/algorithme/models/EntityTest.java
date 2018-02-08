@@ -36,6 +36,11 @@ public class EntityTest {
 		Entity.createEntity(je);
 	}
 	
+	@Test(expected=NullPointerException.class)
+	public void test_creation_from_null_JSONEntity() {
+		Entity.createEntity(null);
+	}
+	
 	@Test
 	public void test_getQuantity() {
 		Entity e = new Entity("name", 0);

@@ -14,6 +14,7 @@ public class Input extends Entity{
 	}
 
 	public static Input createInput(JSONInput ji) {
+		Objects.requireNonNull(ji);
 		return new Input(ji.getName(), ji.getQuantity(), ji.getRelation());
 	}
 
