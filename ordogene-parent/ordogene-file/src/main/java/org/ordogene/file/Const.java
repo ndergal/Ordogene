@@ -23,13 +23,13 @@ public class Const {
 	static {
 
 		ClassLoader classLoader = Const.class.getClassLoader();
-		URL pathUrl = classLoader.getResource("config.json");
-		Path appPath;
+		URL configFileUrl = classLoader.getResource("config.json");
+		Path configFilePath;
 		Map<String, String> tmpResourcesMap;
 		byte[] mapData = null;
 		try {
-			appPath = Paths.get(pathUrl.toURI());
-			mapData = Files.readAllBytes(appPath);
+			configFilePath = Paths.get(configFileUrl.toURI());
+			mapData = Files.readAllBytes(configFilePath);
 		} catch (URISyntaxException | IOException e1) {
 			System.err.println("Error : the file resources/config.json is absent or invalid.");
 		}
