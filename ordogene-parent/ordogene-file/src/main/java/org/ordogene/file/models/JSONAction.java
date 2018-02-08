@@ -4,17 +4,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class Action {
-	public static Action EMPTY(int time) {
-		return new Action("EMPTY", time, Collections.emptyList(), Collections.emptyList());
+public class JSONAction {
+	public static JSONAction EMPTY(int time) {
+		return new JSONAction("EMPTY", time, Collections.emptyList(), Collections.emptyList());
 	}
 
 	private String name;
 	private int time;
-	private List<Input> input;
-	private List<Entity> output;
+	private List<JSONInput> input;
+	private List<JSONEntity> output;
 
-	private Action(String name, int time, List<Input> input, List<Entity> output) {
+	private JSONAction(String name, int time, List<JSONInput> input, List<JSONEntity> output) {
 
 		this.name = Objects.requireNonNull(name);
 		this.time = time;
@@ -22,7 +22,7 @@ public class Action {
 
 	}
 
-	public Action() {
+	public JSONAction() {
 		// TODO Auto-generated constructor stub
 	}
 
@@ -34,11 +34,11 @@ public class Action {
 		return time;
 	}
 
-	public List<Input> getInputs() {
+	public List<JSONInput> getInputs() {
 		return input;
 	}
 
-	public List<Entity> getOutputs() {
+	public List<JSONEntity> getOutputs() {
 		return output;
 	}
 
@@ -53,11 +53,11 @@ public class Action {
 		this.time = time;
 	}
 
-	public void setInput(List<Input> input) {
+	public void setInput(List<JSONInput> input) {
 		this.input = Objects.requireNonNull(input);
 	}
 
-	public void setOutput(List<Entity> output) {
+	public void setOutput(List<JSONEntity> output) {
 		this.output = Objects.requireNonNull(output);
 	}
 

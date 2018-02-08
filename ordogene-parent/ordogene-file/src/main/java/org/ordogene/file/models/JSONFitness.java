@@ -3,9 +3,9 @@ package org.ordogene.file.models;
 import java.util.List;
 import java.util.Objects;
 
-public class Fitness {
+public class JSONFitness {
 	private Type type;
-	private List<Operand> operands;
+	private List<JSONOperand> operands;
 
 	public Type getType() {
 		return type;
@@ -15,11 +15,11 @@ public class Fitness {
 		this.type = Objects.requireNonNull(type);
 	}
 
-	public List<Operand> getOperands() {
+	public List<JSONOperand> getOperands() {
 		return operands;
 	}
 
-	public void setOperands(List<Operand> operands) {
+	public void setOperands(List<JSONOperand> operands) {
 		this.operands = Objects.requireNonNull(operands);
 		if (operands.stream().anyMatch(x -> x == null)) {
 			throw new IllegalArgumentException("the fitness cannot contains a null operand");

@@ -2,7 +2,7 @@ package org.ordogene.file.models;
 
 import java.util.Objects;
 
-public class Entity {
+public class JSONEntity {
 	private String name;
 	private int quantity;
 

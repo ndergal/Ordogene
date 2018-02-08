@@ -2,11 +2,9 @@ package org.ordogene.file.models;
 
 import java.util.Objects;
 
-public class Input {
+public class JSONInput {
 	private String name;
-
 	private int quantity;
-
 	private Relation relation;
 
 	public String getName() {

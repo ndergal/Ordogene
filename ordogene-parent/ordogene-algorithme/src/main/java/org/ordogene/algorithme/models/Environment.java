@@ -25,4 +25,24 @@ public class Environment {
 	public List<Entity> getEntities() {
 		return new ArrayList<>(entities.values());
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		return prime * entities.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof Environment))
+			return false;
+		Environment env = (Environment) obj;
+		if (!entities.equals(env.entities))
+			return false;
+		return true;
+	}
 }

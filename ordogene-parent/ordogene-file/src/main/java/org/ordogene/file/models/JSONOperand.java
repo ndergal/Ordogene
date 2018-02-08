@@ -2,9 +2,9 @@ package org.ordogene.file.models;
 
 import java.util.Objects;
 
-public class Operand {
+public class JSONOperand {
 	private String name;
-	private int coef;
+	private long coef;
 
 	public String getName() {
 		return name;
@@ -14,11 +14,11 @@ public class Operand {
 		this.name = Objects.requireNonNull(name);
 	}
 
-	public int getCoef() {
+	public long getCoef() {
 		return coef;
 	}
 
-	public void setCoef(int coef) {
+	public void setCoef(long coef) {
 		this.coef = coef;
 	}
 
