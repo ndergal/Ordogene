@@ -85,8 +85,8 @@ public class InputTest {
 
 	@Test
 	public void test_equals6() {
-		Input i1 = new Input("name1", 0, Relation.c);
-		Input i2 = new Input("name2", 0, Relation.p);
+		Input i1 = new Input("name", 0, Relation.c);
+		Input i2 = new Input("name", 0, Relation.p);
 		assertFalse(i1.equals(i2));
 	}
 	
