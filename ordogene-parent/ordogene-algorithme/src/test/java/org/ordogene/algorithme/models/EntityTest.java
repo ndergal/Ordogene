@@ -1,8 +1,10 @@
 package org.ordogene.algorithme.models;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.junit.Test;
 import org.ordogene.file.models.JSONEntity;
@@ -26,9 +28,11 @@ public class EntityTest {
 	
 	@Test
 	public void test_creation_from_JSONEntity() {
-		JSONEntity je = new JSONEntity();
-		je.setName("name");
-		je.setQuantity(0);
+		JSONEntity je = mock(JSONEntity.class);
+		
+		when(je.getName()).thenReturn("name");
+		when(je.getQuantity()).thenReturn(0);
+		
 		Entity.createEntity(je);
 	}
 	
@@ -82,5 +86,60 @@ public class EntityTest {
 	public void test_addQuantity_negative_result() {
 		Entity e = new Entity("name", 50);
 		e.addQuantity(-51);
+	}
+	
+	@Test
+	public void test_equals1() {
+		Entity e1 = new Entity("name", 50);
+		Entity e2 = new Entity("name", 50);
+		assertTrue(e1.equals(e2));
+	}
+	
+	@Test
+	public void test_equals2() {
+		Entity e1 = new Entity("name", 50);
+		assertFalse(e1.equals(null));
+	}
+	
+	@Test
+	public void test_equals3() {
+		Entity e = new Entity("name", 50);
+		Object o = new Object();
+		assertFalse(e.equals(o));
+	}
+	
+	@Test
+	public void test_equals4() {
+		Entity e1 = new Entity("name", 50);
+		Entity e2 = new Entity("name", 30);
+		assertFalse(e1.equals(e2));
+	}
+	
+	@Test
+	public void test_equals5() {
+		Entity e1 = new Entity("name1", 50);
+		Entity e2 = new Entity("name2", 50);
+		assertFalse(e1.equals(e2));
+	}
+	
+	@Test
+	public void test_hashcode1() {
+		Entity e1 = new Entity("name", 50);
+		Entity e2 = new Entity("name", 50);
+		assertTrue(e1.hashCode() == e2.hashCode());
+	}
+	
+	@Test
+	public void test_hashcode2() {
+		Entity e1 = new Entity("name", 50);
+		Entity e2 = new Entity("name", 30);
+		assertFalse(e1.hashCode() == e2.hashCode());
+	}
+	
+	@Test
+	public void test_hashcode3() {
+		Entity e1 = new Entity("name1", 50);
+		Entity e2 = new Entity("name2", 50);
+		assertFalse(e1.hashCode() == e2.hashCode());
 	}
 }
