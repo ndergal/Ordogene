@@ -23,7 +23,7 @@ public class Const {
 	static {
 
 		ClassLoader classLoader = Const.class.getClassLoader();
-		URL configFileUrl = classLoader.getResource("config.json");
+		URL configFileUrl = Thread.currentThread().getContextClassLoader().getResource("config.json");
 		Path configFilePath;
 		Map<String, String> tmpResourcesMap;
 		byte[] mapData = null;
