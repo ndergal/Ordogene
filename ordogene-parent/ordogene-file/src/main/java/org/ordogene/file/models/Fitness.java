@@ -3,9 +3,16 @@ package org.ordogene.file.models;
 import java.util.List;
 import java.util.Objects;
 
-public class Fitness {
+import org.ordogene.file.parser.Validable;
+
+public class Fitness implements Validable {
 	private Type type;
 	private List<Operand> operands;
+
+	@Override
+	public boolean isValid() {
+		return type != null && operands != null && operands.stream().allMatch(Validable::isValid);
+	}
 
 	public Type getType() {
 		return type;

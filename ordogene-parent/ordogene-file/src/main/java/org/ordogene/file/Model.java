@@ -6,11 +6,14 @@ import java.util.Objects;
 import org.ordogene.file.models.Action;
 import org.ordogene.file.models.Entity;
 import org.ordogene.file.models.Fitness;
+import org.ordogene.file.parser.Validable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Model {
+import edu.emory.mathcs.backport.java.util.Collections;
+
+public class Model implements Validable {
 	private List<Integer> snaps;
 	private int slots;
 	@JsonProperty("exec_time")
@@ -21,8 +24,16 @@ public class Model {
 	@JsonIgnore
 	private List<Entity> currentEnvironment;
 
+	@Override
+	public boolean isValid() {
+		return snaps != null && slots != 0 && execTime != 0 && environment != null && actions != null && fitness != null
+				&& environment.stream().allMatch(Validable::isValid) && actions.stream().allMatch(Validable::isValid)
+				&& fitness.isValid();
+	}
+
+	@SuppressWarnings("unchecked")
 	public List<Integer> getSnaps() {
-		return snaps;
+		return Collections.unmodifiableList(snaps);
 	}
 
 	public void setSnaps(List<Integer> snaps) {
@@ -77,6 +88,10 @@ public class Model {
 		if (actions.stream().anyMatch(x -> x == null)) {
 			throw new IllegalArgumentException("the actions list should not contains null action");
 		}
+		if (actions.stream().anyMatch(x -> !x.isValid())) {
+			throw new IllegalArgumentException("the actions list should not contains not valid action");
+		}
+
 	}
 
 	public Fitness getFitness() {

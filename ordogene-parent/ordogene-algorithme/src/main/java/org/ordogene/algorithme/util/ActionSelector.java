@@ -6,6 +6,8 @@ import java.util.NavigableMap;
 import java.util.Random;
 import java.util.TreeMap;
 
+import org.ordogene.algorithme.models.Action;
+
 import io.jenetics.util.RandomRegistry;
 
 public class ActionSelector {
@@ -38,7 +40,10 @@ public class ActionSelector {
 		
 		for(SimpleEntry<Action, Long> e : actions) {
 			Long weight = e.getValue();
-			total += weight + (Math.abs(lowerWeight) + 1);
+			if(lowerWeight <= 0) {
+				weight += Math.abs(lowerWeight) + 1;
+			}
+			total += weight;
 			map.put(total, e.getKey());
 		}
 		

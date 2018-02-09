@@ -2,12 +2,17 @@ package org.ordogene.file.models;
 
 import java.util.Objects;
 
-public class Input {
+import org.ordogene.file.parser.Validable;
+
+public class Input implements Validable {
 	private String name;
-
 	private int quantity;
-
 	private Relation relation;
+
+	@Override
+	public boolean isValid() {
+		return name != null && quantity != 0 && relation != null;  
+	}
 
 	public String getName() {
 		return name;

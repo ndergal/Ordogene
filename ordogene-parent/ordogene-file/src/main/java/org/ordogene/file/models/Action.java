@@ -4,10 +4,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class Action {
-	public static Action EMPTY(int time) {
-		return new Action("EMPTY", time, Collections.emptyList(), Collections.emptyList());
-	}
+import org.ordogene.file.parser.Validable;
+
+public class Action implements Validable {
 
 	private String name;
 	private int time;
@@ -26,6 +25,16 @@ public class Action {
 		// TODO Auto-generated constructor stub
 	}
 
+	@Override
+	public boolean isValid() {
+		return name != null && time != 0 && input != null && output != null
+				&& input.stream().allMatch(Validable::isValid) && output.stream().allMatch(Validable::isValid);
+	}
+
+	public static Action EMPTY(int time) {
+		return new Action("EMPTY", time, Collections.emptyList(), Collections.emptyList());
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -34,11 +43,11 @@ public class Action {
 		return time;
 	}
 
-	public List<Input> getInputs() {
+	public List<Input> getInput() {
 		return input;
 	}
 
-	public List<Entity> getOutputs() {
+	public List<Entity> getOutput() {
 		return output;
 	}
 

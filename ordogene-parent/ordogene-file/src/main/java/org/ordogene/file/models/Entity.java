@@ -2,12 +2,19 @@ package org.ordogene.file.models;
 
 import java.util.Objects;
 
-public class Entity {
+import org.ordogene.file.parser.Validable;
+
+public class Entity implements Validable {
 	private String name;
 	private int quantity;
 
 	public int getQuantity() {
 		return quantity;
+	}
+
+	@Override
+	public boolean isValid() {
+		return name != null;
 	}
 
 	public void setQuantity(int quantity) {

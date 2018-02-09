@@ -2,9 +2,16 @@ package org.ordogene.file.models;
 
 import java.util.Objects;
 
-public class Operand {
+import org.ordogene.file.parser.Validable;
+
+public class Operand implements Validable {
 	private String name;
 	private int coef;
+
+	@Override
+	public boolean isValid() {
+		return name != null;
+	}
 
 	public String getName() {
 		return name;
