@@ -35,5 +35,11 @@ public class Application {
     public FileService buildFileService() {
     	return new FileService();
     }
-
+    
+    /*
+    @Bean
+    public CalculationHandler getCalculationHandler() {
+    	return calculationHandler;
+    }
+    */
 }

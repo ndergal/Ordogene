@@ -24,7 +24,7 @@ public class UserController {
 	public ResponseEntity<String> exists(@PathVariable String id) {
 
 		if (id == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(id + " does not exist");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The id checked is null");
 		}
 
 		boolean exist = fs.userExist(id);
