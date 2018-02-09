@@ -34,11 +34,11 @@ public class Input extends Entity{
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!super.equals(obj))
-			return false;
 		if (!(obj instanceof Input))
 			return false;
 		Input input = (Input) obj;
+		if (!super.equals(obj))
+			return false;
 		if (relation != input.relation)
 			return false;
 		return true;

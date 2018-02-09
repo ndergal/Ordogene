@@ -89,6 +89,12 @@ public class InputTest {
 		Input i2 = new Input("name", 0, Relation.p);
 		assertFalse(i1.equals(i2));
 	}
+
+	@Test
+	public void test_equals7() {
+		Input i1 = new Input("name", 0, Relation.c);
+		assertFalse(i1.equals(i1));
+	}
 	
 	@Test
 	public void test_hashcode1() {
