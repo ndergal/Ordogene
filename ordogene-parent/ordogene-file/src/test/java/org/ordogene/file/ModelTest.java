@@ -27,7 +27,7 @@ public class ModelTest {
 		JSONModel m = mock(JSONModel.class);
 		when(m.toString()).thenReturn(
 				"Model\n[snaps=[5, 10, 20, 100],\nslots=300,\nexecTime=10000,\nenvironment=[Entity [name=FUEL, quantity=200], Entity [name=BIG_GOOD, quantity=0], Entity [name=SMALL_BAD, quantity=0]],\nactions=[Action [name=MAKE_GOOD, time=5, input=[Input [name=FUEL, quantity=60, relation=c]], output=[Entity [name=BIG_GOOD, quantity=1]]], Action [name=MAKE_BAD, time=2, input=[Input [name=FUEL, quantity=6, relation=c]], output=[Entity [name=SMALL_BAD, quantity=1]]]],\nfitness=Fitness [type=max, operands=[Operand [name=BIG_GOOD, coef=11], Operand [name=SMALL_BAD, coef=1]]],\ncurrentEnvironment=null]");
-		JSONModel m1 = (JSONModel) Parser.parseJsonFile(Paths.get("/home/ordogene/Documents/examples/fitness1.json"), JSONModel.class);
+		JSONModel m1 = (JSONModel) Parser.parseJsonFile(Paths.get("/home/ordogene/git/ordogene/ordogene-parent/ordogene-file/src/main/java/org/ordogene/file/testJson/fitness1.json"), JSONModel.class);
 		assertEquals(m.toString(), m1.toString());
 	}
 
