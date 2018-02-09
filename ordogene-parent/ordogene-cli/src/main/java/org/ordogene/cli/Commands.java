@@ -10,6 +10,9 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -23,30 +26,40 @@ import org.springframework.shell.table.CellMatcher;
 import org.springframework.shell.table.Table;
 import org.springframework.shell.table.TableBuilder;
 import org.springframework.shell.table.TableModel;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 @ShellComponent
 public class Commands {
-	private final String[] headers = {"id", "name", "status", "progress", "max fitness"};
-	private final String addr = "https://163.172.90.226/ordogene"; 
 	
+	private static final Logger log = LoggerFactory.getLogger(Commands.class);
+	private final String[] headers = {"id", "name", "status", "progress", "date", "max fitness"};
+	@Autowired
+	private RestTemplate restTemplate;
+
 	/**
 	 * Display a table containing calculations of the user
 	 */
 	@ShellMethod(value = "List calculations")
 	public Table listCalculations() {
+		log.info("CECI EST UN TEST");
 		//Request
-		RestTemplate restTemplate = new RestTemplate();
-		ResponseEntity<List<Calculation>> response = restTemplate.exchange(
-				addr + "/:id/calculations",
-				HttpMethod.GET,
-				null,
-				new ParameterizedTypeReference<List<Calculation>>() {}
-			);
+		ResponseEntity<List<Calculation>> response = null;
+		try {
+			response = restTemplate.exchange(
+					"/:id/calculations",
+					HttpMethod.GET,
+					null,
+					new ParameterizedTypeReference<List<Calculation>>() {}
+				);
+		} catch (RestClientException e) {
+			log.error(e.getMessage());
+			return null;
+		}
 		
 		//Check status code
 		int code = response.getStatusCodeValue();
-		switch(code) {
+		/*switch(code) {
 			case 200:
 				//if ??
 				break;
@@ -59,14 +72,21 @@ public class Commands {
 			default:
 				System.out.println("Unimplemented http status code");
 				return null;
+		}*/
+		switch(code) {
+			case 200:
+				break;
+			default:
+				log.error("%d : %s", code, response.getBody());
+				return null;
 		}
 		
 		//Build ascii table
 		List<Calculation> list = response.getBody();
-		String[][] data = new String[list.size() + 1][5];
+		String[][] data = new String[list.size() + 1][headers.length];
 		TableModel model = new ArrayTableModel(data);
 		TableBuilder builder = new TableBuilder(model);
-		for(int i = 0; i < 5; i++) {
+		for(int i = 0; i < headers.length; i++) {
 			data[0][i] = headers[i];
 			//builder.on(at(0, i)).
 		}
@@ -76,7 +96,8 @@ public class Commands {
 			data[i+1][1] = c.getName();
 			data[i+1][2] = String.valueOf(c.getIterationNumber());
 			data[i+1][3] = String.valueOf(c.getMaxIteration());
-			data[i+1][4] = String.valueOf(c.getLastIterationSaved());
+			data[i+1][4] = c.getDate();
+			data[i+1][5] = String.valueOf(c.getLastIterationSaved());
 		}
 		return builder.addFullBorder(BorderStyle.oldschool).build();
 	}
@@ -96,13 +117,18 @@ public class Commands {
 		File file = new File(model);
 		
 		//Request
-		RestTemplate restTemplate = new RestTemplate();
 		HttpEntity<File> request = new HttpEntity<>(file);
-		ResponseEntity<Integer> response = restTemplate.exchange(
-				addr + "/:id/calculations/",
+		ResponseEntity<Integer> response = null;
+		try {
+			response = restTemplate.exchange(
+				"/:id/calculations/",
 				HttpMethod.PUT,
 				request,
 				Integer.class);
+		} catch (RestClientException e) {
+			log.error(e.getMessage());
+			return;
+		}
 		
 		//Check status code
 		int code = response.getStatusCodeValue();
@@ -133,13 +159,18 @@ public class Commands {
 	@ShellMethod(value = "Stop a calculation")
 	public void stopCalculation(int cid) {
 		//Request
-		RestTemplate restTemplate = new RestTemplate();
-		ResponseEntity<Void> response = restTemplate.exchange(
-				addr + "/:id/calculations/" + cid,
+		ResponseEntity<Void> response = null;
+		try {
+			response = restTemplate.exchange(
+				"/:id/calculations/" + cid,
 				HttpMethod.POST,
 				null,
 				Void.class
 			);
+		} catch (RestClientException e) {
+			log.error(e.getMessage());
+			return;
+		}
 		
 		//Check status code
 		int code = response.getStatusCodeValue();
@@ -171,29 +202,34 @@ public class Commands {
 	@ShellMethod(value = "Remove a calculation")
 	public void removeCalculation(int cid) {
 		//Request
-		RestTemplate restTemplate = new RestTemplate();
-		ResponseEntity<Void> response = restTemplate.exchange(
-				addr + "/:id/calculations/" + cid,
+		ResponseEntity<Void> response = null;
+		try {
+			response = restTemplate.exchange(
+				"/:id/calculations/" + cid,
 				HttpMethod.DELETE,
 				null,
 				Void.class
 			);
+		} catch (RestClientException e) {
+			log.error(e.getMessage());
+			return;
+		}
 		
 		//Check status code
 		int code = response.getStatusCodeValue();
 		switch(code) {
-		case 200:
-			//if ??
-			break;
-		case 400:
-			System.out.println("The calculation does not exist");
-			return;
-		case 401:
-			System.out.println("You do not own this calculation");
-			return;
-		default:
-			System.out.println("Unimplemented http status code");
-			return;
+			case 200:
+				//if ??
+				break;
+			case 400:
+				System.out.println("The calculation does not exist");
+				return;
+			case 401:
+				System.out.println("You do not own this calculation");
+				return;
+			default:
+				System.out.println("Unimplemented http status code");
+				return;
 		}
 		
 		System.out.println("Calculation #" + cid + " deleted");
@@ -217,12 +253,17 @@ public class Commands {
 		}
 		
 		//Request
-		RestTemplate restTemplate = new RestTemplate();
-		ResponseEntity<BufferedImage> response = restTemplate.exchange(
-				addr + "/:id/calculations/" + cid,
+		ResponseEntity<BufferedImage> response = null;
+		try {
+			response = restTemplate.exchange(
+				"/:id/calculations/" + cid,
 				HttpMethod.GET,
 				null,
 				BufferedImage.class);
+		} catch (RestClientException e) {
+			log.error(e.getMessage());
+			return;
+		}
 		
 		//Check status code
 		int code = response.getStatusCodeValue();
@@ -261,14 +302,19 @@ public class Commands {
 	@ShellMethod(value = "Launch a snapshot of a calculation")
 	public void launchSnapshot(int cid, int sid, int loops) {
 		//Request
-		RestTemplate restTemplate = new RestTemplate();
 		HttpEntity<Integer> request = new HttpEntity<>(loops);
-		ResponseEntity<Integer> response = restTemplate.exchange(
-				addr + "/:id/calculations/" + cid + "/snapshots/" + sid ,
+		ResponseEntity<Integer> response = null;
+		try {
+			response = restTemplate.exchange(
+				"/:id/calculations/" + cid + "/snapshots/" + sid ,
 				HttpMethod.POST,
 				request,
 				Integer.class
 			);
+		} catch (RestClientException e) {
+			log.error(e.getMessage());
+			return;
+		}
 		
 		//Check status code
 		/*int code = response.getStatusCodeValue();
