@@ -1,8 +1,8 @@
 package org.ordogene.algorithme.models;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -11,15 +11,23 @@ public class Environment {
 	
 	public Environment(List<Entity> entities) {
 		Objects.requireNonNull(entities);
-		entities.forEach(e -> this.entities.put(e.getName(), e));
+		for(Entity e : entities) {
+			Objects.requireNonNull(e);
+			this.entities.put(e.getName(), e);
+		}
 	}
 	
 	public Entity getEntity(String name) {
+		Objects.requireNonNull(name);
 		Entity e = entities.get(name);
 		if(e == null) {
 			throw new IllegalArgumentException("The entity asked don't exist");
 		}
 		return e;
+	}
+	
+	public boolean containsEntity(String name) {
+		return entities.containsKey(name);
 	}
 
 	public List<Entity> getEntities() {
@@ -28,8 +36,7 @@ public class Environment {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		return prime * entities.hashCode();
+		return 31 * entities.hashCode();
 	}
 
 	@Override
