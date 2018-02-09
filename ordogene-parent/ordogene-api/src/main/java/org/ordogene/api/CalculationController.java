@@ -21,7 +21,7 @@ public class CalculationController {
 	@Autowired
 	FileService fs;
 
-	private final Map<Integer, String> currentCalculation = new HashMap<>();
+	private static final Map<Integer, String> currentCalculation = new HashMap<>();
 	private final Object token = new Object();
 
 	@RequestMapping(value = "/{id}/calculations")
@@ -85,8 +85,10 @@ public class CalculationController {
 					// int exitVal = proc.waitFor();
 					int exitVal = proc.waitFor();
 					synchronized (token) {
-						if (currentCalculation.containsKey(pid))
+						if (currentCalculation.containsKey(pid)) {
 							currentCalculation.remove(pid);
+							System.out.println("remove " + pid + " from the map");
+						}
 					}
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
