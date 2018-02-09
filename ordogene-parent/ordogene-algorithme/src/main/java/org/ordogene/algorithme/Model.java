@@ -3,9 +3,11 @@ package org.ordogene.algorithme;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.ordogene.algorithme.models.Action;
@@ -52,7 +54,7 @@ public class Model {
 
 	public static Model createModel(JSONModel jm) {
 		Environment env = new Environment(
-				jm.getEnvironment().stream().map(Entity::createEntity).collect(Collectors.toList()));
+				jm.getEnvironment().stream().map(Entity::createEntity).collect(Collectors.toSet()));
 		List<Action> actions = jm.getActions().stream().map(Action::createAction).collect(Collectors.toList());
 		List<Integer> snaps = jm.getSnaps().stream().collect(Collectors.toList());
 		return new Model(snaps, jm.getSlots(), jm.getExecTime(), env, actions, Fitness.createFitness(jm.getFitness()));
@@ -153,7 +155,7 @@ public class Model {
 	}
 
 	public static void main(String[] args) {
-		ArrayList<Entity> entities = new ArrayList<>();
+		Set<Entity> entities = new HashSet<>();
 		entities.add(new Entity("A", 10));
 		entities.add(new Entity("B", 1));
 		entities.add(new Entity("C", 5));
