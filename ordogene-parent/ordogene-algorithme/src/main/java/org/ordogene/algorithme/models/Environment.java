@@ -1,19 +1,21 @@
 package org.ordogene.algorithme.models;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 public class Environment {
 	private final Map<String, Entity> entities = new HashMap<>();
 	
-	public Environment(List<Entity> entities) {
+	public Environment(Set<Entity> entities) {
 		Objects.requireNonNull(entities);
 		for(Entity e : entities) {
 			Objects.requireNonNull(e);
-			this.entities.put(e.getName(), e);
+			if(this.entities.put(e.getName(), e) != null) {
+				throw new IllegalArgumentException("The Environment can't have Entityt with the same name.");
+			}
 		}
 	}
 	
@@ -30,8 +32,8 @@ public class Environment {
 		return entities.containsKey(name);
 	}
 
-	public List<Entity> getEntities() {
-		return new ArrayList<>(entities.values());
+	public Set<Entity> getEntities() {
+		return new HashSet<>(entities.values());
 	}
 
 	@Override
