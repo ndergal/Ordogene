@@ -5,9 +5,9 @@ import java.util.Objects;
 
 import org.ordogene.file.parser.Validable;
 
-public class Fitness implements Validable {
+public class JSONFitness implements Validable {
 	private Type type;
-	private List<Operand> operands;
+	private List<JSONOperand> operands;
 
 	@Override
 	public boolean isValid() {
@@ -22,11 +22,11 @@ public class Fitness implements Validable {
 		this.type = Objects.requireNonNull(type);
 	}
 
-	public List<Operand> getOperands() {
+	public List<JSONOperand> getOperands() {
 		return operands;
 	}
 
-	public void setOperands(List<Operand> operands) {
+	public void setOperands(List<JSONOperand> operands) {
 		this.operands = Objects.requireNonNull(operands);
 		if (operands.stream().anyMatch(x -> x == null)) {
 			throw new IllegalArgumentException("the fitness cannot contains a null operand");

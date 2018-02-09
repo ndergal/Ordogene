@@ -6,14 +6,14 @@ import java.util.Objects;
 
 import org.ordogene.file.parser.Validable;
 
-public class Action implements Validable {
+public class JSONAction implements Validable {
 
 	private String name;
 	private int time;
-	private List<Input> input;
-	private List<Entity> output;
+	private List<JSONInput> input;
+	private List<JSONEntity> output;
 
-	private Action(String name, int time, List<Input> input, List<Entity> output) {
+	private JSONAction(String name, int time, List<JSONInput> input, List<JSONEntity> output) {
 
 		this.name = Objects.requireNonNull(name);
 		this.time = time;
@@ -21,8 +21,8 @@ public class Action implements Validable {
 
 	}
 
-	public Action() {
-		// TODO Auto-generated constructor stub
+	public JSONAction() {
+
 	}
 
 	@Override
@@ -31,8 +31,8 @@ public class Action implements Validable {
 				&& input.stream().allMatch(Validable::isValid) && output.stream().allMatch(Validable::isValid);
 	}
 
-	public static Action EMPTY(int time) {
-		return new Action("EMPTY", time, Collections.emptyList(), Collections.emptyList());
+	public static JSONAction EMPTY(int time) {
+		return new JSONAction("EMPTY", time, Collections.emptyList(), Collections.emptyList());
 	}
 
 	public String getName() {
@@ -43,11 +43,11 @@ public class Action implements Validable {
 		return time;
 	}
 
-	public List<Input> getInput() {
+	public List<JSONInput> getInput() {
 		return input;
 	}
 
-	public List<Entity> getOutput() {
+	public List<JSONEntity> getOutput() {
 		return output;
 	}
 
@@ -62,11 +62,11 @@ public class Action implements Validable {
 		this.time = time;
 	}
 
-	public void setInput(List<Input> input) {
+	public void setInput(List<JSONInput> input) {
 		this.input = Objects.requireNonNull(input);
 	}
 
-	public void setOutput(List<Entity> output) {
+	public void setOutput(List<JSONEntity> output) {
 		this.output = Objects.requireNonNull(output);
 	}
 

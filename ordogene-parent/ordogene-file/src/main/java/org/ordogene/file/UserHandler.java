@@ -25,11 +25,11 @@ public class UserHandler {
 			return false;
 		} else {
 			try {
-				System.out.println("Création de l'utilisateur " + username);
+				System.out.println("Create new user " + username);
 				Files.createDirectories(
 						Paths.get(Const.getConst().get("ApplicationPath") + File.separatorChar + username));
 			} catch (IOException e) {
-				System.err.println("... échec :");
+				System.err.println("... failed :");
 				e.printStackTrace();
 				return false;
 			}
@@ -45,12 +45,12 @@ public class UserHandler {
 			Path rootPath = Paths.get(Const.getConst().get("ApplicationPath") + File.separatorChar + username);
 
 			try (Stream<Path> paths = Files.walk(rootPath, FileVisitOption.FOLLOW_LINKS)) {
-				System.out.println("Suppressions :");
+				System.out.println("Deleting :");
 				paths.sorted(Comparator.reverseOrder()).map(Path::toFile).peek(System.out::println)
 						.forEach(File::delete);
 				return true;
 			} catch (IOException e) {
-				System.err.println("Erreur lors de la suppression de " + rootPath.toString());
+				System.err.println("Error while deleting " + rootPath.toString());
 				e.printStackTrace();
 				return false;
 			}

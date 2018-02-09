@@ -1,11 +1,17 @@
 package org.ordogene.cli;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import javax.imageio.ImageIO;
+
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.shell.standard.ShellComponent;
@@ -32,7 +38,7 @@ public class Commands {
 		//Request
 		RestTemplate restTemplate = new RestTemplate();
 		ResponseEntity<List<Calculation>> response = restTemplate.exchange(
-				addr+"/:id/calculations",
+				addr + "/:id/calculations",
 				HttpMethod.GET,
 				null,
 				new ParameterizedTypeReference<List<Calculation>>() {}
@@ -81,13 +87,42 @@ public class Commands {
 	 */
 	@ShellMethod(value = "Launch a calculation from a model")
 	public void launchCalculation(String model) {
+		//Parameter validation
 		Path path = Paths.get(model);
 		if(Files.notExists(path)) {
 			System.out.println("The path does not exist. Try again.");
 			return;
 		}
-
-		System.out.println("calculation launched");
+		File file = new File(model);
+		
+		//Request
+		RestTemplate restTemplate = new RestTemplate();
+		HttpEntity<File> request = new HttpEntity<>(file);
+		ResponseEntity<Integer> response = restTemplate.exchange(
+				addr + "/:id/calculations/",
+				HttpMethod.PUT,
+				request,
+				Integer.class);
+		
+		//Check status code
+		int code = response.getStatusCodeValue();
+		switch(code) {
+			case 200:
+				//if ??
+				break;
+			case 400:
+				System.out.println("The model is corrupted");
+				return;
+			case 404:
+				System.out.println("User does not exist");
+				return;
+			default:
+				System.out.println("Unimplemented http status code");
+				return;
+		}
+		
+		int cid = response.getBody();
+		System.out.println("Calculation #" + cid + "launched");
 	}
 	
 	
@@ -96,9 +131,37 @@ public class Commands {
 	 * @param id id of the calculation
 	 */
 	@ShellMethod(value = "Stop a calculation")
-	public void stopCalculation(int id) {
-		//HTTPRequest
-		System.out.println("calculation stopped");
+	public void stopCalculation(int cid) {
+		//Request
+		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<Void> response = restTemplate.exchange(
+				addr + "/:id/calculations/" + cid,
+				HttpMethod.POST,
+				null,
+				Void.class
+			);
+		
+		//Check status code
+		int code = response.getStatusCodeValue();
+		switch(code) {
+			case 200:
+				//if ??
+				break;
+			case 400:
+				System.out.println("The calculation is already stopped");
+				return;
+			case 401:
+				System.out.println("You do not own this calculation");
+				return;
+			case 404:
+				System.out.println("The calculation does not exist");
+				return;
+			default:
+				System.out.println("Unimplemented http status code");
+				return;
+		}
+		
+		System.out.println("Calculation #" + cid + " stopped");
 	}
 	
 	/**
@@ -106,9 +169,34 @@ public class Commands {
 	 * @param id id of the calculation
 	 */
 	@ShellMethod(value = "Remove a calculation")
-	public void removeCalculation(int id) {
-		//HTTPRequest
-		System.out.println("calculation removed");
+	public void removeCalculation(int cid) {
+		//Request
+		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<Void> response = restTemplate.exchange(
+				addr + "/:id/calculations/" + cid,
+				HttpMethod.DELETE,
+				null,
+				Void.class
+			);
+		
+		//Check status code
+		int code = response.getStatusCodeValue();
+		switch(code) {
+		case 200:
+			//if ??
+			break;
+		case 400:
+			System.out.println("The calculation does not exist");
+			return;
+		case 401:
+			System.out.println("You do not own this calculation");
+			return;
+		default:
+			System.out.println("Unimplemented http status code");
+			return;
+		}
+		
+		System.out.println("Calculation #" + cid + " deleted");
 	}
 	
 	/**
@@ -118,18 +206,50 @@ public class Commands {
 	 * @param force if set, overwrite if dst already exists
 	 */
 	@ShellMethod(value = "Get the result of a calculation")
-	public void resultCalculation(int id, String dst, @ShellOption(arity=0, defaultValue="false") boolean force) {
-		//HTTPRequest
+	public void resultCalculation(int cid, String dst, @ShellOption(arity=0, defaultValue="false") boolean force) {
+		//Parameter validation
 		Path path = Paths.get(dst);
 		if(Files.exists(path)/* && Files.isRegularFile(path) && Files.isWritable(path)*/) {
-			if(force) {
-				System.out.println("calculation resulted");
-			} else {
+			if(!force) {
 				System.out.println("A file already exists, use --force to overwrite.");
+				return;
 			}
-		} else {
-			
 		}
+		
+		//Request
+		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<BufferedImage> response = restTemplate.exchange(
+				addr + "/:id/calculations/" + cid,
+				HttpMethod.GET,
+				null,
+				BufferedImage.class);
+		
+		//Check status code
+		int code = response.getStatusCodeValue();
+		switch(code) {
+			case 200:
+				//if ??
+				break;
+			case 401:
+				System.out.println("You do not own this calculation");
+				return;
+			case 404:
+				System.out.println("The calculation does not exist");
+				return;
+			default:
+				System.out.println("Unimplemented http status code");
+				return;
+		}
+		
+		//Writing the image
+		BufferedImage img = response.getBody();
+		try {
+			ImageIO.write(img, "PNG", new File(dst));
+		} catch (IOException e) {
+			System.out.println("A error has occured while writing the image");
+		}
+		
+		System.out.println("The image of the result is downloaded at " + dst);
 	}
 	
 	/**
@@ -139,8 +259,37 @@ public class Commands {
 	 * @param loops number of loops to calculate
 	 */
 	@ShellMethod(value = "Launch a snapshot of a calculation")
-	public void launchSnapshot(int id, int iter, int loops) {
-		//HTTPRequest
+	public void launchSnapshot(int cid, int sid, int loops) {
+		//Request
+		RestTemplate restTemplate = new RestTemplate();
+		HttpEntity<Integer> request = new HttpEntity<>(loops);
+		ResponseEntity<Integer> response = restTemplate.exchange(
+				addr + "/:id/calculations/" + cid + "/snapshots/" + sid ,
+				HttpMethod.POST,
+				request,
+				Integer.class
+			);
+		
+		//Check status code
+		/*int code = response.getStatusCodeValue();
+		switch(code) {
+			case 200:
+				//if ??
+				break;
+			case 400:
+				System.out.println("The calculation is already stopped");
+				return;
+			case 401:
+				System.out.println("You do not own this snapshot");
+				return;
+			case 404:
+				System.out.println("The snapshot does not exist");
+				return;
+			default:
+				System.out.println("Unimplemented http status code");
+				return;
+		}*/
+		
 		System.out.println("snapshot launched");
 	}
 	

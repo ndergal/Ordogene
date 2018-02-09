@@ -1,10 +1,12 @@
 package org.ordogene.file;
 
 import java.security.SecureRandom;
+import java.util.List;
 
 public class FileService {
 
 	private final UserHandler uh = new UserHandler();
+	private final CalculationHandler ch = new CalculationHandler();
 
 	public boolean userExist(String username) {
 		return uh.checkUserExists(username);
@@ -26,7 +28,10 @@ public class FileService {
 		for (int i = 0; i < nbChar; i++)
 			sb.append(AB.charAt(rnd.nextInt(AB.length())));
 		return sb.toString();
-
+	}
+	
+	public List<String> getUserCalculations(String username){
+		return ch.getCallculations(username);
 	}
 
 }

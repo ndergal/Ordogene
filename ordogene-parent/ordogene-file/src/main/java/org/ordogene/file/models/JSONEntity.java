@@ -4,13 +4,24 @@ import java.util.Objects;
 
 import org.ordogene.file.parser.Validable;
 
-public class Operand implements Validable {
+public class JSONEntity implements Validable {
 	private String name;
-	private int coef;
+	private int quantity;
+
+	public int getQuantity() {
+		return quantity;
+	}
 
 	@Override
 	public boolean isValid() {
 		return name != null;
+	}
+
+	public void setQuantity(int quantity) {
+		if (quantity < 0) {
+			throw new IllegalArgumentException("the quantity of an entity has to be positive or equal to zero");
+		}
+		this.quantity = quantity;
 	}
 
 	public String getName() {
@@ -21,21 +32,13 @@ public class Operand implements Validable {
 		this.name = Objects.requireNonNull(name);
 	}
 
-	public int getCoef() {
-		return coef;
-	}
-
-	public void setCoef(int coef) {
-		this.coef = coef;
-	}
-
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("Operand [name=");
+		builder.append("Entity [name=");
 		builder.append(name);
-		builder.append(", coef=");
-		builder.append(coef);
+		builder.append(", quantity=");
+		builder.append(quantity);
 		builder.append("]");
 		return builder.toString();
 	}

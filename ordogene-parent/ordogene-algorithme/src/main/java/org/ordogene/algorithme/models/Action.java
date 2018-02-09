@@ -3,6 +3,9 @@ package org.ordogene.algorithme.models;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+
+import org.ordogene.file.models.JSONAction;
 
 public class Action {
 	public static Action EMPTY(int time) {
@@ -23,6 +26,12 @@ public class Action {
 		this.inputs = Objects.requireNonNull(inputs);
 		this.outputs = Objects.requireNonNull(outputs);
 	}
+	
+	public static Action createAction(JSONAction jAction) {
+		List<Input> inputs = jAction.getInput().stream().map(Input::createInput).collect(Collectors.toList());
+		List<Entity> outputs = jAction.getOutput().stream().map(Entity::createEntity).collect(Collectors.toList());
+		return new Action(jAction.getName(), jAction.getTime(), inputs, outputs);
+	}
 
 	public String getName() {
 		return name;
@@ -38,6 +47,36 @@ public class Action {
 
 	public List<Entity> getOutputs() {
 		return outputs;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = prime * inputs.hashCode();
+		result = prime * result + name.hashCode();
+		result = prime * result + outputs.hashCode();
+		result = prime * result + time;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof Action))
+			return false;
+		Action action = (Action) obj;
+		if (!inputs.equals(action.inputs))
+			return false;
+		if (!name.equals(action.name))
+			return false;
+		if (!outputs.equals(action.outputs))
+			return false;
+		if (time != action.time)
+			return false;
+		return true;
 	}
 
 	@Override

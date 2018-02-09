@@ -1,16 +1,22 @@
 package org.ordogene.algorithme.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
+import java.util.Random;
+
 import org.assertj.core.api.Assertions;
-import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.ordogene.algorithme.models.Action;
+
+import io.jenetics.util.RandomRegistry;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ActionSelectorTest {
@@ -23,6 +29,15 @@ public class ActionSelectorTest {
 	}
 	
 	@Test
+	public void do_test_isReset_for_not_empty_action_list() {
+		// what - Création des mocks pour ce test particulier
+		Action action = mock(Action.class);
+		
+		mockActionSelector.add(action, 0);
+		assertThat(mockActionSelector.isReset()).isFalse();
+	}
+	
+	@Test
 	public void should_assert_true_after_emptying_actions() {
 		// what - Création des mocks pour ce test particulier
 		Action action = mock(Action.class);
@@ -31,11 +46,77 @@ public class ActionSelectorTest {
 		when(action.getName()).thenReturn("a1");
 		
 		// then - assertions via assertj
-		mockActionSelector.add(action, 1);
+		mockActionSelector.add(action, 0);
 		assertThat(mockActionSelector.isReset()).isFalse();
-		assertThat(mockActionSelector.select()).isEqualTo(action);
 		
 		mockActionSelector.reset();
 		assertThat(mockActionSelector.isReset()).isTrue();
+	}
+	
+	@Test
+	public void do_select_without_action() {
+		Assertions.assertThatThrownBy(() -> mockActionSelector.select()).isInstanceOf(IllegalStateException.class);
+	}
+	
+	@Test
+	public void do_select_with_one_action() {
+		// Initialize Random with a particular seed
+		RandomRegistry.setRandom(new Random(0));
+		
+		// what
+		Action a = mock(Action.class);
+		
+		// when
+		when(a.getInputs()).thenReturn(Collections.emptyList());
+		when(a.getOutputs()).thenReturn(Collections.emptyList());
+		when(a.getName()).thenReturn("EMPTY");
+		when(a.getTime()).thenReturn(1);
+		
+		// then
+		mockActionSelector.add(a, 1);
+		assertThat(mockActionSelector.select()).isEqualTo(a);
+	}
+	
+	@Test
+	public void do_select_with_multiple_actions() {
+		// Initialize Random with a particular seed
+		RandomRegistry.setRandom(new Random(0));
+		
+		// what
+		
+		Action a1 = mock(Action.class);
+		Action a2 = mock(Action.class);
+		Action a3 = mock(Action.class);
+		Action a4 = mock(Action.class);
+		
+		// when
+		when(a1.getName()).thenReturn("EMPTY");
+		when(a2.getName()).thenReturn("EMPTY");
+		when(a3.getName()).thenReturn("EMPTY");
+		when(a4.getName()).thenReturn("EMPTY");
+
+		when(a1.getTime()).thenReturn(1);
+		when(a1.getTime()).thenReturn(2);
+		when(a1.getTime()).thenReturn(3);
+		when(a1.getTime()).thenReturn(4);
+
+		when(a1.getInputs()).thenReturn(Collections.emptyList());
+		when(a2.getInputs()).thenReturn(Collections.emptyList());
+		when(a3.getInputs()).thenReturn(Collections.emptyList());
+		when(a4.getInputs()).thenReturn(Collections.emptyList());
+
+		when(a1.getOutputs()).thenReturn(Collections.emptyList());
+		when(a2.getOutputs()).thenReturn(Collections.emptyList());
+		when(a3.getOutputs()).thenReturn(Collections.emptyList());
+		when(a4.getOutputs()).thenReturn(Collections.emptyList());
+		
+		// then
+		mockActionSelector.add(a1, 1);
+		mockActionSelector.add(a2, 1);
+		mockActionSelector.add(a3, 1);
+		mockActionSelector.add(a4, 1);
+		assertThat(mockActionSelector.select()).isEqualTo(a1);
+		assertThat(mockActionSelector.select()).isEqualTo(a4);
+		assertThat(mockActionSelector.select()).isEqualTo(a4);
 	}
 }

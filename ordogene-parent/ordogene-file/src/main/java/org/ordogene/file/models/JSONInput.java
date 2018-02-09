@@ -4,14 +4,14 @@ import java.util.Objects;
 
 import org.ordogene.file.parser.Validable;
 
-public class Input implements Validable {
+public class JSONInput implements Validable {
 	private String name;
 	private int quantity;
 	private Relation relation;
 
 	@Override
 	public boolean isValid() {
-		return name != null && quantity != 0 && relation != null;  
+		return name != null && quantity != 0 && relation != null;
 	}
 
 	public String getName() {

@@ -24,15 +24,15 @@ public class UserController {
 	public ResponseEntity<String> exists(@PathVariable String id) {
 
 		if (id == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(id + " n'existe pas");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(id + " does not exist");
 		}
 
 		boolean exist = fs.userExist(id);
 
 		if (!exist) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(id + " n'existe pas");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(id + " does not exist");
 		} else {
-			return ResponseEntity.ok().body(id + " existe");
+			return ResponseEntity.ok().body(id + " exist");
 		}
 	}
 
@@ -40,12 +40,12 @@ public class UserController {
 	@ResponseBody
 	public ResponseEntity<String> createUserGivenId(@PathVariable String id) {
 		if (id == null || id.equals("")) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("L'id ne peut pas être vide.");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The id can't be empty.");
 		}
 		if(fs.addUser(id)) {
 			return ResponseEntity.ok().body(id);
 		}
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(id + " : erreur...");
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(id + " : error...");
 	}
 	
 	@RequestMapping(method = RequestMethod.PUT, value = "/")
@@ -59,7 +59,7 @@ public class UserController {
 		if(fs.addUser(randomId)) {
 			return ResponseEntity.ok().body(randomId);
 		}
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(randomId + " : erreur...");
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(randomId + " : error...");
 	}
 	
  

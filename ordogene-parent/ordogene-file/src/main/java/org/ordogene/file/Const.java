@@ -1,10 +1,8 @@
 package org.ordogene.file;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URI;
+import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,38 +16,34 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class Const {
 
 	private final static Map<String, String> resourcesMap;
+	private final static Map<String, String> unmodifiableResourcesMap;
 
 	static {
 
-		ClassLoader classLoader = Const.class.getClassLoader();
-		URL pathUrl = classLoader.getResource("config.json");
-		Path appPath;
+		// URL configFileUrl =
+		// Thread.currentThread().getContextClassLoader().getResource("config.json");
+		InputStream configFile = Thread.currentThread().getContextClassLoader()
+				.getResourceAsStream("config.json");
 		Map<String, String> tmpResourcesMap;
-		byte[] mapData = null;
-		try {
-			appPath = Paths.get(pathUrl.toURI());
-			mapData = Files.readAllBytes(appPath);
-		} catch (URISyntaxException | IOException e1) {
-			System.err.println("Erreur : le fichier resources/config.json absent ou erroné.");
-		}
 
 		ObjectMapper objectMapper = new ObjectMapper();
 		try {
-			tmpResourcesMap = objectMapper.readValue(mapData, new TypeReference<HashMap<String, String>>() {
+			tmpResourcesMap = objectMapper.readValue(configFile, new TypeReference<HashMap<String, String>>() {
 			});
 		} catch (IOException e) {
-			System.err.println("Erreur : le fichier resources/config.json invalide.");
+			System.err.println("Error : the file resources/config.json is not valid.");
 			tmpResourcesMap = new HashMap<>();
 		}
 		resourcesMap = tmpResourcesMap;
+		unmodifiableResourcesMap = Collections.unmodifiableMap(resourcesMap);
 		String appliPath = resourcesMap.get("ApplicationPath");
 		if (appliPath == null) {
-			System.err.println("Erreur : 'ApplicationPath' est manquant dans config.json");
+			System.err.println("Error : 'ApplicationPath' is missing config.json");
 		} else {
 			try {
 				Files.createDirectories(Paths.get(appliPath));
 			} catch (IOException e) {
-				System.err.println("échec de la création du dossier " + appliPath);
+				System.err.println("Error while creating the directory " + appliPath);
 				e.printStackTrace();
 			}
 		}
@@ -57,6 +51,6 @@ public class Const {
 	}
 
 	public static Map<String, String> getConst() {
-		return Collections.unmodifiableMap(resourcesMap);
+		return unmodifiableResourcesMap;
 	}
 }
