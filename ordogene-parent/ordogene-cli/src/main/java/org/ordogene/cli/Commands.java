@@ -42,7 +42,6 @@ public class Commands {
 	 */
 	@ShellMethod(value = "List calculations")
 	public Table listCalculations() {
-		log.info("CECI EST UN TEST");
 		//Request
 		ResponseEntity<List<Calculation>> response = null;
 		try {
@@ -64,13 +63,13 @@ public class Commands {
 				//if ??
 				break;
 			case 204:
-				System.out.println("No calculations. Send one already !");
+				log.error("No calculations. Send one already !");
 				return null;
 			case 400:
-				System.out.println("User does not exist");
+				log.error("User does not exist");
 				return null;
 			default:
-				System.out.println("Unimplemented http status code");
+				log.error("Unimplemented http status code");
 				return null;
 		}*/
 		switch(code) {
@@ -111,7 +110,7 @@ public class Commands {
 		//Parameter validation
 		Path path = Paths.get(model);
 		if(Files.notExists(path)) {
-			System.out.println("The path does not exist. Try again.");
+			log.error("The path does not exist. Try again.");
 			return;
 		}
 		File file = new File(model);
@@ -137,18 +136,18 @@ public class Commands {
 				//if ??
 				break;
 			case 400:
-				System.out.println("The model is corrupted");
+				log.error("The model is corrupted");
 				return;
 			case 404:
-				System.out.println("User does not exist");
+				log.error("User does not exist");
 				return;
 			default:
-				System.out.println("Unimplemented http status code");
+				log.error("Unimplemented http status code");
 				return;
 		}
 		
 		int cid = response.getBody();
-		System.out.println("Calculation #" + cid + "launched");
+		log.info("Calculation #" + cid + "launched");
 	}
 	
 	
@@ -179,20 +178,20 @@ public class Commands {
 				//if ??
 				break;
 			case 400:
-				System.out.println("The calculation is already stopped");
+				log.error("The calculation is already stopped");
 				return;
 			case 401:
-				System.out.println("You do not own this calculation");
+				log.error("You do not own this calculation");
 				return;
 			case 404:
-				System.out.println("The calculation does not exist");
+				log.error("The calculation does not exist");
 				return;
 			default:
-				System.out.println("Unimplemented http status code");
+				log.error("Unimplemented http status code");
 				return;
 		}
 		
-		System.out.println("Calculation #" + cid + " stopped");
+		log.info("Calculation #" + cid + " stopped");
 	}
 	
 	/**
@@ -222,17 +221,17 @@ public class Commands {
 				//if ??
 				break;
 			case 400:
-				System.out.println("The calculation does not exist");
+				log.error("The calculation does not exist");
 				return;
 			case 401:
-				System.out.println("You do not own this calculation");
+				log.error("You do not own this calculation");
 				return;
 			default:
-				System.out.println("Unimplemented http status code");
+				log.error("Unimplemented http status code");
 				return;
 		}
 		
-		System.out.println("Calculation #" + cid + " deleted");
+		log.info("Calculation #" + cid + " deleted");
 	}
 	
 	/**
@@ -247,7 +246,7 @@ public class Commands {
 		Path path = Paths.get(dst);
 		if(Files.exists(path)/* && Files.isRegularFile(path) && Files.isWritable(path)*/) {
 			if(!force) {
-				System.out.println("A file already exists, use --force to overwrite.");
+				log.error("A file already exists, use --force to overwrite.");
 				return;
 			}
 		}
@@ -272,13 +271,13 @@ public class Commands {
 				//if ??
 				break;
 			case 401:
-				System.out.println("You do not own this calculation");
+				log.error("You do not own this calculation");
 				return;
 			case 404:
-				System.out.println("The calculation does not exist");
+				log.error("The calculation does not exist");
 				return;
 			default:
-				System.out.println("Unimplemented http status code");
+				log.error("Unimplemented http status code");
 				return;
 		}
 		
@@ -287,10 +286,10 @@ public class Commands {
 		try {
 			ImageIO.write(img, "PNG", new File(dst));
 		} catch (IOException e) {
-			System.out.println("A error has occured while writing the image");
+			log.error("A error has occured while writing the image");
 		}
 		
-		System.out.println("The image of the result is downloaded at " + dst);
+		log.info("The image of the result is downloaded at " + dst);
 	}
 	
 	/**
@@ -323,20 +322,20 @@ public class Commands {
 				//if ??
 				break;
 			case 400:
-				System.out.println("The calculation is already stopped");
+				log.error("The calculation is already stopped");
 				return;
 			case 401:
-				System.out.println("You do not own this snapshot");
+				log.error("You do not own this snapshot");
 				return;
 			case 404:
-				System.out.println("The snapshot does not exist");
+				log.error("The snapshot does not exist");
 				return;
 			default:
-				System.out.println("Unimplemented http status code");
+				log.error("Unimplemented http status code");
 				return;
 		}*/
 		
-		System.out.println("snapshot launched");
+		log.info("snapshot launched");
 	}
 	
 	/**
@@ -347,7 +346,7 @@ public class Commands {
 	@ShellMethod(value = "Remove a calculation")
 	public void removeSnapshot(int id, int iter) {
 		//HTTPRequest
-		System.out.println("snapshot removed");
+		log.info("snapshot removed");
 	}
 	
 	/* UTILS */

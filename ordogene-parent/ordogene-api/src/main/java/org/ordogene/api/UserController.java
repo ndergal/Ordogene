@@ -45,7 +45,7 @@ public class UserController {
 		if(fs.addUser(id)) {
 			return ResponseEntity.ok().body(id);
 		}
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(id + " : error...");
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error : "+"user" + " not created ");
 	}
 	
 	@RequestMapping(method = RequestMethod.PUT, value = "/")
@@ -59,7 +59,7 @@ public class UserController {
 		if(fs.addUser(randomId)) {
 			return ResponseEntity.ok().body(randomId);
 		}
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(randomId + " : error...");
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error : "+randomId + " not created ");
 	}
 	
  
