@@ -128,6 +128,12 @@ public class EntityTest {
 	}
 	
 	@Test
+	public void test_equals6() {
+		Entity e1 = new Entity("name1", 50);
+		assertFalse(e1.equals(e1));
+	}
+	
+	@Test
 	public void test_hashcode1() {
 		Entity e1 = new Entity("name", 50);
 		Entity e2 = new Entity("name", 50);

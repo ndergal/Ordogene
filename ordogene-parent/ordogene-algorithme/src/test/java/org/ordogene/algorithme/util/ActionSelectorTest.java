@@ -1,8 +1,6 @@
 package org.ordogene.algorithme.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -70,7 +68,7 @@ public class ActionSelectorTest {
 		when(a.getInputs()).thenReturn(Collections.emptyList());
 		when(a.getOutputs()).thenReturn(Collections.emptyList());
 		when(a.getName()).thenReturn("EMPTY");
-		when(a.getTime()).thenReturn(1);
+		when(a.getTime()).thenReturn(0);
 		
 		// then
 		mockActionSelector.add(a, 1);

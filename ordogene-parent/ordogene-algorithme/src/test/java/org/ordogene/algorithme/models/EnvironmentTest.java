@@ -8,7 +8,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
@@ -231,6 +230,48 @@ public class EnvironmentTest {
 		Environment env2 = new Environment(entities2);
 		
 		assertTrue(env1.equals(env2));
+	}
+	
+	@Test
+	public void test_equals6() {
+		Entity e1 = mock(Entity.class);
+		
+		when(e1.getName()).thenReturn("name1");
+		when(e1.getQuantity()).thenReturn(1);
+		
+		Set<Entity> entities1 = new HashSet<>(Arrays.asList(e1));
+		
+		Environment env1 = new Environment(entities1);
+		
+		assertFalse(env1.equals(null));
+	}
+	
+	@Test
+	public void test_equals7() {
+		Entity e1 = mock(Entity.class);
+		
+		when(e1.getName()).thenReturn("name1");
+		when(e1.getQuantity()).thenReturn(1);
+		
+		Set<Entity> entities1 = new HashSet<>(Arrays.asList(e1));
+		
+		Environment env1 = new Environment(entities1);
+		
+		assertFalse(env1.equals(new Object()));
+	}
+	
+	@Test
+	public void test_equals8() {
+		Entity e1 = mock(Entity.class);
+		
+		when(e1.getName()).thenReturn("name1");
+		when(e1.getQuantity()).thenReturn(1);
+		
+		Set<Entity> entities1 = new HashSet<>(Arrays.asList(e1));
+		
+		Environment env1 = new Environment(entities1);
+		
+		assertTrue(env1.equals(env1));
 	}
 
 	@Test

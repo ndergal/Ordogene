@@ -315,4 +315,26 @@ public class FitnessTest {
 		assertTrue(f1.equals(f1));
 	}
 
+	@Test
+	public void testEqualsObject6() {
+		HashMap<String, Long> op1 = new HashMap<>();
+		op1.put("i", Long.valueOf(1));
+		op1.put("o", Long.valueOf(10));
+		
+		Fitness f1 = new Fitness(Type.max, op1);
+		
+		assertTrue(f1.equals(null));
+	}
+
+	@Test
+	public void testEqualsObject7() {
+		HashMap<String, Long> op1 = new HashMap<>();
+		op1.put("i", Long.valueOf(1));
+		op1.put("o", Long.valueOf(10));
+		
+		Fitness f1 = new Fitness(Type.max, op1);
+		
+		assertTrue(f1.equals(new Object()));
+	}
+
 }
