@@ -323,7 +323,7 @@ public class FitnessTest {
 		
 		Fitness f1 = new Fitness(Type.max, op1);
 		
-		assertTrue(f1.equals(null));
+		assertFalse(f1.equals(null));
 	}
 
 	@Test
@@ -334,7 +334,7 @@ public class FitnessTest {
 		
 		Fitness f1 = new Fitness(Type.max, op1);
 		
-		assertTrue(f1.equals(new Object()));
+		assertFalse(f1.equals(new Object()));
 	}
 
 }
