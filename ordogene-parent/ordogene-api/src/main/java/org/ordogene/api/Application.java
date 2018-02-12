@@ -11,6 +11,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.ordogene.api.utils.CustomArgsParser;
 import org.ordogene.file.FileService;
+import org.ordogene.file.utils.Const;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -28,7 +29,7 @@ public class Application {
 		Option config = new Option("conf", "config", true, "input file path");
 		config.setRequired(true);
 		options.addOption(config);
-		
+
 		HelpFormatter formatter = new HelpFormatter();
 		CommandLine cmd;
 		boolean ignoreUnknowArg = true;
@@ -36,9 +37,9 @@ public class Application {
 			cmd = new CustomArgsParser(ignoreUnknowArg).parse(options, args);
 		} catch (ParseException e) {
 			System.out.println(e.getMessage());
-			String jarName = new java.io.File(Application.class.getProtectionDomain().getCodeSource().getLocation().getPath())
-					.getName();
-			formatter.printHelp("java -jar "+jarName, options);
+			String jarName = new java.io.File(
+					Application.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
+			formatter.printHelp("java -jar " + jarName, options);
 			System.exit(1);
 			return;
 		}
@@ -46,8 +47,8 @@ public class Application {
 		String configFilePath = cmd.getOptionValue("config");
 
 		System.out.println(configFilePath);
-
-		SpringApplication.run(Application.class, args);
+		if (Const.loadConfig(configFilePath))
+			SpringApplication.run(Application.class, args);
 	}
 
 	@Bean
