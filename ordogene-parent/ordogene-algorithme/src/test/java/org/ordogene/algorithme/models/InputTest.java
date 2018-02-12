@@ -93,7 +93,7 @@ public class InputTest {
 	@Test
 	public void test_equals7() {
 		Input i1 = new Input("name", 0, Relation.c);
-		assertFalse(i1.equals(i1));
+		assertTrue(i1.equals(i1));
 	}
 	
 	@Test
