@@ -47,6 +47,7 @@ public class Model {
 		this.startEnvironment = Objects.requireNonNull(environment);
 		this.currentEnvironment = new Environment(environment.getEntities());
 		actions.forEach(a -> {
+			Objects.requireNonNull(a);
 			if(this.actionsInProgress.put(a, 0) != null) {
 				throw new IllegalArgumentException("Can't be have a null Action");
 			}
