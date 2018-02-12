@@ -1,10 +1,9 @@
 package org.ordogene.file;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.ordogene.file.utils.Const;
 
 /**
@@ -12,6 +11,11 @@ import org.ordogene.file.utils.Const;
  */
 public class ConstTest {
 
+	@Before
+	public void init() {
+		Const.loadConfig("./src/test/resources/ordogene.conf.json");
+	}
+	
 	@Test
 	public void loadConstTest() {
 		assertTrue(Const.getConst().size()>0);
