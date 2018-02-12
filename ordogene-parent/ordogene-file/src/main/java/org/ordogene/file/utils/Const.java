@@ -1,4 +1,4 @@
-package org.ordogene.file;
+package org.ordogene.file.utils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
