@@ -62,7 +62,7 @@ public class Commands {
 				createUser();
 				break;
 		}
-		scanner.close();
+		//scanner.close();
 		System.out.println();
 	}
 	
@@ -137,26 +137,16 @@ public class Commands {
 		
 		//Check status code
 		int code = response.getStatusCodeValue();
-		/*switch(code) {
-			case 200:
-				//if ??
-				break;
-			case 204:
-				log.error("No calculations. Send one already !");
-				return null;
-			case 400:
-				log.error("User does not exist");
-				return null;
-			default:
-				log.error("Unimplemented http status code");
-				return null;
-		}*/
 		if(!isHttpCodeValid(code, response)) {
 			return null;
 		}
 		
 		//Build ascii table
 		List<Calculation> list = response.getBody().getList();
+		if(list == null) {
+			log.info("No calculations yet");
+			return null;
+		}
 		String[][] data = new String[list.size() + 1][headers.length];
 		TableModel model = new ArrayTableModel(data);
 		TableBuilder builder = new TableBuilder(model);
@@ -206,20 +196,6 @@ public class Commands {
 		
 		//Check status code
 		int code = response.getStatusCodeValue();
-		/*switch(code) {
-			case 200:
-				//if ??
-				break;
-			case 400:
-				log.error("The model is corrupted");
-				return;
-			case 404:
-				log.error("User does not exist");
-				return;
-			default:
-				log.error("Unimplemented http status code");
-				return;
-		}*/
 		if(!isHttpCodeValid(code, response)) {
 			return;
 		}
@@ -251,23 +227,6 @@ public class Commands {
 		
 		//Check status code
 		int code = response.getStatusCodeValue();
-		/*switch(code) {
-			case 200:
-				//if ??
-				break;
-			case 400:
-				log.error("The calculation is already stopped");
-				return;
-			case 401:
-				log.error("You do not own this calculation");
-				return;
-			case 404:
-				log.error("The calculation does not exist");
-				return;
-			default:
-				log.error("Unimplemented http status code");
-				return;
-		}*/
 		if(!isHttpCodeValid(code, response)) {
 			return;
 		}
@@ -297,20 +256,6 @@ public class Commands {
 		
 		//Check status code
 		int code = response.getStatusCodeValue();
-		/*switch(code) {
-			case 200:
-				//if ??
-				break;
-			case 400:
-				log.error("The calculation does not exist");
-				return;
-			case 401:
-				log.error("You do not own this calculation");
-				return;
-			default:
-				log.error("Unimplemented http status code");
-				return;
-		}*/
 		if(!isHttpCodeValid(code, response)) {
 			return;
 		}
@@ -350,20 +295,6 @@ public class Commands {
 		
 		//Check status code
 		int code = response.getStatusCodeValue();
-		/*switch(code) {
-			case 200:
-				//if ??
-				break;
-			case 401:
-				log.error("You do not own this calculation");
-				return;
-			case 404:
-				log.error("The calculation does not exist");
-				return;
-			default:
-				log.error("Unimplemented http status code");
-				return;
-		}*/
 		if(!isHttpCodeValid(code, response)) {
 			return;
 		}
@@ -404,23 +335,6 @@ public class Commands {
 		
 		//Check status code
 		int code = response.getStatusCodeValue();
-		/*switch(code) {
-			case 200:
-				//if ??
-				break;
-			case 400:
-				log.error("The calculation is already stopped");
-				return;
-			case 401:
-				log.error("You do not own this snapshot");
-				return;
-			case 404:
-				log.error("The snapshot does not exist");
-				return;
-			default:
-				log.error("Unimplemented http status code");
-				return;
-		}*/
 		if(!isHttpCodeValid(code, response)) {
 			return;
 		}

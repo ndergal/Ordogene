@@ -10,6 +10,10 @@ public class ApiJsonResponse {
 	private List<Calculation> list;
 	private BufferedImage img;
 	
+	public ApiJsonResponse() {
+		
+	}
+	
 	public ApiJsonResponse(String id, int cid, String error, List<Calculation> list, BufferedImage img) {
 		this.id = id;
 		this.cid = cid;
