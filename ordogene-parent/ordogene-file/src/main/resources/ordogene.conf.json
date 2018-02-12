@@ -1,4 +1,3 @@
 {
-	"ApplicationPath": "/home/ordogene/testProjectFiles",
-	"JarAlgorithmPath": "/home/ordogene/ordogene-algo.jar"
+	"ApplicationPath": "/opt/ordogene/testProjectFiles"
 }

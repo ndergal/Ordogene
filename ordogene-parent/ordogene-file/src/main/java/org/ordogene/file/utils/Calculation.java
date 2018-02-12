@@ -1,4 +1,4 @@
-package org.ordogene.cli;
+package org.ordogene.file.utils;
 
 public class Calculation {
 	private int id;
