@@ -42,7 +42,7 @@ public class Const {
 		URI configUri;
 
 		try {
-			// System.out.println("PATH !!!!!!!!! = " + location);
+			System.out.println("PATH !!!!!!!!! = " + location);
 			if (location.endsWith(File.separator)) {
 				configUri = new URI(location + /* File.separator + */ "ordogene.conf.json");
 			} else {
