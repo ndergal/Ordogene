@@ -1,6 +1,5 @@
 package org.ordogene.file.models;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -13,14 +12,6 @@ public class JSONAction implements Validable {
 	private List<JSONInput> input;
 	private List<JSONEntity> output;
 
-	private JSONAction(String name, int time, List<JSONInput> input, List<JSONEntity> output) {
-
-		this.name = Objects.requireNonNull(name);
-		this.time = time;
-		this.input = Objects.requireNonNull(input);
-
-	}
-
 	public JSONAction() {
 
 	}
@@ -29,10 +20,6 @@ public class JSONAction implements Validable {
 	public boolean isValid() {
 		return name != null && time != 0 && input != null && output != null
 				&& input.stream().allMatch(Validable::isValid) && output.stream().allMatch(Validable::isValid);
-	}
-
-	public static JSONAction EMPTY(int time) {
-		return new JSONAction("EMPTY", time, Collections.emptyList(), Collections.emptyList());
 	}
 
 	public String getName() {
