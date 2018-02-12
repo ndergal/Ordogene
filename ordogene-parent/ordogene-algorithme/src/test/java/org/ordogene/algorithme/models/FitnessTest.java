@@ -1,11 +1,14 @@
 package org.ordogene.algorithme.models;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import org.junit.Test;
@@ -110,9 +113,9 @@ public class FitnessTest {
 		Input i1 = mock(Input.class);
 		Entity o1 = mock(Entity.class);
 		
-		List<Input> inputs = new ArrayList<>();
+		HashSet<Input> inputs = new HashSet<>();
 		inputs.add(i1);
-		List<Entity> outputs = new ArrayList<>();
+		HashSet<Entity> outputs = new HashSet<>();
 		outputs.add(o1);
 		
 		when(i1.getName()).thenReturn("i1");
@@ -148,9 +151,9 @@ public class FitnessTest {
 		Action a = mock(Action.class);
 		Entity o1 = mock(Entity.class);
 		
-		List<Input> inputs = new ArrayList<>();
+		HashSet<Input> inputs = new HashSet<>();
 		inputs.add(null);
-		List<Entity> outputs = new ArrayList<>();
+		HashSet<Entity> outputs = new HashSet<>();
 		outputs.add(o1);
 		
 		when(o1.getName()).thenReturn("o1");
@@ -173,9 +176,9 @@ public class FitnessTest {
 		Action a = mock(Action.class);
 		Input i1 = mock(Input.class);
 		
-		List<Input> inputs = new ArrayList<>();
+		HashSet<Input> inputs = new HashSet<>();
 		inputs.add(i1);
-		List<Entity> outputs = new ArrayList<>();
+		HashSet<Entity> outputs = new HashSet<>();
 		outputs.add(null);
 		
 		when(i1.getName()).thenReturn("i1");

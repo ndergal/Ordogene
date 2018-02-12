@@ -1,35 +1,36 @@
 package org.ordogene.algorithme.models;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.ordogene.file.models.JSONAction;
 
 public class Action {
 	public static Action EMPTY(int time) {
-		return new Action("EMPTY", time, Collections.emptyList(), Collections.emptyList());
+		return new Action("EMPTY", time, Collections.emptySet(), Collections.emptySet());
 	}
 	
 	private final String name;
 	private final int time;
-	private final List<Input> inputs;
-	private final List<Entity> outputs;
+	private final Set<Input> inputs = new HashSet<>();
+	private final Set<Entity> outputs = new HashSet<>();
 
-	public Action(String name, int time, List<Input> inputs, List<Entity> outputs) {
+	public Action(String name, int time, Set<Input> inputs, Set<Entity> outputs) {
 		if (time <= 0) {
 			throw new IllegalArgumentException("the time an action need has to be positive");
 		}
 		this.name = Objects.requireNonNull(name);
 		this.time = time;
-		this.inputs = Objects.requireNonNull(inputs);
-		this.outputs = Objects.requireNonNull(outputs);
+		Objects.requireNonNull(inputs).stream().forEach(i -> this.inputs.add(Objects.requireNonNull(i)));
+		Objects.requireNonNull(outputs).stream().forEach(e -> this.outputs.add(Objects.requireNonNull(e)));
 	}
 	
 	public static Action createAction(JSONAction jAction) {
-		List<Input> inputs = jAction.getInput().stream().map(Input::createInput).collect(Collectors.toList());
-		List<Entity> outputs = jAction.getOutput().stream().map(Entity::createEntity).collect(Collectors.toList());
+		Set<Input> inputs = jAction.getInput().stream().map(Input::createInput).collect(Collectors.toSet());
+		Set<Entity> outputs = jAction.getOutput().stream().map(Entity::createEntity).collect(Collectors.toSet());
 		return new Action(jAction.getName(), jAction.getTime(), inputs, outputs);
 	}
 
@@ -41,11 +42,11 @@ public class Action {
 		return time;
 	}
 
-	public List<Input> getInputs() {
+	public Set<Input> getInputs() {
 		return inputs;
 	}
 
-	public List<Entity> getOutputs() {
+	public Set<Entity> getOutputs() {
 		return outputs;
 	}
 

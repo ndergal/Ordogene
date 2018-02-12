@@ -7,13 +7,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Scanner;
 
+import javax.annotation.PostConstruct;
 import javax.imageio.ImageIO;
 
+import org.ordogene.file.utils.ApiJsonResponse;
+import org.ordogene.file.utils.Calculation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -32,10 +35,86 @@ import org.springframework.web.client.RestTemplate;
 @ShellComponent
 public class Commands {
 	
+	private String id;
 	private static final Logger log = LoggerFactory.getLogger(Commands.class);
 	private final String[] headers = {"id", "name", "status", "progress", "date", "max fitness"};
 	@Autowired
 	private RestTemplate restTemplate;
+	
+	@PostConstruct
+	public void login() {
+		System.out.println();
+		System.out.print("Do you want to create a new id ? [y/N] : ");
+		Scanner scanner = new Scanner(System.in);
+		String choice = scanner.nextLine();
+		switch(choice) {
+			case "":
+			case "n":
+			case "N":
+			case "no":
+				System.out.print("Enter your id : ");
+				id = scanner.next();
+				getUser(id);
+				break;
+			case "y":
+			case "Y":
+			case "yes":
+				createUser();
+				break;
+		}
+		//scanner.close();
+		System.out.println();
+	}
+	
+	public void getUser(String id) {
+		//Request
+		ResponseEntity<ApiJsonResponse> response = null;
+		try {
+			response = restTemplate.exchange(
+					"/" + id,
+					HttpMethod.GET,
+					null,
+					ApiJsonResponse.class
+				);
+		} catch (RestClientException e) {
+			log.error(e.getMessage());
+			return;
+		}
+		
+		//Check status code
+		int code = response.getStatusCodeValue();
+		if(!isHttpCodeValid(code, response)) {
+			return;
+		}
+		
+		this.id = id;
+		log.info("Welcome back #" + id);
+	}
+	
+	public void createUser() {
+		//Request
+		ResponseEntity<ApiJsonResponse> response = null;
+		try {
+			response = restTemplate.exchange(
+					"/",
+					HttpMethod.PUT,
+					null,
+					ApiJsonResponse.class
+				);
+		} catch (RestClientException e) {
+			log.error(e.getMessage());
+			return;
+		}
+		
+		//Check status code
+		int code = response.getStatusCodeValue();
+		if(!isHttpCodeValid(code, response)) {
+			return;
+		}
+		
+		id = response.getBody().getId();
+		log.info("Your new id is #" + id);
+	}
 
 	/**
 	 * Display a table containing calculations of the user
@@ -43,13 +122,13 @@ public class Commands {
 	@ShellMethod(value = "List calculations")
 	public Table listCalculations() {
 		//Request
-		ResponseEntity<List<Calculation>> response = null;
+		ResponseEntity<ApiJsonResponse> response = null;
 		try {
 			response = restTemplate.exchange(
-					"/:id/calculations",
+					"/" + id + "/calculations",
 					HttpMethod.GET,
 					null,
-					new ParameterizedTypeReference<List<Calculation>>() {}
+					ApiJsonResponse.class
 				);
 		} catch (RestClientException e) {
 			log.error(e.getMessage());
@@ -58,30 +137,16 @@ public class Commands {
 		
 		//Check status code
 		int code = response.getStatusCodeValue();
-		/*switch(code) {
-			case 200:
-				//if ??
-				break;
-			case 204:
-				log.error("No calculations. Send one already !");
-				return null;
-			case 400:
-				log.error("User does not exist");
-				return null;
-			default:
-				log.error("Unimplemented http status code");
-				return null;
-		}*/
-		switch(code) {
-			case 200:
-				break;
-			default:
-				log.error("%d : %s", code, response.getBody());
-				return null;
+		if(!isHttpCodeValid(code, response)) {
+			return null;
 		}
 		
 		//Build ascii table
-		List<Calculation> list = response.getBody();
+		List<Calculation> list = response.getBody().getList();
+		if(list == null) {
+			log.info("No calculations yet");
+			return null;
+		}
 		String[][] data = new String[list.size() + 1][headers.length];
 		TableModel model = new ArrayTableModel(data);
 		TableBuilder builder = new TableBuilder(model);
@@ -117,13 +182,13 @@ public class Commands {
 		
 		//Request
 		HttpEntity<File> request = new HttpEntity<>(file);
-		ResponseEntity<Integer> response = null;
+		ResponseEntity<ApiJsonResponse> response = null;
 		try {
 			response = restTemplate.exchange(
-				"/:id/calculations/",
+				"/" + id + "/calculations/",
 				HttpMethod.PUT,
 				request,
-				Integer.class);
+				ApiJsonResponse.class);
 		} catch (RestClientException e) {
 			log.error(e.getMessage());
 			return;
@@ -131,40 +196,29 @@ public class Commands {
 		
 		//Check status code
 		int code = response.getStatusCodeValue();
-		switch(code) {
-			case 200:
-				//if ??
-				break;
-			case 400:
-				log.error("The model is corrupted");
-				return;
-			case 404:
-				log.error("User does not exist");
-				return;
-			default:
-				log.error("Unimplemented http status code");
-				return;
+		if(!isHttpCodeValid(code, response)) {
+			return;
 		}
 		
-		int cid = response.getBody();
+		int cid = response.getBody().getCid();
 		log.info("Calculation #" + cid + "launched");
 	}
 	
 	
 	/**
 	 * Stop the calculation
-	 * @param id id of the calculation
+	 * @param cid id of the calculation
 	 */
 	@ShellMethod(value = "Stop a calculation")
 	public void stopCalculation(int cid) {
 		//Request
-		ResponseEntity<Void> response = null;
+		ResponseEntity<ApiJsonResponse> response = null;
 		try {
 			response = restTemplate.exchange(
-				"/:id/calculations/" + cid,
+				"/" + id + "/calculations/" + cid,
 				HttpMethod.POST,
 				null,
-				Void.class
+				ApiJsonResponse.class
 			);
 		} catch (RestClientException e) {
 			log.error(e.getMessage());
@@ -173,22 +227,8 @@ public class Commands {
 		
 		//Check status code
 		int code = response.getStatusCodeValue();
-		switch(code) {
-			case 200:
-				//if ??
-				break;
-			case 400:
-				log.error("The calculation is already stopped");
-				return;
-			case 401:
-				log.error("You do not own this calculation");
-				return;
-			case 404:
-				log.error("The calculation does not exist");
-				return;
-			default:
-				log.error("Unimplemented http status code");
-				return;
+		if(!isHttpCodeValid(code, response)) {
+			return;
 		}
 		
 		log.info("Calculation #" + cid + " stopped");
@@ -196,18 +236,18 @@ public class Commands {
 	
 	/**
 	 * Remove the calculation
-	 * @param id id of the calculation
+	 * @param cid id of the calculation
 	 */
 	@ShellMethod(value = "Remove a calculation")
 	public void removeCalculation(int cid) {
 		//Request
-		ResponseEntity<Void> response = null;
+		ResponseEntity<ApiJsonResponse> response = null;
 		try {
 			response = restTemplate.exchange(
-				"/:id/calculations/" + cid,
+				"/" + id + "/calculations/" + cid,
 				HttpMethod.DELETE,
 				null,
-				Void.class
+				ApiJsonResponse.class
 			);
 		} catch (RestClientException e) {
 			log.error(e.getMessage());
@@ -216,19 +256,8 @@ public class Commands {
 		
 		//Check status code
 		int code = response.getStatusCodeValue();
-		switch(code) {
-			case 200:
-				//if ??
-				break;
-			case 400:
-				log.error("The calculation does not exist");
-				return;
-			case 401:
-				log.error("You do not own this calculation");
-				return;
-			default:
-				log.error("Unimplemented http status code");
-				return;
+		if(!isHttpCodeValid(code, response)) {
+			return;
 		}
 		
 		log.info("Calculation #" + cid + " deleted");
@@ -236,7 +265,7 @@ public class Commands {
 	
 	/**
 	 * Create the image of the best solution of the calculation
-	 * @param id id of the calculation
+	 * @param cid id of the calculation
 	 * @param dst path of the generated image
 	 * @param force if set, overwrite if dst already exists
 	 */
@@ -252,13 +281,13 @@ public class Commands {
 		}
 		
 		//Request
-		ResponseEntity<BufferedImage> response = null;
+		ResponseEntity<ApiJsonResponse> response = null;
 		try {
 			response = restTemplate.exchange(
-				"/:id/calculations/" + cid,
+				"/" + id + "/calculations/" + cid,
 				HttpMethod.GET,
 				null,
-				BufferedImage.class);
+				ApiJsonResponse.class);
 		} catch (RestClientException e) {
 			log.error(e.getMessage());
 			return;
@@ -266,23 +295,12 @@ public class Commands {
 		
 		//Check status code
 		int code = response.getStatusCodeValue();
-		switch(code) {
-			case 200:
-				//if ??
-				break;
-			case 401:
-				log.error("You do not own this calculation");
-				return;
-			case 404:
-				log.error("The calculation does not exist");
-				return;
-			default:
-				log.error("Unimplemented http status code");
-				return;
+		if(!isHttpCodeValid(code, response)) {
+			return;
 		}
 		
 		//Writing the image
-		BufferedImage img = response.getBody();
+		BufferedImage img = response.getBody().getImg();
 		try {
 			ImageIO.write(img, "PNG", new File(dst));
 		} catch (IOException e) {
@@ -302,13 +320,13 @@ public class Commands {
 	public void launchSnapshot(int cid, int sid, int loops) {
 		//Request
 		HttpEntity<Integer> request = new HttpEntity<>(loops);
-		ResponseEntity<Integer> response = null;
+		ResponseEntity<ApiJsonResponse> response = null;
 		try {
 			response = restTemplate.exchange(
-				"/:id/calculations/" + cid + "/snapshots/" + sid ,
+				"/" + id + "/calculations/" + cid + "/snapshots/" + sid ,
 				HttpMethod.POST,
 				request,
-				Integer.class
+				ApiJsonResponse.class
 			);
 		} catch (RestClientException e) {
 			log.error(e.getMessage());
@@ -316,26 +334,12 @@ public class Commands {
 		}
 		
 		//Check status code
-		/*int code = response.getStatusCodeValue();
-		switch(code) {
-			case 200:
-				//if ??
-				break;
-			case 400:
-				log.error("The calculation is already stopped");
-				return;
-			case 401:
-				log.error("You do not own this snapshot");
-				return;
-			case 404:
-				log.error("The snapshot does not exist");
-				return;
-			default:
-				log.error("Unimplemented http status code");
-				return;
-		}*/
+		int code = response.getStatusCodeValue();
+		if(!isHttpCodeValid(code, response)) {
+			return;
+		}
 		
-		log.info("snapshot launched");
+		log.info("Snapshot #" + sid + "launched");
 	}
 	
 	/**
@@ -350,6 +354,20 @@ public class Commands {
 	}
 	
 	/* UTILS */
+	
+	/**
+	 * @param response
+	 * @param code
+	 */
+	public boolean isHttpCodeValid(int code, ResponseEntity<ApiJsonResponse> response) {
+		switch(code) {
+			case 200:
+				return true;
+			default:
+				log.error("%d : %s", code, response.getBody().getError());
+				return false;
+		}
+	}
 	
 	public static CellMatcher at(final int theRow, final int col) {
 		return new CellMatcher() {

@@ -1,4 +1,4 @@
-package org.ordogene.cli;
+package org.ordogene.file.utils;
 
 public class Calculation {
 	private int id;
@@ -8,6 +8,8 @@ public class Calculation {
 	private int maxIteration;
 	private String date;
 	private int lastIterationSaved;
+	
+	public Calculation() {} 
 	
 	public int getId() {
 		return id;
