@@ -10,11 +10,7 @@ public class JSONAction implements Validable {
 	private String name;
 	private int time;
 	private List<JSONInput> input;
-	private List<JSONEntity> output;
-
-	public JSONAction() {
-
-	}
+	private List<JSONEntity> output; 
 
 	@Override
 	public boolean isValid() {

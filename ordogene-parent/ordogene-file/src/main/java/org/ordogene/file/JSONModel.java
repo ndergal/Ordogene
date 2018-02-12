@@ -1,14 +1,18 @@
 package org.ordogene.file;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.ordogene.file.models.JSONAction;
 import org.ordogene.file.models.JSONEntity;
 import org.ordogene.file.models.JSONFitness;
+import org.ordogene.file.models.JSONInput;
+import org.ordogene.file.models.JSONOperand;
 import org.ordogene.file.parser.Validable;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import edu.emory.mathcs.backport.java.util.Collections;
@@ -21,14 +25,30 @@ public class JSONModel implements Validable {
 	private List<JSONEntity> environment;
 	private List<JSONAction> actions;
 	private JSONFitness fitness;
-	@JsonIgnore
-	private List<JSONEntity> currentEnvironment;
 
 	@Override
 	public boolean isValid() {
 		return snaps != null && slots != 0 && execTime != 0 && environment != null && actions != null && fitness != null
 				&& environment.stream().allMatch(Validable::isValid) && actions.stream().allMatch(Validable::isValid)
-				&& fitness.isValid();
+				&& fitness.isValid() && this.Consistency();
+	}
+
+	private boolean Consistency() {
+		Set<String> all = new HashSet<String>();
+		Set<String> contained = new HashSet<String>();
+		all.addAll(environment.stream().map(JSONEntity::getName).collect(Collectors.toList()));
+		for (JSONAction a : actions) {
+			for (JSONInput i : a.getInput()) {
+				contained.add(i.getName());
+			}
+		}
+		for (JSONAction a : actions) {
+			for (JSONEntity e : a.getOutput()) {
+				contained.add(e.getName());
+			}
+		}
+		contained.addAll(fitness.getOperands().stream().map(JSONOperand::getName).collect(Collectors.toList()));
+		return contained.stream().allMatch(str -> all.contains(str));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -102,17 +122,6 @@ public class JSONModel implements Validable {
 		this.fitness = Objects.requireNonNull(fitness);
 	}
 
-	public List<JSONEntity> getCurrentEnvironment() {
-		return currentEnvironment;
-	}
-
-	public void setCurrentEnvironment(List<JSONEntity> currentEnvironment) {
-		this.currentEnvironment = Objects.requireNonNull(currentEnvironment);
-		if (currentEnvironment.stream().anyMatch(x -> x == null)) {
-			throw new IllegalArgumentException("the current environment should not contains null entities");
-		}
-	}
-
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -128,8 +137,6 @@ public class JSONModel implements Validable {
 		builder.append(actions);
 		builder.append(",\nfitness=");
 		builder.append(fitness);
-		builder.append(",\ncurrentEnvironment=");
-		builder.append(currentEnvironment);
 		builder.append("]");
 		return builder.toString();
 	}
