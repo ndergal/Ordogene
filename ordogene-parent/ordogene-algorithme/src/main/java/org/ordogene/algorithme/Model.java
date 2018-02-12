@@ -1,8 +1,6 @@
 package org.ordogene.algorithme;
 
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -17,7 +15,6 @@ import org.ordogene.algorithme.models.Input;
 import org.ordogene.algorithme.util.ActionSelector;
 import org.ordogene.file.JSONModel;
 import org.ordogene.file.models.Relation;
-import org.ordogene.file.models.Type;
 
 public class Model {
 	private final List<Integer> snaps;
@@ -31,7 +28,6 @@ public class Model {
 
 	private ActionSelector actionSelector = new ActionSelector();
 
-	// TODO check les null dans les list
 	public Model(List<Integer> snaps, int slots, int execTime, Environment environment, Set<Action> actions,
 			Fitness fitness) {
 		if (slots <= 0) {

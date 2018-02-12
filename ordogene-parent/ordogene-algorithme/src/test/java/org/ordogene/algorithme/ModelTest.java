@@ -448,36 +448,49 @@ public class ModelTest {
 		
 		Environment env = mock(Environment.class);
 		Entity e1 = mock(Entity.class);
+		Entity e2 = mock(Entity.class);
 		Fitness f = mock(Fitness.class);
 		Action a = mock(Action.class);
-		Input i = mock(Input.class);
+		Input i1 = mock(Input.class);
+		Input i2 = mock(Input.class);
 		
 		Set<Entity> entityEnv = new HashSet<>();
 		entityEnv.add(e1);
+		entityEnv.add(e2);
 		
 		Set<Action> actions = new HashSet<>();
 		actions.add(a);
 		
 		Set<Input> inputs = new HashSet<>();
-		inputs.add(i);
+		inputs.add(i1);
+		inputs.add(i2);
 		Set<Entity> outputs = new HashSet<>();
 		outputs.add(e1);
+		outputs.add(e2);
 		
 		when(env.containsEntity(anyString())).thenReturn(true);
 		when(env.getEntity("e1")).thenReturn(e1);
+		when(env.getEntity("e2")).thenReturn(e2);
 		when(env.getEntities()).thenReturn(entityEnv);
 		
 		when(e1.getName()).thenReturn("e1");
 		when(e1.getQuantity()).thenReturn(10);
+		
+		when(e2.getName()).thenReturn("e2");
+		when(e2.getQuantity()).thenReturn(2);
 		
 		when(a.getOutputs()).thenReturn(outputs);
 		when(a.getInputs()).thenReturn(inputs);
 		when(a.getName()).thenReturn("action");
 		when(a.getTime()).thenReturn(5);
 		
-		when(i.getName()).thenReturn("e1");
-		when(i.getQuantity()).thenReturn(1);
-		when(i.getRelation()).thenReturn(Relation.c);
+		when(i1.getName()).thenReturn("e1");
+		when(i1.getQuantity()).thenReturn(1);
+		when(i1.getRelation()).thenReturn(Relation.c);
+		
+		when(i2.getName()).thenReturn("e2");
+		when(i2.getQuantity()).thenReturn(1);
+		when(i2.getRelation()).thenReturn(Relation.p);
 		
 		when(f.eval(a)).thenReturn(Long.valueOf(3));
 		
@@ -630,36 +643,49 @@ public class ModelTest {
 		
 		Environment env = mock(Environment.class);
 		Entity e1 = mock(Entity.class);
+		Entity e2 = mock(Entity.class);
 		Fitness f = mock(Fitness.class);
 		Action a = mock(Action.class);
-		Input i = mock(Input.class);
+		Input i1 = mock(Input.class);
+		Input i2 = mock(Input.class);
 		
 		Set<Entity> entityEnv = new HashSet<>();
 		entityEnv.add(e1);
+		entityEnv.add(e2);
 		
 		Set<Action> actions = new HashSet<>();
 		actions.add(a);
 		
 		Set<Input> inputs = new HashSet<>();
-		inputs.add(i);
+		inputs.add(i1);
+		inputs.add(i2);
 		Set<Entity> outputs = new HashSet<>();
 		outputs.add(e1);
+		outputs.add(e2);
 		
 		when(env.containsEntity(anyString())).thenReturn(true);
 		when(env.getEntity("e1")).thenReturn(e1);
+		when(env.getEntity("e2")).thenReturn(e2);
 		when(env.getEntities()).thenReturn(entityEnv);
 		
 		when(e1.getName()).thenReturn("e1");
 		when(e1.getQuantity()).thenReturn(10);
+		
+		when(e2.getName()).thenReturn("e2");
+		when(e2.getQuantity()).thenReturn(2);
 		
 		when(a.getOutputs()).thenReturn(outputs);
 		when(a.getInputs()).thenReturn(inputs);
 		when(a.getName()).thenReturn("action");
 		when(a.getTime()).thenReturn(5);
 		
-		when(i.getName()).thenReturn("e1");
-		when(i.getQuantity()).thenReturn(5);
-		when(i.getRelation()).thenReturn(Relation.c);
+		when(i1.getName()).thenReturn("e1");
+		when(i1.getQuantity()).thenReturn(1);
+		when(i1.getRelation()).thenReturn(Relation.c);
+		
+		when(i2.getName()).thenReturn("e2");
+		when(i2.getQuantity()).thenReturn(1);
+		when(i2.getRelation()).thenReturn(Relation.p);
 		
 		when(f.eval(a)).thenReturn(Long.valueOf(3));
 		
