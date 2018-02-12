@@ -36,7 +36,7 @@ public class Const {
 		if (!tmpResourcesMap.isEmpty()) {
 			System.out.println("Configuraiton well loaded !");
 		} else {
-			System.err.println("Configuraiton not loaded...");
+			System.err.println("Configuraiton not loaded....");
 			return false;
 		}
 		resourcesMap = tmpResourcesMap;
