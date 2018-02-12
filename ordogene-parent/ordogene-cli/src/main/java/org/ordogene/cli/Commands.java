@@ -35,7 +35,7 @@ import org.springframework.web.client.RestTemplate;
 @ShellComponent
 public class Commands {
 	
-	private int id;
+	private String id;
 	private static final Logger log = LoggerFactory.getLogger(Commands.class);
 	private final String[] headers = {"id", "name", "status", "progress", "date", "max fitness"};
 	@Autowired
@@ -53,7 +53,7 @@ public class Commands {
 			case "N":
 			case "no":
 				System.out.print("Enter your id : ");
-				id = scanner.nextInt();
+				id = scanner.next();
 				getUser(id);
 				break;
 			case "y":
@@ -66,7 +66,7 @@ public class Commands {
 		System.out.println();
 	}
 	
-	public void getUser(int id) {
+	public void getUser(String id) {
 		//Request
 		ResponseEntity<ApiJsonResponse> response = null;
 		try {
