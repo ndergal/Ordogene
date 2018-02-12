@@ -21,6 +21,7 @@ public class Const {
 
 	private static Map<String, String> resourcesMap;
 
+	 
 	public static boolean loadConfig(String configFilePath) {
 
 		System.out.println("Loading " + configFilePath);
@@ -59,7 +60,6 @@ public class Const {
 		return true;
 
 	}
-
 	public static Map<String, String> getConst() {
 		return Collections.unmodifiableMap(resourcesMap);
 	}
