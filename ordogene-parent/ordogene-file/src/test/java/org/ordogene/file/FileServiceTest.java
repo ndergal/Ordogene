@@ -4,11 +4,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.net.URISyntaxException;
-import java.security.PermissionCollection;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.ordogene.file.utils.Const;
 
 /**
@@ -18,8 +16,7 @@ public class FileServiceTest {
 
 	@Before
 	public void init() throws URISyntaxException {
-		PermissionCollection permCollection = FileServiceTest.class.getProtectionDomain().getPermissions();
-		String configFileLocation = ModelTest.class.getClassLoader().getResource("ordogene.conf.json").toURI().toString();
+ 		String configFileLocation = ModelTest.class.getClassLoader().getResource("ordogene.conf.json").toURI().toString();
 		if (configFileLocation.startsWith("file:")) {
 			configFileLocation = configFileLocation.substring(5);
 
