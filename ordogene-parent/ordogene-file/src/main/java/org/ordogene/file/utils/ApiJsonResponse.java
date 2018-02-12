@@ -4,12 +4,20 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 
 public class ApiJsonResponse {
-	private int id;
+	private String id;
 	private int cid;
 	private String error;
 	private List<Calculation> list;
 	private BufferedImage img;
 	
+	public ApiJsonResponse(String id, int cid, String error, List<Calculation> list, BufferedImage img) {
+		this.id = id;
+		this.cid = cid;
+		this.error = error;
+		this.list = list;
+		this.img = img;
+	}
+
 	public BufferedImage getImg() {
 		return img;
 	}
@@ -18,11 +26,11 @@ public class ApiJsonResponse {
 		this.img = img;
 	}
 
-	public int getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 

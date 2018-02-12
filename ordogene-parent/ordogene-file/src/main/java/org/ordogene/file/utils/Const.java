@@ -1,5 +1,6 @@
 package org.ordogene.file.utils;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
@@ -18,51 +19,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Const {
 
-	private final static Map<String, String> resourcesMap;
-	private final static Map<String, String> unmodifiableResourcesMap;
+	private static Map<String, String> resourcesMap;
 
-	static {
+	public static boolean loadConfig(String configFilePath) {
 
-		PermissionCollection permCollection = Const.class.getProtectionDomain().getPermissions();
-		String location = null;
-		if (permCollection != null) {
-			Enumeration<Permission> en = permCollection.elements();
-			while (en.hasMoreElements() && location == null) {
-				Permission perm = en.nextElement();
-				if (perm.toString().startsWith("(\"java.io.FilePermission\"")) {
-					location = perm.getName();
-				}
-			}
-		}
-		if (location.endsWith("-")) {
-			location = location.substring(0, location.length() - 1);
-		}
+		System.out.println("Loading " + configFilePath);
 
-		URI configUri;
-
-		try {
-//			System.out.println("PATH !!!!!!!!! = " + location);
-			configUri = new URI(location + /* File.separator + */ "ordogene.conf.json");
-			System.out.println("Loading " + configUri.toString());
-		} catch (URISyntaxException e2) {
-			System.err.println(
-					"Error while retrieving the configuration file... Looking in " + System.getProperty("user.home"));
-			try {
-				configUri = new URI(System.getProperty("user.home") + '/' + "ordogene.conf.json");
-			} catch (URISyntaxException e) {
-				System.err.println("Error while looking for the current user folder. Application will shutdown");
-				configUri = null;
-				System.exit(0);
-			}
-			// e2.printStackTrace();
-		}
-
-		System.out.println("configUri = "+configUri);
-		
 		Map<String, String> tmpResourcesMap;
 
 		ObjectMapper objectMapper = new ObjectMapper();
-		try (FileInputStream fis = new FileInputStream(location + /* File.separator + */ "ordogene.conf.json")) {
+		try (FileInputStream fis = new FileInputStream(configFilePath)) {
 			tmpResourcesMap = objectMapper.readValue(fis, new TypeReference<HashMap<String, String>>() {
 			});
 
@@ -70,13 +36,18 @@ public class Const {
 			// e1.printStackTrace();
 			System.err.println("Error : the configuration file is missing or invalid. The application will fail.");
 			tmpResourcesMap = new HashMap<>();
+			return false;
 		}
-
+		if (!tmpResourcesMap.isEmpty()) {
+			System.out.println("Configuraiton well loaded !");
+		} else {
+			System.err.println("Configuraiton not loaded...");
+			return false;
+		}
 		resourcesMap = tmpResourcesMap;
-		unmodifiableResourcesMap = Collections.unmodifiableMap(resourcesMap);
 		String appliPath = resourcesMap.get("ApplicationPath");
 		if (appliPath == null) {
-			System.err.println("Error : 'ApplicationPath' is missing config.json");
+			System.err.println("Error : 'ApplicationPath' is missing the config file.");
 		} else {
 			try {
 				Files.createDirectories(Paths.get(appliPath));
@@ -85,10 +56,11 @@ public class Const {
 				e.printStackTrace();
 			}
 		}
+		return true;
 
 	}
 
 	public static Map<String, String> getConst() {
-		return unmodifiableResourcesMap;
+		return Collections.unmodifiableMap(resourcesMap);
 	}
 }
