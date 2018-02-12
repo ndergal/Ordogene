@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.ordogene.file.FileService;
 import org.ordogene.file.utils.ApiJsonResponse;
+import org.ordogene.file.utils.Calculation;
 import org.ordogene.file.utils.Const;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,10 +30,10 @@ public class CalculationController {
 	@ResponseBody
 	public ResponseEntity<ApiJsonResponse> getUserCalculations(@PathVariable String id) {
 
-		if (id == null) {
+		if (id == null) { // never
 			//return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(id + " does not exist");
 			return new ResponseEntity<ApiJsonResponse>(
-					new ApiJsonResponse(null, 0, id + " does not exist", null, null),
+					new ApiJsonResponse(null, 0, "id can't be null", null, null),
 					HttpStatus.BAD_REQUEST
 				);
 		}
@@ -46,12 +47,12 @@ public class CalculationController {
 					HttpStatus.NOT_FOUND
 				);
 		} else {
-			List<String> calculations = fs.getUserCalculations(id);
+			List<Calculation> calculations = fs.getUserCalculations(id);
 			StringBuilder sb = new StringBuilder();
 			calculations.forEach(c -> sb.append(c).append('\n'));
 			//return ResponseEntity.ok().body(sb.toString());
 			return new ResponseEntity<ApiJsonResponse>(
-					new ApiJsonResponse(null, 0, sb.toString(), null, null),
+					new ApiJsonResponse(null, 0, null, calculations, null),
 					HttpStatus.OK
 				);
 		}

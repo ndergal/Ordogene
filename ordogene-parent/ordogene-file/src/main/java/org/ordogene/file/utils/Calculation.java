@@ -9,6 +9,8 @@ public class Calculation {
 	private String date;
 	private int lastIterationSaved;
 	
+	public Calculation() {} 
+	
 	public int getId() {
 		return id;
 	}

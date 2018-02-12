@@ -3,6 +3,8 @@ package org.ordogene.file;
 import java.security.SecureRandom;
 import java.util.List;
 
+import org.ordogene.file.utils.Calculation;
+
 public class FileService {
 
 	private final UserHandler uh = new UserHandler();
@@ -30,7 +32,7 @@ public class FileService {
 		return sb.toString();
 	}
 	
-	public List<String> getUserCalculations(String username){
+	public List<Calculation> getUserCalculations(String username){
 		return ch.getCallculations(username);
 	}
 

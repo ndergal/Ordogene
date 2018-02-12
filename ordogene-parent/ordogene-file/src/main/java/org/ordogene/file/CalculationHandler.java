@@ -5,34 +5,33 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.DirectoryStream;
-import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
+import org.ordogene.file.utils.Calculation;
 import org.ordogene.file.utils.Const;
 
 public class CalculationHandler {
 
-	List<String> getCallculations(String username) {
-		List<String> res = new ArrayList<>();
+	List<Calculation> getCallculations(String username) {
+		List<Calculation> res = new ArrayList<>();
 		if (username == null || username.equals("")) {
 			return res;
 		}
-		Path userPath = Paths.get(Const.getConst().get("ApplicationPath")+File.separatorChar+username );
-		try (DirectoryStream<Path> dirStream = Files
-				.newDirectoryStream(userPath, p -> Files.isDirectory(p))) {
-			dirStream.forEach(p -> {
-				res.add(p.getFileName().toString());
+		Path userPath = Paths.get(Const.getConst().get("ApplicationPath") + File.separatorChar + username);
+		try (DirectoryStream<Path> userPathStream = Files.newDirectoryStream(userPath, p -> Files.isDirectory(p))) {
+			
+			userPathStream.forEach(p -> {
+				Calculation currenCalculation = new Calculation();
+				currenCalculation.setName(p.getFileName().toString());
+				res.add(currenCalculation);
 			});
 
 		} catch (IOException e) {
-			System.err.println("Error while browsing the path "+userPath.toString());
+			System.err.println("Error while browsing the path " + userPath.toString());
 			e.printStackTrace();
 		}
 
