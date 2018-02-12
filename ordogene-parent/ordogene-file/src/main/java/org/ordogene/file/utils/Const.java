@@ -1,15 +1,15 @@
-package org.ordogene.file;
+package org.ordogene.file.utils;
 
-import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.Permission;
+import java.security.PermissionCollection;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,13 +23,27 @@ public class Const {
 
 	static {
 
-		URL currentUrl = Const.class.getProtectionDomain().getCodeSource().getLocation();
-		URI currentUri;
+		PermissionCollection permCollection = Const.class.getProtectionDomain().getPermissions();
+		String location = null;
+		if (permCollection != null) {
+			Enumeration<Permission> en = permCollection.elements();
+			while (en.hasMoreElements() && location == null) {
+				Permission perm = en.nextElement();
+				if (perm.toString().startsWith("(\"java.io.FilePermission\"")) {
+					location = perm.getName();
+				}
+			}
+		}
+		if (location.endsWith("-")) {
+			location = location.substring(0, location.length() - 1);
+		}
+
 		URI configUri;
+
 		try {
-			currentUri = currentUrl.toURI();
-			configUri = currentUri.resolve(currentUri.getPath() + /*File.separator +*/ "ordogene.conf.json");
-			System.out.println("Loading "+configUri.toString());
+//			System.out.println("PATH !!!!!!!!! = " + location);
+			configUri = new URI(location + /* File.separator + */ "ordogene.conf.json");
+			System.out.println("Loading " + configUri.toString());
 		} catch (URISyntaxException e2) {
 			System.err.println(
 					"Error while retrieving the configuration file... Looking in " + System.getProperty("user.home"));
@@ -43,11 +57,13 @@ public class Const {
 			// e2.printStackTrace();
 		}
 
+		System.out.println("configUri = "+configUri);
+		
 		Map<String, String> tmpResourcesMap;
 
 		ObjectMapper objectMapper = new ObjectMapper();
-		try (InputStream configFile = configUri.toURL().openStream()) {
-			tmpResourcesMap = objectMapper.readValue(configFile, new TypeReference<HashMap<String, String>>() {
+		try (FileInputStream fis = new FileInputStream(location + /* File.separator + */ "ordogene.conf.json")) {
+			tmpResourcesMap = objectMapper.readValue(fis, new TypeReference<HashMap<String, String>>() {
 			});
 
 		} catch (IOException e1) {
