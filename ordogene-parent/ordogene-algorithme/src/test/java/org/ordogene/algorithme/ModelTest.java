@@ -2,14 +2,11 @@ package org.ordogene.algorithme;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
@@ -19,9 +16,7 @@ import org.ordogene.algorithme.models.Environment;
 import org.ordogene.algorithme.models.Fitness;
 import org.ordogene.algorithme.models.Input;
 import org.ordogene.file.JSONModel;
-import org.ordogene.file.models.JSONAction;
 import org.ordogene.file.models.JSONFitness;
-import org.ordogene.file.models.JSONOperand;
 import org.ordogene.file.models.Relation;
 import org.ordogene.file.models.Type;
 
@@ -45,7 +40,7 @@ public class ModelTest {
 		when(e1.getName()).thenReturn("e1");
 		when(e1.getQuantity()).thenReturn(1);
 		
-		new Model(Collections.emptyList(), 100, 20, env, Collections.emptyList(), f);
+		new Model(Collections.emptyList(), 100, 20, env, Collections.emptySet(), f);
 	}
 
 	@Test(expected=NullPointerException.class)
@@ -64,7 +59,7 @@ public class ModelTest {
 		when(e1.getName()).thenReturn("e1");
 		when(e1.getQuantity()).thenReturn(1);
 		
-		new Model(null, 100, 20, env, Collections.emptyList(), f);
+		new Model(null, 100, 20, env, Collections.emptySet(), f);
 	}
 
 	@Test(expected=IllegalArgumentException.class)
@@ -83,7 +78,7 @@ public class ModelTest {
 		when(e1.getName()).thenReturn("e1");
 		when(e1.getQuantity()).thenReturn(1);
 		
-		new Model(Collections.emptyList(), 0, 20, env, Collections.emptyList(), f);
+		new Model(Collections.emptyList(), 0, 20, env, Collections.emptySet(), f);
 	}
 
 	@Test(expected=IllegalArgumentException.class)
@@ -102,7 +97,7 @@ public class ModelTest {
 		when(e1.getName()).thenReturn("e1");
 		when(e1.getQuantity()).thenReturn(1);
 		
-		new Model(Collections.emptyList(), -1, 20, env, Collections.emptyList(), f);
+		new Model(Collections.emptyList(), -1, 20, env, Collections.emptySet(), f);
 	}
 
 	@Test(expected=IllegalArgumentException.class)
@@ -121,7 +116,7 @@ public class ModelTest {
 		when(e1.getName()).thenReturn("e1");
 		when(e1.getQuantity()).thenReturn(1);
 		
-		new Model(Collections.emptyList(), 100, 0, env, Collections.emptyList(), f);
+		new Model(Collections.emptyList(), 100, 0, env, Collections.emptySet(), f);
 	}
 
 	@Test(expected=IllegalArgumentException.class)
@@ -140,14 +135,14 @@ public class ModelTest {
 		when(e1.getName()).thenReturn("e1");
 		when(e1.getQuantity()).thenReturn(1);
 		
-		new Model(Collections.emptyList(), 100, -1, env, Collections.emptyList(), f);
+		new Model(Collections.emptyList(), 100, -1, env, Collections.emptySet(), f);
 	}
 
 	@Test(expected=NullPointerException.class)
 	public void testModel_null_env() {
 		Fitness f = mock(Fitness.class);
 		
-		new Model(null, 100, 20, null, Collections.emptyList(), f);
+		new Model(null, 100, 20, null, Collections.emptySet(), f);
 	}
 
 	@Test(expected=NullPointerException.class)
@@ -178,7 +173,7 @@ public class ModelTest {
 		Set<Entity> entityEnv = new HashSet<>();
 		entityEnv.add(e1);
 		
-		List<Action> actions = new ArrayList<>();
+		Set<Action> actions = new HashSet<>();
 		actions.add(null);
 		
 		when(env.containsEntity(anyString())).thenReturn(true);
@@ -207,7 +202,7 @@ public class ModelTest {
 		when(e1.getName()).thenReturn("e1");
 		when(e1.getQuantity()).thenReturn(1);
 		
-		new Model(Collections.emptyList(), 100, 20, env, Collections.emptyList(), null);
+		new Model(Collections.emptyList(), 100, 20, env, Collections.emptySet(), null);
 	}
 
 	@Test
@@ -239,7 +234,7 @@ public class ModelTest {
 		Set<Entity> entityEnv = new HashSet<>();
 		entityEnv.add(e1);
 		
-		List<Action> actions = new ArrayList<>();
+		Set<Action> actions = new HashSet<>();
 		actions.add(a);
 		
 		Set<Input> inputs = new HashSet<>();
@@ -279,7 +274,7 @@ public class ModelTest {
 		Set<Entity> entityEnv = new HashSet<>();
 		entityEnv.add(e1);
 		
-		List<Action> actions = new ArrayList<>();
+		Set<Action> actions = new HashSet<>();
 		actions.add(a);
 		
 		Set<Input> inputs = new HashSet<>();
@@ -320,7 +315,7 @@ public class ModelTest {
 		Set<Entity> entityEnv = new HashSet<>();
 		entityEnv.add(e1);
 		
-		List<Action> actions = new ArrayList<>();
+		Set<Action> actions = new HashSet<>();
 		actions.add(a);
 		
 		Set<Input> inputs = new HashSet<>();

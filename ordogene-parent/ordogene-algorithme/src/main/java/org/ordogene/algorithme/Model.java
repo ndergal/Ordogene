@@ -1,6 +1,5 @@
 package org.ordogene.algorithme;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,7 +32,7 @@ public class Model {
 	private ActionSelector actionSelector = new ActionSelector();
 
 	// TODO check les null dans les list
-	public Model(List<Integer> snaps, int slots, int execTime, Environment environment, List<Action> actions,
+	public Model(List<Integer> snaps, int slots, int execTime, Environment environment, Set<Action> actions,
 			Fitness fitness) {
 		if (slots <= 0) {
 			throw new IllegalArgumentException("slots has to be a positive integer");
@@ -47,10 +46,7 @@ public class Model {
 		this.startEnvironment = Objects.requireNonNull(environment);
 		this.currentEnvironment = new Environment(environment.getEntities());
 		actions.forEach(a -> {
-			Objects.requireNonNull(a);
-			if(this.actionsInProgress.put(a, 0) != null) {
-				throw new IllegalArgumentException("Can't be have a null Action");
-			}
+			this.actionsInProgress.put(Objects.requireNonNull(a), 0);
 		});
 		this.fitness = Objects.requireNonNull(fitness);
 	}
@@ -59,7 +55,7 @@ public class Model {
 		Objects.requireNonNull(jm);
 		Environment env = new Environment(
 				jm.getEnvironment().stream().map(Entity::createEntity).collect(Collectors.toSet()));
-		List<Action> actions = jm.getActions().stream().map(Action::createAction).collect(Collectors.toList());
+		Set<Action> actions = jm.getActions().stream().map(Action::createAction).collect(Collectors.toSet());
 		List<Integer> snaps = jm.getSnaps().stream().collect(Collectors.toList());
 		return new Model(snaps, jm.getSlots(), jm.getExecTime(), env, actions, Fitness.createFitness(jm.getFitness()));
 	}
@@ -178,7 +174,7 @@ public class Model {
 
 		Action a = new Action("1", 1, inputs, outputs);
 
-		ArrayList<Action> actions = new ArrayList<>();
+		Set<Action> actions = new HashSet<>();
 		actions.add(a);
 
 		HashMap<String, Long> h = new HashMap<>();
