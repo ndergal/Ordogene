@@ -8,7 +8,6 @@ import org.ordogene.file.models.JSONEntity;
 import org.ordogene.file.models.JSONFitness;
 import org.ordogene.file.parser.Validable;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import edu.emory.mathcs.backport.java.util.Collections;
@@ -21,8 +20,6 @@ public class JSONModel implements Validable {
 	private List<JSONEntity> environment;
 	private List<JSONAction> actions;
 	private JSONFitness fitness;
-	@JsonIgnore
-	private List<JSONEntity> currentEnvironment;
 
 	@Override
 	public boolean isValid() {
@@ -102,17 +99,6 @@ public class JSONModel implements Validable {
 		this.fitness = Objects.requireNonNull(fitness);
 	}
 
-	public List<JSONEntity> getCurrentEnvironment() {
-		return currentEnvironment;
-	}
-
-	public void setCurrentEnvironment(List<JSONEntity> currentEnvironment) {
-		this.currentEnvironment = Objects.requireNonNull(currentEnvironment);
-		if (currentEnvironment.stream().anyMatch(x -> x == null)) {
-			throw new IllegalArgumentException("the current environment should not contains null entities");
-		}
-	}
-
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -128,8 +114,6 @@ public class JSONModel implements Validable {
 		builder.append(actions);
 		builder.append(",\nfitness=");
 		builder.append(fitness);
-		builder.append(",\ncurrentEnvironment=");
-		builder.append(currentEnvironment);
 		builder.append("]");
 		return builder.toString();
 	}

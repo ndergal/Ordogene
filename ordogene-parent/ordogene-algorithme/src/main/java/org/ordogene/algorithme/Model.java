@@ -25,15 +25,15 @@ public class Model {
 	private final int slots;
 	private final int execTime;
 	private final Environment startEnvironment;
-	private final HashMap<Action, Integer> actions = new HashMap<>();
+	private final HashMap<Action, Integer> actionsInProgress = new HashMap<>();
 	private final Fitness fitness;
 
 	private Environment currentEnvironment;
 
-	private ActionSelector actionSelector;
+	private ActionSelector actionSelector = new ActionSelector();
 
 	// TODO check les null dans les list
-	private Model(List<Integer> snaps, int slots, int execTime, Environment environment, List<Action> actions,
+	public Model(List<Integer> snaps, int slots, int execTime, Environment environment, List<Action> actions,
 			Fitness fitness) {
 		if (slots <= 0) {
 			throw new IllegalArgumentException("slots has to be a positive integer");
@@ -46,13 +46,16 @@ public class Model {
 		this.execTime = execTime;
 		this.startEnvironment = Objects.requireNonNull(environment);
 		this.currentEnvironment = new Environment(environment.getEntities());
-		actions.forEach(a -> this.actions.put(a, 0));
-		;
+		actions.forEach(a -> {
+			if(this.actionsInProgress.put(a, 0) != null) {
+				throw new IllegalArgumentException("Can't be have a null Action");
+			}
+		});
 		this.fitness = Objects.requireNonNull(fitness);
-		this.actionSelector = new ActionSelector();
 	}
 
 	public static Model createModel(JSONModel jm) {
+		Objects.requireNonNull(jm);
 		Environment env = new Environment(
 				jm.getEnvironment().stream().map(Entity::createEntity).collect(Collectors.toSet()));
 		List<Action> actions = jm.getActions().stream().map(Action::createAction).collect(Collectors.toList());
@@ -68,7 +71,7 @@ public class Model {
 	 * @return True if the action can be done, else False
 	 */
 	public boolean workable(Action a) {
-		if (actions.get(a) == null) {
+		if (actionsInProgress.get(a) == null) {
 			throw new IllegalArgumentException("The Action given don't exist in this model");
 		}
 		Iterator<Input> it = a.getInputs().iterator();
@@ -93,7 +96,7 @@ public class Model {
 			return actionSelector.select();
 		}
 		actionSelector.add(Action.EMPTY(1), 0);
-		for (Action a : actions.keySet()) {
+		for (Action a : actionsInProgress.keySet()) {
 			if (this.workable(a)) {
 				actionSelector.add(a, fitness.eval(a));
 			}
@@ -102,7 +105,7 @@ public class Model {
 	}
 
 	public void startAnAction(Action a) {
-		if (actions.get(a) == null) {
+		if (actionsInProgress.get(a) == null) {
 			throw new IllegalArgumentException("The Action given don't exist in this model");
 		}
 		if (!workable(a)) {
@@ -119,17 +122,17 @@ public class Model {
 				environmentEntity.addQuantity(-quantityToRemoved);
 			}
 		}
-		actions.compute(a, (k, i) -> {
+		actionsInProgress.compute(a, (k, i) -> {
 			return i + 1;
 		});
 	}
 
 	public void endAnAction(Action a) {
-		Integer actionsInProgress = actions.get(a);
-		if (actionsInProgress == null) {
+		Integer action = actionsInProgress.get(a);
+		if (action == null) {
 			throw new IllegalArgumentException("The Action given don't exist in this model");
 		}
-		if (actionsInProgress == 0) {
+		if (action == 0) {
 			throw new IllegalArgumentException("The Action given was not launched");
 		}
 		for (Input input : a.getInputs()) {
@@ -149,7 +152,7 @@ public class Model {
 			environmentEntity.addQuantity(quantityToAdd);
 		}
 
-		actions.compute(a, (k, i) -> {
+		actionsInProgress.compute(a, (k, i) -> {
 			return i - 1;
 		});
 	}
