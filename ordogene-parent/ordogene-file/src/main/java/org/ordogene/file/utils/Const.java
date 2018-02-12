@@ -1,5 +1,6 @@
 package org.ordogene.file.utils;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
@@ -41,8 +42,12 @@ public class Const {
 		URI configUri;
 
 		try {
-//			System.out.println("PATH !!!!!!!!! = " + location);
-			configUri = new URI(location + /* File.separator + */ "ordogene.conf.json");
+			// System.out.println("PATH !!!!!!!!! = " + location);
+			if (location.endsWith(File.separator)) {
+				configUri = new URI(location + /* File.separator + */ "ordogene.conf.json");
+			} else {
+				configUri = new URI(location + File.separator + "ordogene.conf.json");
+			}
 			System.out.println("Loading " + configUri.toString());
 		} catch (URISyntaxException e2) {
 			System.err.println(
@@ -57,8 +62,8 @@ public class Const {
 			// e2.printStackTrace();
 		}
 
-		System.out.println("configUri = "+configUri);
-		
+		//System.out.println("configUri = " + configUri);
+
 		Map<String, String> tmpResourcesMap;
 
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -71,12 +76,17 @@ public class Const {
 			System.err.println("Error : the configuration file is missing or invalid. The application will fail.");
 			tmpResourcesMap = new HashMap<>();
 		}
-
+		if (!tmpResourcesMap.isEmpty()) {
+			System.out.println("Configuraiton well loaded !");
+		}
+		else {
+			System.err.println("Configuraiton not loaded...");
+		}
 		resourcesMap = tmpResourcesMap;
 		unmodifiableResourcesMap = Collections.unmodifiableMap(resourcesMap);
 		String appliPath = resourcesMap.get("ApplicationPath");
 		if (appliPath == null) {
-			System.err.println("Error : 'ApplicationPath' is missing config.json");
+			System.err.println("Error : 'ApplicationPath' is missing ordogene.conf.json");
 		} else {
 			try {
 				Files.createDirectories(Paths.get(appliPath));

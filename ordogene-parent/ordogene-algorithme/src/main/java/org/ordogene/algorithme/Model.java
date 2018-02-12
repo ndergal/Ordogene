@@ -165,11 +165,11 @@ public class Model {
 
 		Environment env = new Environment(entities);
 
-		ArrayList<Input> inputs = new ArrayList<>();
+		Set<Input> inputs = new HashSet<>();
 		inputs.add(new Input("A", 2, Relation.c));
 		inputs.add(new Input("B", 1, Relation.c));
 
-		ArrayList<Entity> outputs = new ArrayList<>();
+		Set<Entity> outputs = new HashSet<>();
 		outputs.add(new Entity("D", 3));
 
 		Action a = new Action("1", 1, inputs, outputs);

@@ -65,8 +65,8 @@ public class ActionSelectorTest {
 		Action a = mock(Action.class);
 		
 		// when
-		when(a.getInputs()).thenReturn(Collections.emptyList());
-		when(a.getOutputs()).thenReturn(Collections.emptyList());
+		when(a.getInputs()).thenReturn(Collections.emptySet());
+		when(a.getOutputs()).thenReturn(Collections.emptySet());
 		when(a.getName()).thenReturn("EMPTY");
 		when(a.getTime()).thenReturn(0);
 		
@@ -98,15 +98,15 @@ public class ActionSelectorTest {
 		when(a1.getTime()).thenReturn(3);
 		when(a1.getTime()).thenReturn(4);
 
-		when(a1.getInputs()).thenReturn(Collections.emptyList());
-		when(a2.getInputs()).thenReturn(Collections.emptyList());
-		when(a3.getInputs()).thenReturn(Collections.emptyList());
-		when(a4.getInputs()).thenReturn(Collections.emptyList());
+		when(a1.getInputs()).thenReturn(Collections.emptySet());
+		when(a2.getInputs()).thenReturn(Collections.emptySet());
+		when(a3.getInputs()).thenReturn(Collections.emptySet());
+		when(a4.getInputs()).thenReturn(Collections.emptySet());
 
-		when(a1.getOutputs()).thenReturn(Collections.emptyList());
-		when(a2.getOutputs()).thenReturn(Collections.emptyList());
-		when(a3.getOutputs()).thenReturn(Collections.emptyList());
-		when(a4.getOutputs()).thenReturn(Collections.emptyList());
+		when(a1.getOutputs()).thenReturn(Collections.emptySet());
+		when(a2.getOutputs()).thenReturn(Collections.emptySet());
+		when(a3.getOutputs()).thenReturn(Collections.emptySet());
+		when(a4.getOutputs()).thenReturn(Collections.emptySet());
 		
 		// then
 		mockActionSelector.add(a1, 1);
