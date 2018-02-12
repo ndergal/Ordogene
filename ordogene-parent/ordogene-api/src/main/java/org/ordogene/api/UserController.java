@@ -18,7 +18,7 @@ public class UserController {
 	@Autowired
 	FileService fs;
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{id}")
+	@RequestMapping(method = RequestMethod.GET, value = "/{id}", produces = "application/json")
 	// @RequestMapping(value = "/checkUserId/{user_ID}", produces =
 	// "application/json")
 	@ResponseBody
