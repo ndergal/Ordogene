@@ -1,0 +1,78 @@
+{
+    "snaps" : [5,10,20,100],
+    "slots" : 300,
+    "exec_time" : 10000,
+    "environment" : [
+	{"name" : "Nexus", "quantity" : 1},
+	{"name" : "Peon", "quantity" : 1},
+	{"name" : "Gold", "quantity" : 34},
+	{"name" : "Barrack", "quantity" : 0},
+	{"name" : "Knight", "quantity" : 0}
+    ],
+    "actions" : [
+        {"name" : "Build_nexus", "time" : 20,
+         "input" : [
+    	     { "name" : "Gold", "quantity" : 20, "relation" : "c" },
+	     { "name" : "Peon", "quantity" : 1, "relation" : "p" }
+	 ],
+	 "output" : [
+	     {"name" : "Nexus", "quantity" : 1}
+	 ]
+	},
+	{"name" : "Build_peon", "time" : 2,
+         "input" : [
+    	     { "name" : "Nexus", "quantity" : 1, "relation" : "p" },
+	     { "name" : "Gold", "quantity" : 5, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "Peon", "quantity" : 1}
+	 ]
+	},
+	{"name" : "Dig_gold", "time" : 1,
+         "input" : [
+    	     { "name" : "Nexus", "quantity" : 1, "relation" : "r" },
+	     { "name" : "Peon", "quantity" : 1, "relation" : "p" }
+	 ],
+	 "output" : [
+	     {"name" : "Gold", "quantity" : 1}
+	 ]
+	},
+	{"name" : "Build_barrack", "time" : 10,
+         "input" : [
+    	     { "name" : "Nexus", "quantity" : 1, "relation" : "r" },
+	     { "name" : "Peon", "quantity" : 1, "relation" : "p" },
+	     { "name" : "Gold", "quantity" : 15, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "Barrack", "quantity" : 1}
+	 ]
+	},
+	{"name" : "Build_barrack", "time" : 10,
+         "input" : [
+    	     { "name" : "Nexus", "quantity" : 1, "relation" : "r" },
+	     { "name" : "Peon", "quantity" : 1, "relation" : "p" },
+	     { "name" : "Gold", "quantity" : 15, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "Barrack", "quantity" : 1}
+	 ]
+	},
+	{"name" : "Train_knight", "time" : 10,
+         "input" : [
+	     { "name" : "Barrack", "quantity" : 1, "relation" : "p" },
+	     { "name" : "Gold", "quantity" : 10, "relation" : "c" },
+	     { "name" : "Peon", "quantity" : 1, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "Knight", "quantity" : 1}
+	 ]
+	}
+    ],
+    "fitness" : {
+	"type" : "max",
+	"operands" : [
+	    {"name" : "Peon", "coef" : 1},
+	    {"name" : "Knight", "coef" : 20}
+	]
+    }
+}

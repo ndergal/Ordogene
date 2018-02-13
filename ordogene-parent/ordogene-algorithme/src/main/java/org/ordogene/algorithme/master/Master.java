@@ -60,9 +60,9 @@ public class Master {
 			InstantiationException, IllegalAccessException, UnmarshalException, IOException, InterruptedException {
 
 		synchronized (threadMap) {
-			while (currentThread == maxThread) {
+			if (currentThread == maxThread) {
 				// timeout -2 complet ~5sec -1 error random
-				threadMap.wait();
+				return -2;
 			}
 			currentThread++;
 		}
@@ -73,6 +73,15 @@ public class Master {
 
 		ThreadHandler th = new ThreadHandler();
 		Thread t = new Thread(() -> {
+			
+			try {
+				Dummy.fakeCalculation(th, idUser,numCalc);
+			} catch (InterruptedException | IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			/*
 			System.out.println("hello world !");
 			int i = 5;
 			while (i > 0) {
@@ -93,12 +102,12 @@ public class Master {
 				}
 				i--;
 			}
+			*/
 
 			// TODO donner blockingqueue a la méthode sunchronized pour get th
 			synchronized (threadMap) {
 				currentThread--;
-				threadMap.notifyAll();
-				threadMap.remove(numCalc);
+ 				threadMap.remove(numCalc);
 				return;
 			}
 		});

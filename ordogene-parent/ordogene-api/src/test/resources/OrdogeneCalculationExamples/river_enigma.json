@@ -1,0 +1,140 @@
+{
+    "snaps" : [5,10,20,100],
+    "slots" : 100,
+    "exec_time" : 10000,
+    "environment" : [
+	{"name" : "A_G", "quantity" : 1},
+	{"name" : "B_G", "quantity" : 1},
+	{"name" : "C_G", "quantity" : 1},	
+	{"name" : "D_G", "quantity" : 1},
+	{"name" : "A_D", "quantity" : 0},
+	{"name" : "B_D", "quantity" : 0},
+	{"name" : "C_D", "quantity" : 0},	
+	{"name" : "D_D", "quantity" : 0}
+	{"name" : "Boat_G", "quantity" : 1},
+	{"name" : "Boat_D", "quantity" : 0}
+    ],
+    "actions" : [
+	{"name" : "AB", "time" : 2,
+	 "input" : [
+	     { "name" : "A_G", "quantity" : 1, "relation" : "c" },
+	     { "name" : "B_G", "quantity" : 1, "relation" : "c" },
+	     { "name" : "Boat_G", "quantity" : 1, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "A_D", "quantity" : 1},
+	     {"name" : "B_D", "quantity" : 1},
+	     {"name" : "Boat_D", "quantity" : 1}
+	 ]
+	},
+	{"name" : "AC", "time" : 5,
+	 "input" : [
+	     { "name" : "A_G", "quantity" : 1, "relation" : "c" },
+	     { "name" : "C_G", "quantity" : 1, "relation" : "c" },
+	     { "name" : "Boat_G", "quantity" : 1, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "A_D", "quantity" : 1},
+	     {"name" : "C_D", "quantity" : 1},
+	     {"name" : "Boat_D", "quantity" : 1}
+	 ]
+	},
+	{"name" : "AD", "time" : 10,
+	 "input" : [
+	     { "name" : "A_G", "quantity" : 1, "relation" : "c" },
+	     { "name" : "D_G", "quantity" : 1, "relation" : "c" },
+	     { "name" : "Boat_G", "quantity" : 1, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "A_D", "quantity" : 1},
+	     {"name" : "D_D", "quantity" : 1},
+	     {"name" : "Boat_D", "quantity" : 1}
+	 ]
+	},
+	{"name" : "BC", "time" : 5,
+	 "input" : [
+	     { "name" : "B_G", "quantity" : 1, "relation" : "c" },
+	     { "name" : "C_G", "quantity" : 1, "relation" : "c" },
+	     { "name" : "Boat_G", "quantity" : 1, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "B_D", "quantity" : 1},
+	     {"name" : "C_D", "quantity" : 1},
+	     {"name" : "Boat_D", "quantity" : 1}
+	 ]
+	},
+	{"name" : "BD", "time" : 10,
+	 "input" : [
+	     { "name" : "B_G", "quantity" : 1, "relation" : "c" },
+	     { "name" : "D_G", "quantity" : 1, "relation" : "c" },
+	     { "name" : "Boat_G", "quantity" : 1, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "B_D", "quantity" : 1},
+	     {"name" : "D_D", "quantity" : 1},
+	     {"name" : "Boat_D", "quantity" : 1}
+	 ]
+	},
+	{"name" : "CD", "time" : 10,
+	 "input" : [
+	     { "name" : "C_G", "quantity" : 1, "relation" : "c" },
+	     { "name" : "D_G", "quantity" : 1, "relation" : "c" },
+	     { "name" : "Boat_G", "quantity" : 1, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "C_D", "quantity" : 1},
+	     {"name" : "D_D", "quantity" : 1},
+	     {"name" : "Boat_D", "quantity" : 1}
+	 ]
+	},
+	{"name" : "A_back", "time" : 1,
+	 "input" : [
+	     { "name" : "A_D", "quantity" : 1, "relation" : "c" },
+	     { "name" : "Boat_D", "quantity" : 1, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "A_G", "quantity" : 1},
+	     {"name" : "Boat_G", "quantity" : 1}
+	 ]
+	},
+	{"name" : "B_back", "time" : 2,
+	 "input" : [
+	     { "name" : "B_D", "quantity" : 1, "relation" : "c" },
+	     { "name" : "Boat_D", "quantity" : 1, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "B_G", "quantity" : 1},
+	     {"name" : "Boat_G", "quantity" : 1}
+	 ]
+	},
+	{"name" : "C_back", "time" : 5,
+	 "input" : [
+	     { "name" : "C_D", "quantity" : 1, "relation" : "c" },
+	     { "name" : "Boat_D", "quantity" : 1, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "C_G", "quantity" : 1},
+	     {"name" : "Boat_G", "quantity" : 1}
+	 ]
+	},
+	{"name" : "D_back", "time" : 10,
+	 "input" : [
+	     { "name" : "D_D", "quantity" : 1, "relation" : "c" },
+	     { "name" : "Boat_D", "quantity" : 1, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "D_G", "quantity" : 1},
+	     {"name" : "Boat_G", "quantity" : 1}
+	 ]
+	}
+    ],
+    "fitness" : {
+	"type" : "max",
+	"operands" : [
+	    {"name" : "A_D", "coef" : 1},
+	    {"name" : "B_D", "coef" : 1},
+	    {"name" : "C_D", "coef" : 1},
+	    {"name" : "D_D", "coef" : 1}
+	]
+    }
+}
