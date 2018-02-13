@@ -31,7 +31,50 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 public class CalculationController {
 
 	@Autowired
-	FileService fs;
+	private FileService fs;
+	
+	@Autowired
+	private Master masterAlgorithme;
+	
+	private static String JSONTest = "{\n" + 
+			"    \"snaps\" : [5,10,20,100],\n" + 
+			"    \"slots\" : 300,\n" + 
+			"    \"exec_time\" : 10000,\n" + 
+			"    \"environment\" : [\n" + 
+			"		{\"name\" : \"FUEL\", \"quantity\" : 200},\n" + 
+			"		{\"name\" : \"BIG_GOOD\", \"quantity\" : 0},\n" + 
+			"		{\"name\" : \"SMALL_BAD\", \"quantity\" : 0}\n" + 
+			"    ],\n" + 
+			"    \"actions\" : [\n" + 
+			"		{\n" + 
+			"			\"name\" : \"MAKE_GOOD\", \"time\" : 5,\n" + 
+			"			\"input\" : [\n" + 
+			"		     	{ \"name\" : \"FUEL\", \"quantity\" : 60, \"relation\" : \"c\" }\n" + 
+			"		 	],\n" + 
+			"		 	\"output\" : [\n" + 
+			"		    	{\"name\" : \"BIG_GOOD\", \"quantity\" : 1}\n" + 
+			"		 	]\n" + 
+			"		},\n" + 
+			"		{\n" + 
+			"			\"name\" : \"MAKE_BAD\", \"time\" : 2,\n" + 
+			"		 	\"input\" : [\n" + 
+			"		     	{ \"name\" : \"FUEL\", \"quantity\" : 6, \"relation\" : \"c\" }\n" + 
+			"		 	],\n" + 
+			"		 	\"output\" : [\n" + 
+			"		     	{\"name\" : \"SMALL_BAD\", \"quantity\" : 1}\n" + 
+			"		 	]\n" + 
+			"		}\n" + 
+			"    ],\n" + 
+			"    \"fitness\" : {\n" + 
+			"		\"type\" : \"max\",\n" + 
+			"		\"operands\" : [\n" + 
+			"		    {\"name\" : \"BIG_GOOD\", \"coef\" : 11},\n" + 
+			"		    {\"name\" : \"SMALL_BAD\", \"coef\" : 1}\n" + 
+			"		]\n" + 
+			"    }\n" + 
+			"}";
+	
+	
 
 	@Autowired
 	Master masterAlgo;
@@ -39,29 +82,46 @@ public class CalculationController {
 	private static final Map<Integer, String> currentCalculation = new HashMap<>();
 	private final Object token = new Object();
 
-	@RequestMapping(value = "/{id}/calculations",method = RequestMethod.GET, consumes = "text/plain")
+
+	@RequestMapping(method = RequestMethod.GET, value = "/{userId}/calculations", produces = "application/json")
 	@ResponseBody
-	public ResponseEntity<ApiJsonResponse> getUserCalculations(@PathVariable String id) {
-
-		if (id == null) { // never
-			// return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(id + " does not
-			// exist");
-			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(null, 0, "id can't be null", null, null),
-					HttpStatus.BAD_REQUEST);
+	public ResponseEntity<ApiJsonResponse> getUserCalculations(@PathVariable String userId) {
+		if (userId == null) { // never
+			//return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(id + " does not exist");
+			return new ResponseEntity<ApiJsonResponse>(
+					new ApiJsonResponse(null, 0, "id can't be null", null, null),
+					HttpStatus.BAD_REQUEST
+				);
 		}
-
-		if (!fs.userExist(id)) {
-			// return ResponseEntity.status(HttpStatus.NOT_FOUND).body(id + " does not
-			// exist");
-			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(null, 0, id + " does not exist", null, null),
-					HttpStatus.NOT_FOUND);
+		if (!fs.userExist(userId)) {
+			//return ResponseEntity.status(HttpStatus.NOT_FOUND).body(id + " does not exist");
+			return new ResponseEntity<ApiJsonResponse>(
+					new ApiJsonResponse(null, 0, userId + " does not exist", null, null),
+					HttpStatus.NOT_FOUND
+				);
 		} else {
-			List<Calculation> calculations = fs.getUserCalculations(id);
+			try {
+				masterAlgorithme.compute(userId, JSONTest);
+			} catch (InstantiationException | IllegalAccessException | UnmarshalException | IOException
+					| InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			List<Calculation> calculations = fs.getUserCalculations(userId);
 			StringBuilder sb = new StringBuilder();
-			calculations.forEach(c -> sb.append(c).append('\n'));
-			// return ResponseEntity.ok().body(sb.toString());
-			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(null, 0, null, calculations, null),
-					HttpStatus.OK);
+			calculations.forEach(c -> {
+				try {
+					masterAlgorithme.updateCalculation(c);
+				} catch (InternalError e) {
+					System.err.println("Problem with calculation format informations");
+					return;
+				}
+				sb.append(c).append('\n');
+			});
+			return new ResponseEntity<ApiJsonResponse>(
+					new ApiJsonResponse(null, 0, null, calculations, null),
+					HttpStatus.OK
+				);
 		}
 	}
 
@@ -92,7 +152,7 @@ public class CalculationController {
 			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(null, 0, uid + " does not exist", null, null),
 					HttpStatus.NOT_FOUND);
 		}
-
+			
 		int calculationId = 0;
 		try {
 			calculationId= this.masterAlgo.compute(uid, jsonBody);

@@ -31,9 +31,7 @@ public class UserController {
 				);
 		}
 
-		boolean exist = fs.userExist(id);
-
-		if (!exist) {
+		if (!fs.userExist(id)) {
 			//return ResponseEntity.status(HttpStatus.NOT_FOUND).body(id + " does not exist");
 			return new ResponseEntity<ApiJsonResponse>(
 					new ApiJsonResponse(null, 0, id + " does not exist", null, null),

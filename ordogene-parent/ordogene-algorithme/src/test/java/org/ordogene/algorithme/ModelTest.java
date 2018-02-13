@@ -43,7 +43,7 @@ public class ModelTest {
 		when(e1.getName()).thenReturn("e1");
 		when(e1.getQuantity()).thenReturn(1);
 		
-		new Model(Collections.emptyList(), 100, 20, env, Collections.emptySet(), f);
+		new Model(Collections.emptyList(), "model", 100, 20, env, Collections.emptySet(), f);
 	}
 
 	@Test(expected=NullPointerException.class)
@@ -62,7 +62,7 @@ public class ModelTest {
 		when(e1.getName()).thenReturn("e1");
 		when(e1.getQuantity()).thenReturn(1);
 		
-		new Model(null, 100, 20, env, Collections.emptySet(), f);
+		new Model(null, "model", 100, 20, env, Collections.emptySet(), f);
 	}
 
 	@Test(expected=IllegalArgumentException.class)
@@ -81,7 +81,7 @@ public class ModelTest {
 		when(e1.getName()).thenReturn("e1");
 		when(e1.getQuantity()).thenReturn(1);
 		
-		new Model(Collections.emptyList(), 0, 20, env, Collections.emptySet(), f);
+		new Model(Collections.emptyList(), "model", 0, 20, env, Collections.emptySet(), f);
 	}
 
 	@Test(expected=IllegalArgumentException.class)
@@ -100,7 +100,7 @@ public class ModelTest {
 		when(e1.getName()).thenReturn("e1");
 		when(e1.getQuantity()).thenReturn(1);
 		
-		new Model(Collections.emptyList(), -1, 20, env, Collections.emptySet(), f);
+		new Model(Collections.emptyList(), "model", -1, 20, env, Collections.emptySet(), f);
 	}
 
 	@Test(expected=IllegalArgumentException.class)
@@ -119,7 +119,7 @@ public class ModelTest {
 		when(e1.getName()).thenReturn("e1");
 		when(e1.getQuantity()).thenReturn(1);
 		
-		new Model(Collections.emptyList(), 100, 0, env, Collections.emptySet(), f);
+		new Model(Collections.emptyList(), "model", 100, 0, env, Collections.emptySet(), f);
 	}
 
 	@Test(expected=IllegalArgumentException.class)
@@ -138,14 +138,14 @@ public class ModelTest {
 		when(e1.getName()).thenReturn("e1");
 		when(e1.getQuantity()).thenReturn(1);
 		
-		new Model(Collections.emptyList(), 100, -1, env, Collections.emptySet(), f);
+		new Model(Collections.emptyList(), "model", 100, -1, env, Collections.emptySet(), f);
 	}
 
 	@Test(expected=NullPointerException.class)
 	public void testModel_null_env() {
 		Fitness f = mock(Fitness.class);
 		
-		new Model(null, 100, 20, null, Collections.emptySet(), f);
+		new Model(null, "model", 100, 20, null, Collections.emptySet(), f);
 	}
 
 	@Test(expected=NullPointerException.class)
@@ -164,7 +164,7 @@ public class ModelTest {
 		when(e1.getName()).thenReturn("e1");
 		when(e1.getQuantity()).thenReturn(1);
 		
-		new Model(Collections.emptyList(), 100, 20, env, null, f);
+		new Model(Collections.emptyList(), "model", 100, 20, env, null, f);
 	}
 
 	@Test(expected=NullPointerException.class)
@@ -186,7 +186,7 @@ public class ModelTest {
 		when(e1.getName()).thenReturn("e1");
 		when(e1.getQuantity()).thenReturn(1);
 		
-		new Model(Collections.emptyList(), 100, 20, env, actions, f);
+		new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 	}
 
 	@Test(expected=NullPointerException.class)
@@ -205,7 +205,7 @@ public class ModelTest {
 		when(e1.getName()).thenReturn("e1");
 		when(e1.getQuantity()).thenReturn(1);
 		
-		new Model(Collections.emptyList(), 100, 20, env, Collections.emptySet(), null);
+		new Model(Collections.emptyList(), "model", 100, 20, env, Collections.emptySet(), null);
 	}
 
 	@Test
@@ -261,7 +261,7 @@ public class ModelTest {
 		when(i.getQuantity()).thenReturn(1);
 		when(i.getRelation()).thenReturn(Relation.c);
 		
-		Model m = new Model(Collections.emptyList(), 100, 20, env, actions, f);
+		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
 		assertTrue(m.workable(a));
 	}
@@ -301,7 +301,7 @@ public class ModelTest {
 		when(i.getQuantity()).thenReturn(10);
 		when(i.getRelation()).thenReturn(Relation.c);
 		
-		Model m = new Model(Collections.emptyList(), 100, 20, env, actions, f);
+		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
 		assertFalse(m.workable(a));
 	}
@@ -347,7 +347,7 @@ public class ModelTest {
 		when(i.getQuantity()).thenReturn(10);
 		when(i.getRelation()).thenReturn(Relation.c);
 		
-		Model m = new Model(Collections.emptyList(), 100, 20, env, actions, f);
+		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
 		assertFalse(m.workable(otherAction));
 	}
@@ -391,7 +391,7 @@ public class ModelTest {
 		
 		when(f.eval(a)).thenReturn(Long.valueOf(3));
 		
-		Model m = new Model(Collections.emptyList(), 100, 20, env, actions, f);
+		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
 		assertEquals(a, m.getWorkableAction());
 	}
@@ -435,7 +435,7 @@ public class ModelTest {
 		
 		when(f.eval(a)).thenReturn(Long.valueOf(3));
 		
-		Model m = new Model(Collections.emptyList(), 100, 20, env, actions, f);
+		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
 		assertEquals(a, m.getWorkableAction());
 		assertEquals(a, m.getWorkableAction());
@@ -494,7 +494,7 @@ public class ModelTest {
 		
 		when(f.eval(a)).thenReturn(Long.valueOf(3));
 		
-		Model m = new Model(Collections.emptyList(), 100, 20, env, actions, f);
+		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
 		m.startAnAction(a);
 	}
@@ -538,7 +538,7 @@ public class ModelTest {
 		
 		when(f.eval(a)).thenReturn(Long.valueOf(3));
 		
-		Model m = new Model(Collections.emptyList(), 100, 20, env, actions, f);
+		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
 		m.startAnAction(null);
 	}
@@ -588,7 +588,7 @@ public class ModelTest {
 		
 		when(f.eval(a)).thenReturn(Long.valueOf(3));
 		
-		Model m = new Model(Collections.emptyList(), 100, 20, env, actions, f);
+		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
 		m.startAnAction(otherAction);
 	}
@@ -632,7 +632,7 @@ public class ModelTest {
 		
 		when(f.eval(a)).thenReturn(Long.valueOf(3));
 		
-		Model m = new Model(Collections.emptyList(), 100, 20, env, actions, f);
+		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
 		m.startAnAction(a);
 	}
@@ -689,7 +689,7 @@ public class ModelTest {
 		
 		when(f.eval(a)).thenReturn(Long.valueOf(3));
 		
-		Model m = new Model(Collections.emptyList(), 100, 20, env, actions, f);
+		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
 		m.startAnAction(a);
 		m.endAnAction(a);
@@ -740,7 +740,7 @@ public class ModelTest {
 		
 		when(f.eval(a)).thenReturn(Long.valueOf(3));
 		
-		Model m = new Model(Collections.emptyList(), 100, 20, env, actions, f);
+		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
 		m.startAnAction(a);
 		m.endAnAction(otherAction);
@@ -785,7 +785,7 @@ public class ModelTest {
 		
 		when(f.eval(a)).thenReturn(Long.valueOf(3));
 		
-		Model m = new Model(Collections.emptyList(), 100, 20, env, actions, f);
+		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
 		m.endAnAction(a);
 	}
@@ -829,7 +829,7 @@ public class ModelTest {
 		
 		when(f.eval(a)).thenReturn(Long.valueOf(3));
 		
-		Model m = new Model(Collections.emptyList(), 100, 20, env, actions, f);
+		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
 		m.endAnAction(null);
 	}

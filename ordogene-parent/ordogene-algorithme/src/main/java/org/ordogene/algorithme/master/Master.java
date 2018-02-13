@@ -1,8 +1,11 @@
 package org.ordogene.algorithme.master;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -11,15 +14,19 @@ import javax.xml.bind.UnmarshalException;
 import org.ordogene.algorithme.Model;
 import org.ordogene.file.JSONModel;
 import org.ordogene.file.parser.Parser;
+import org.ordogene.file.utils.Calculation;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+
+import io.jenetics.util.RandomRegistry;
 
 public class Master {
 	private static final int DEFAULT_THREAD = 10;
 	private final int maxThread;
 	private int currentThread;
 	private final Map<Integer, ThreadHandler> threadMap = new HashMap<>();
+	private final SimpleDateFormat formater = new SimpleDateFormat("dd/MM/yyyy-hh:mm");
 
 	static class ThreadHandler {
 		private Thread thread;
@@ -30,16 +37,16 @@ public class Master {
 			queue1.put(str);
 		}
 
+		public String threadFromMaster() throws InterruptedException {
+			return queue1.poll();
+		}
+
 		public String masterFromThread() throws InterruptedException {
 			return queue2.take();
 		}
 
 		public void threadToMaster(String str) throws InterruptedException {
 			queue2.put(str);
-		}
-
-		public String threadFromMaster() throws InterruptedException {
-			return queue1.poll();
 		}
 
 		public void setThread(Thread thread) {
@@ -73,28 +80,36 @@ public class Master {
 
 		ThreadHandler th = new ThreadHandler();
 		Thread t = new Thread(() -> {
-			
 			try {
 				Dummy.fakeCalculation(th, idUser,numCalc);
 			} catch (InterruptedException | IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			
-			/*
-			System.out.println("hello world !");
 			int i = 5;
 			while (i > 0) {
+				System.out.println("hello world !(" + Thread.currentThread().getName() +")");
 				try {
-					threadMap.wait(1000);
+					Thread.sleep(1000);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				
 				try {
 					String str = th.threadFromMaster();
 					if (str != null) {
-						th.threadToMaster("hello thread");
+						Random rand = RandomRegistry.getRandom();
+						int maxIteration = rand.nextInt(1000);
+						int iterationNumber = rand.nextInt(maxIteration);
+						int lastIterationSaved = rand.nextInt(iterationNumber);
+						StringBuilder sb = new StringBuilder();
+						sb.append(new Date().getTime()).append("_");
+						sb.append(iterationNumber).append("_");
+						sb.append(lastIterationSaved).append("_");
+						sb.append(maxIteration).append("_");
+						sb.append(rand.nextInt(Integer.MAX_VALUE));
+						th.threadToMaster(sb.toString());
 					}
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
@@ -102,7 +117,6 @@ public class Master {
 				}
 				i--;
 			}
-			*/
 
 			// TODO donner blockingqueue a la méthode sunchronized pour get th
 			synchronized (threadMap) {
@@ -123,5 +137,38 @@ public class Master {
 		ThreadHandler th = threadMap.get(numCalc);
 		th.masterToThread("something");
 		return th.masterFromThread();
+	}
+	
+	//TODO connection with Thread
+	public void updateCalculation(Calculation cal) {
+		ThreadHandler th = threadMap.get(cal.getId());
+		if(th != null) {
+			//IsRunning
+			try {
+				th.masterToThread("state");
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			try {
+				//Format: epoch_iterationNumber_lastIterationSaved_maxIteration_fitness
+				String[] state = th.masterFromThread().split("_");
+				try {
+					Date date = new Date(Long.valueOf(state[0]));
+					cal.setDate(formater.format(date));
+					cal.setIterationNumber(Integer.valueOf(state[1]));
+					cal.setLastIterationSaved(Integer.valueOf(state[2]));
+					cal.setMaxIteration(Integer.valueOf(state[3]));
+					cal.setFitnessSaved(Integer.valueOf(state[4]));
+				} catch(NumberFormatException | ArrayIndexOutOfBoundsException e) {
+					throw new InternalError("Problem with calculation format informations");
+				}
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else {
+			cal.setRunning(false);
+		}
 	}
 }

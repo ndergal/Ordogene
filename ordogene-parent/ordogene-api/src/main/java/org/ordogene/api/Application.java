@@ -8,6 +8,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.ordogene.algorithme.master.Master;
 import org.ordogene.api.utils.CustomArgsParser;
 import org.ordogene.file.FileService;
 import org.ordogene.file.utils.Const;
@@ -20,6 +21,8 @@ import org.springframework.context.annotation.Bean;
 @SpringBootApplication
 
 public class Application {
+	
+	private final Master masterAlgorithme = new Master();
 
 	private final static Master algoMaster;
 	static {
