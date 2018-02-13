@@ -9,9 +9,14 @@ import org.ordogene.file.models.Type;
 
 public class Fitness {
 	private final Type type;
+	private Integer value;
 	private final HashMap<String, Long> operands = new HashMap<>();
 
 	public Fitness(Type type, HashMap<String, Long> operands) {
+		this(type, operands, null);
+	}
+	
+	public Fitness(Type type, HashMap<String, Long> operands, Integer value) {
 		this.type = Objects.requireNonNull(type);
 		Objects.requireNonNull(operands);
 		for(Entry<String, Long> e : operands.entrySet()) {
@@ -19,6 +24,10 @@ public class Fitness {
 			Long coef = Objects.requireNonNull(e.getValue());
 			this.operands.put(name, coef);
 		}
+		if(Type.value.equals(type)) {
+			Objects.requireNonNull(value);
+		}
+		this.value = value;
 	}
 	
 	public static Fitness createFitness(JSONFitness jf) {
@@ -26,7 +35,7 @@ public class Fitness {
 		jf.getOperands().forEach(jo -> {
 			operands.put(jo.getName(), jo.getCoef());
 		});
-		return new Fitness(jf.getType(), operands);
+		return new Fitness(jf.getType(), operands, jf.getValue());
 	}
 	
 	/**
@@ -54,13 +63,18 @@ public class Fitness {
 		return score;
 	}
 	
-	
+	public Type getType() {
+		return type;
+	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = prime * operands.hashCode();
 		result = prime * result + type.hashCode();
+		if(value != null) {
+			result = prime * result + value.hashCode();			
+		}
 		return result;
 	}
 
@@ -76,6 +90,8 @@ public class Fitness {
 		if (!operands.equals(fit.operands))
 			return false;
 		if (type != fit.type)
+			return false;
+		if (value != fit.value)
 			return false;
 		return true;
 	}

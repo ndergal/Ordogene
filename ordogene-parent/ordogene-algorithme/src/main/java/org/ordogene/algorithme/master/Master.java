@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 
 import javax.xml.bind.UnmarshalException;
 
 import org.ordogene.algorithme.Model;
+import org.ordogene.algorithme.jenetics.ScheduleBuilder;
 import org.ordogene.file.JSONModel;
 import org.ordogene.file.parser.Parser;
 
@@ -21,32 +21,30 @@ public class Master {
 	private int currentThread;
 	private final Map<Integer, ThreadHandler> threadMap = new HashMap<>();
 
-	static class ThreadHandler {
-		private Thread thread;
-		private final BlockingQueue<String> queue1 = new ArrayBlockingQueue<>(1);
-		private final BlockingQueue<String> queue2 = new ArrayBlockingQueue<>(1);
+	/*static class ThreadHandler {
+		private ThreadHandler data = new ThreadHandler(new ArrayBlockingQueue<>(1), new ArrayBlockingQueue<>(1));
 
 		public void masterToThread(String str) throws InterruptedException {
-			queue1.put(str);
+			data.queue1.put(str);
 		}
 
 		public String masterFromThread() throws InterruptedException {
-			return queue2.take();
+			return data.queue2.take();
 		}
 
 		public void threadToMaster(String str) throws InterruptedException {
-			queue2.put(str);
+			data.queue2.put(str);
 		}
 
 		public String threadFromMaster() throws InterruptedException {
-			return queue1.poll();
+			return data.queue1.poll();
 		}
 
 		public void setThread(Thread thread) {
-			this.thread = thread;
+			this.data.thread = thread;
 		}
 
-	}
+	}*/
 
 	public Master() {
 		maxThread = DEFAULT_THREAD;
@@ -71,9 +69,9 @@ public class Master {
 		Model model = Model.createModel(jmodel);
 		int numCalc = jsonString.hashCode();
 
-		ThreadHandler th = new ThreadHandler();
+		ThreadHandler th = new ThreadHandler(new ArrayBlockingQueue<>(1), new ArrayBlockingQueue<>(1));
 		Thread t = new Thread(() -> {
-			System.out.println("hello world !");
+			/*System.out.println("hello world !");
 			int i = 5;
 			while (i > 0) {
 				try {
@@ -92,9 +90,11 @@ public class Master {
 					e.printStackTrace();
 				}
 				i--;
-			}
-
-			// TODO donner blockingqueue a la méthode sunchronized pour get th
+			}*/
+			
+			ScheduleBuilder runnable = new ScheduleBuilder(th, model);
+			runnable.run();
+			// TODO donner blockingqueue a la méthode synchronized pour get th
 			synchronized (threadMap) {
 				currentThread--;
 				threadMap.notifyAll();

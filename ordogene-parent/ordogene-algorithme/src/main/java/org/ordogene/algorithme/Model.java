@@ -147,4 +147,8 @@ public class Model {
 
 		actionsInProgress.put(a, action - 1);
 	}
+	
+	public Fitness getFitness() {
+		return fitness;
+	}
 }
