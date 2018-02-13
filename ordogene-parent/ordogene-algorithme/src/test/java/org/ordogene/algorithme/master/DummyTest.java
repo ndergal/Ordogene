@@ -1,7 +1,5 @@
 package org.ordogene.algorithme.master;
 
-import static org.junit.Assert.assertNotEquals;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -45,7 +43,7 @@ public class DummyTest {
 		String jsonContentPost = new String(contentFileTest);
 		// System.out.println(jsonContentPost);
 		int randomNum = ThreadLocalRandom.current().nextInt();
-		Dummy.fakeCalculation(new Master.ThreadHandler(), "tester", randomNum);
+		Dummy.fakeCalculation(new Master.ThreadHandler(), "tester", randomNum, 1);
 
 	}
 

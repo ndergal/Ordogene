@@ -17,8 +17,7 @@ import org.ordogene.file.utils.Const;
 
 public class Dummy {
 
-	public static void fakeCalculation(ThreadHandler th, String uid, int cid) throws InterruptedException, IOException {
-		int occur = 0;
+	public static void fakeCalculation(ThreadHandler th, String uid, int cid, int occur) throws InterruptedException, IOException {
 		if (uid == null) {
 			System.err.println("Pas de dossier ou écrire spécifié en argument!");
 		}
@@ -26,7 +25,7 @@ public class Dummy {
 		if (location == null) {
 			location = "/home/ordogene/testProjectFiles/";
 		}
-		location = location + File.separator + uid + File.separator + cid+"_Dummy";
+		location = location + File.separator + uid + File.separator + cid + "_Dummy";
 		if (!Files.exists(Paths.get(location))) {
 			Files.createDirectories(Paths.get(location));
 		}
@@ -36,27 +35,15 @@ public class Dummy {
 			System.err.println("Error while creating the directory " + location);
 			e.printStackTrace();
 		}
-		while (occur < 10) {
-			Thread.sleep(900);
-			try (FileOutputStream fos = new FileOutputStream(location + File.separator + "result" + occur + ".jpg")) {
-				URL doge = new URL("https://quiteirregular.files.wordpress.com/2014/02/doge.png");
-				ReadableByteChannel rbc = Channels.newChannel(doge.openStream());
-				fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-			} catch (FileAlreadyExistsException e) {
-				System.err.println("already exists: " + e.getMessage());
-			}
-			occur++;
-			try {
-				String str = th.threadFromMaster();
-				if (str != null) {
-					th.threadToMaster("hello thread");
-				}
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
 
+		Thread.sleep(900);
+		try (FileOutputStream fos = new FileOutputStream(location + File.separator + "result" + occur + ".jpg")) {
+			URL doge = new URL("https://quiteirregular.files.wordpress.com/2014/02/doge.png");
+			ReadableByteChannel rbc = Channels.newChannel(doge.openStream());
+			fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+		} catch (FileAlreadyExistsException e) {
+			System.err.println("already exists: " + e.getMessage());
+		}
 	}
 
 	private static String imgAsBase64(URL imgUrl) throws IOException {

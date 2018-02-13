@@ -80,21 +80,19 @@ public class Master {
 
 		ThreadHandler th = new ThreadHandler();
 		Thread t = new Thread(() -> {
-			try {
-				Dummy.fakeCalculation(th, idUser,numCalc);
-			} catch (InterruptedException | IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			int i = 5;
-			while (i > 0) {
+			int occur = 0;
+			while (occur < 10) {
 				System.out.println("hello world !(" + Thread.currentThread().getName() +")");
+				
+				//TODO call real algorithm functions
 				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
+					Dummy.fakeCalculation(th, idUser, numCalc, occur);
+				} catch (InterruptedException | IOException e1) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					e1.printStackTrace();
 				}
+				
+				occur++;
 				
 				try {
 					String str = th.threadFromMaster();
@@ -115,7 +113,6 @@ public class Master {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				i--;
 			}
 
 			// TODO donner blockingqueue a la méthode sunchronized pour get th
