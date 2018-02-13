@@ -6,28 +6,31 @@ import io.jenetics.Gene;
 
 public class ActionGene implements Gene<Action, ActionGene> {
 
+	private final Action action;
+	
+	public ActionGene(Action action) {
+		super();
+		this.action = action;
+	}
+
 	@Override
 	public boolean isValid() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public Action getAllele() {
-		// TODO Auto-generated method stub
-		return null;
+		return action;
 	}
 
 	@Override
 	public ActionGene newInstance() {
-		// TODO Auto-generated method stub
-		return null;
+		return new ActionGene(Action.EMPTY(5));
 	}
 
 	@Override
-	public ActionGene newInstance(Action arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	public ActionGene newInstance(Action action) {
+		return new ActionGene(action);
 	}
 
 }

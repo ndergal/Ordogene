@@ -7,13 +7,15 @@ public class ScheduleCrossover extends Crossover<ActionGene, Double> {
 
 	protected ScheduleCrossover(double probability) {
 		super(probability);
-		
 	}
 
 	@Override
 	protected int crossover(MSeq<ActionGene> papa, MSeq<ActionGene> mama) {
-		//MSeq<ActionGene> fiston = papa.asMSeq().;
-		return 0;
+		MSeq<ActionGene> fiston = MSeq.empty();
+		
+		
+		
+		return 2;
 	}
 
 }
