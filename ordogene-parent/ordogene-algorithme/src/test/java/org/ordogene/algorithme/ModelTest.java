@@ -219,6 +219,7 @@ public class ModelTest {
 		when(jm.getFitness()).thenReturn(jf);
 		when(jm.getSlots()).thenReturn(100);
 		when(jm.getSnaps()).thenReturn(Collections.emptyList());
+		when(jm.getName()).thenReturn("testModelCreation");
 		
 		when(jf.getType()).thenReturn(Type.max);
 		when(jf.getOperands()).thenReturn(Collections.emptyList());
