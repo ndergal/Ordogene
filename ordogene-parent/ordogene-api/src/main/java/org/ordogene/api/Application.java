@@ -1,5 +1,6 @@
 package org.ordogene.api;
 
+import org.ordogene.algorithme.master.Master;
 import java.util.Arrays;
 
 import org.apache.commons.cli.CommandLine;
@@ -19,6 +20,11 @@ import org.springframework.context.annotation.Bean;
 @SpringBootApplication
 
 public class Application {
+
+	private final static Master algoMaster;
+	static {
+		algoMaster = new Master();
+	}
 
 	public static void main(String[] args) {
 
@@ -67,6 +73,11 @@ public class Application {
 	@Bean
 	public FileService buildFileService() {
 		return new FileService();
+	}
+	
+	@Bean
+	public Master buildMasterAlgo() {
+		return algoMaster;
 	}
 
 	/*
