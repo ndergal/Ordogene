@@ -1,5 +1,6 @@
 package org.ordogene.api;
 
+import org.ordogene.algorithme.master.Master;
 import java.util.Arrays;
 
 import org.apache.commons.cli.CommandLine;
@@ -7,6 +8,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.ordogene.algorithme.master.Master;
 import org.ordogene.api.utils.CustomArgsParser;
 import org.ordogene.file.FileService;
 import org.ordogene.file.utils.Const;
@@ -19,6 +21,13 @@ import org.springframework.context.annotation.Bean;
 @SpringBootApplication
 
 public class Application {
+	
+	private final Master masterAlgorithme = new Master();
+
+	private final static Master algoMaster;
+	static {
+		algoMaster = new Master();
+	}
 
 	public static void main(String[] args) {
 
@@ -67,6 +76,11 @@ public class Application {
 	@Bean
 	public FileService buildFileService() {
 		return new FileService();
+	}
+	
+	@Bean
+	public Master buildMasterAlgo() {
+		return algoMaster;
 	}
 
 	/*

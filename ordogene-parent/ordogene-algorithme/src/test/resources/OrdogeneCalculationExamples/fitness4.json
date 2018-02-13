@@ -1,0 +1,86 @@
+{
+    "snaps" : [5,10,20,100],
+    "name" : "fitness4.json",
+    "slots" : 300,
+    "exec_time" : 10000,
+    "environment" : [
+	{"name" : "FUEL", "quantity" : 20},
+	{"name" : "GOOD", "quantity" : 0},
+	{"name" : "BAD1", "quantity" : 0},
+	{"name" : "BAD2", "quantity" : 0},
+	{"name" : "BAD3", "quantity" : 0},
+	{"name" : "BAD4", "quantity" : 0},
+	{"name" : "BAD5", "quantity" : 0},
+	{"name" : "MIDDLE", "quantity" : 0}
+    ],
+    "actions" : [
+	{"name" : "MAKE_MIDDLE", "time" : 1,
+	 "input" : [
+	     { "name" : "FUEL", "quantity" : 1, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "MIDDLE", "quantity" : 1}
+	 ]
+	},
+	{"name" : "MAKE_BAD1", "time" : 1,
+	 "input" : [
+	     { "name" : "FUEL", "quantity" : 1, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "BAD1", "quantity" : 1}
+	 ]
+	},
+	{"name" : "MAKE_GOOD", "time" : 1,
+	 "input" : [
+	     { "name" : "BAD5", "quantity" : 1, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "GOOD", "quantity" : 1}
+	 ]
+	},
+	{"name" : "MAKE_BAD2", "time" : 1,
+	 "input" : [
+	     { "name" : "BAD1", "quantity" : 1, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "BAD2", "quantity" : 1}
+	 ]
+	},
+	{"name" : "MAKE_BAD3", "time" : 1,
+	 "input" : [
+	     { "name" : "BAD2", "quantity" : 1, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "BAD3", "quantity" : 1}
+	 ]
+	},
+	{"name" : "MAKE_BAD4", "time" : 1,
+	 "input" : [
+	     { "name" : "BAD3", "quantity" : 1, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "BAD4", "quantity" : 1}
+	 ]
+	},
+	{"name" : "MAKE_BAD5", "time" : 1,
+	 "input" : [
+	     { "name" : "BAD4", "quantity" : 1, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "BAD5", "quantity" : 1}
+	 ]
+	}
+    ],
+    "fitness" : {
+	"type" : "max",
+	"operands" : [
+	    {"name" : "GOOD", "coef" : 8},
+	    {"name" : "BAD1", "coef" : 5},
+	    {"name" : "BAD2", "coef" : 4},
+	    {"name" : "BAD3", "coef" : 3},
+	    {"name" : "BAD4", "coef" : 2},
+	    {"name" : "BAD5", "coef" : 1},
+	    {"name" : "MIDDLE", "coef" : 6}
+	]
+    }
+}

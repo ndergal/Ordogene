@@ -39,7 +39,7 @@
 
 		<dependency>
 			<groupId>fr.ordogene</groupId>
-			<artifactId>ordogene-file</artifactId>
+			<artifactId>ordogene-algorithme</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 

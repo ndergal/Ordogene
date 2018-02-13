@@ -1,0 +1,66 @@
+{
+    "snaps" : [5,10,20,100],
+    "name" : "fitness5.json",
+    "slots" : 300,
+    "exec_time" : 10000,
+    "environment" : [
+	{"name" : "FUEL", "quantity" : 2000},
+	{"name" : "VERY_GOOD", "quantity" : 0},
+	{"name" : "GOOD", "quantity" : 0},
+	{"name" : "MIDDLE", "quantity" : 0},
+	{"name" : "BAD", "quantity" : 0},
+	{"name" : "VERY_BAD", "quantity" : 0}
+    ],
+    "actions" : [
+	{"name" : "MAKE_VERY_GOOD", "time" : 5,
+	 "input" : [
+	     { "name" : "FUEL", "quantity" : 600, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "VERY_GOOD", "quantity" : 1}
+	 ]
+	},
+	{"name" : "MAKE_GOOD", "time" : 5,
+	 "input" : [
+	     { "name" : "FUEL", "quantity" : 70, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "GOOD", "quantity" : 1}
+	 ]
+	},
+	{"name" : "MAKE_MIDDLE", "time" : 5,
+	 "input" : [
+	     { "name" : "FUEL", "quantity" : 35, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "MIDDLE", "quantity" : 1}
+	 ]
+	},
+	{"name" : "MAKE_BAD", "time" : 5,
+	 "input" : [
+	     { "name" : "FUEL", "quantity" : 6, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "BAD", "quantity" : 1}
+	 ]
+	},
+	{"name" : "MAKE_VERY_BAD", "time" : 2,
+	 "input" : [
+	     { "name" : "FUEL", "quantity" : 1, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "VERY_BAD", "quantity" : 1}
+	 ]
+	}
+    ],
+    "fitness" : {
+	"type" : "max",
+	"operands" : [
+	    {"name" : "VERY_GOOD", "coef" : 780},
+	    {"name" : "GOOD", "coef" : 90},
+	    {"name" : "MIDDLE", "coef" : 42},
+	    {"name" : "BAD", "coef" : 7},
+	    {"name" : "VERY_BAD", "coef" : 1}
+	]
+    }
+}

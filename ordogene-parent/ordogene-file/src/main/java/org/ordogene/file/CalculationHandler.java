@@ -16,7 +16,7 @@ import org.ordogene.file.utils.Const;
 
 public class CalculationHandler {
 
-	List<Calculation> getCallculations(String username) {
+	List<Calculation> getCalculations(String username) {
 		List<Calculation> res = new ArrayList<>();
 		if (username == null || username.equals("")) {
 			return res;
@@ -26,7 +26,18 @@ public class CalculationHandler {
 			
 			userPathStream.forEach(p -> {
 				Calculation currenCalculation = new Calculation();
-				currenCalculation.setName(p.getFileName().toString());
+				String directoryName = p.getFileName().toString();
+				String[] idAndName = directoryName.split("_", 2);
+				if(idAndName.length < 2) {
+					return;
+				}
+				try {
+					currenCalculation.setId(Integer.valueOf(idAndName[0]));
+				} catch (NumberFormatException e) {
+					return;
+				}
+				currenCalculation.setName(idAndName[1]);
+				//currenCalculation.set
 				res.add(currenCalculation);
 			});
 
