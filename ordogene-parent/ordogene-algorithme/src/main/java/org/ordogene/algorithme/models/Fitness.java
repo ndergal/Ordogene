@@ -67,6 +67,10 @@ public class Fitness {
 		return type;
 	}
 
+	public Integer getValue() {
+		return value;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
