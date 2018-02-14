@@ -37,13 +37,14 @@ import org.springframework.web.client.RestTemplate;
 
 @ShellComponent
 public class Commands {
-	
+
 	private String id;
 	private static final Logger log = LoggerFactory.getLogger(Commands.class);
-	private final String[] headers = {"Id", "Name", "Date", "Running", "Fitness", "Iteration done", "Last iteration saved", "Max iteration"};
+	private final String[] headers = { "Id", "Name", "Date", "Running", "Fitness", "Iteration done",
+			"Last iteration saved", "Max iteration" };
 	@Autowired
 	private RestTemplate restTemplate;
-	
+
 	@PostConstruct
 	public void login() {
 		System.out.println();
@@ -72,51 +73,42 @@ public class Commands {
 	
 	public boolean getUser(String id) {
 		//Request
+
 		ResponseEntity<ApiJsonResponse> response = null;
 		try {
-			response = restTemplate.exchange(
-					"/" + id,
-					HttpMethod.GET,
-					null,
-					ApiJsonResponse.class
-				);
+			response = restTemplate.exchange("/" + id, HttpMethod.GET, null, ApiJsonResponse.class);
 		} catch (RestClientException e) {
 			log.error(e.getMessage());
 			return false;
 		}
-		
-		//Check status code
+
+		// Check status code
 		int code = response.getStatusCodeValue();
 		if(!isHttpCodeValid(code, response)) {
 			return false;
 		}
-		
+
 		this.id = id;
 		log.info("Welcome back " + id);
 		return true;
 	}
-	
+
 	public void createUser() {
-		//Request
+		// Request
 		ResponseEntity<ApiJsonResponse> response = null;
 		try {
-			response = restTemplate.exchange(
-					"/",
-					HttpMethod.PUT,
-					null,
-					ApiJsonResponse.class
-				);
+			response = restTemplate.exchange("/", HttpMethod.PUT, null, ApiJsonResponse.class);
 		} catch (RestClientException e) {
 			log.error(e.getMessage());
 			return;
 		}
-		
-		//Check status code
+
+		// Check status code
 		int code = response.getStatusCodeValue();
-		if(!isHttpCodeValid(code, response)) {
+		if (!isHttpCodeValid(code, response)) {
 			return;
 		}
-		
+
 		id = response.getBody().getId();
 		log.info("Your new id is " + id);
 	}
@@ -126,40 +118,35 @@ public class Commands {
 	 */
 	@ShellMethod(value = "List calculations")
 	public Table listCalculations() {
-		//Request
+		// Request
 		ResponseEntity<ApiJsonResponse> response = null;
 		try {
-			response = restTemplate.exchange(
-					"/" + id + "/calculations",
-					HttpMethod.GET,
-					null,
-					ApiJsonResponse.class
-				);
+			response = restTemplate.exchange("/" + id + "/calculations", HttpMethod.GET, null, ApiJsonResponse.class);
 		} catch (RestClientException e) {
 			log.error(e.getMessage());
 			return null;
 		}
-		
-		//Check status code
+
+		// Check status code
 		int code = response.getStatusCodeValue();
-		if(!isHttpCodeValid(code, response)) {
+		if (!isHttpCodeValid(code, response)) {
 			return null;
 		}
-		
-		//Build ascii table
+
+		// Build ascii table
 		List<Calculation> list = response.getBody().getList();
-		if(list == null) {
+		if (list == null) {
 			log.info("No calculations yet");
 			return null;
 		}
 		String[][] data = new String[list.size() + 1][headers.length];
 		TableModel model = new ArrayTableModel(data);
 		TableBuilder builder = new TableBuilder(model);
-		for(int i = 0; i < headers.length; i++) {
+		for (int i = 0; i < headers.length; i++) {
 			data[0][i] = headers[i];
-			//builder.on(at(0, i)).
+			// builder.on(at(0, i)).
 		}
-		for(int i = 0; i < list.size(); i++) {
+		for (int i = 0; i < list.size(); i++) {
 			Calculation c = list.get(i);
 			data[i + 1][0] = String.valueOf(c.getId());
 			data[i + 1][1] = c.getName();
@@ -172,10 +159,12 @@ public class Commands {
 		}
 		return builder.addFullBorder(BorderStyle.oldschool).build();
 	}
-	
+
 	/**
 	 * Launch a calculation based on the model
-	 * @param model path to model to send
+	 * 
+	 * @param model
+	 *            path to model to send
 	 */
 	@ShellMethod(value = "Launch a calculation from a model")
 	public void launchCalculation(File model) {
@@ -202,176 +191,171 @@ public class Commands {
 		HttpEntity<String> request = new HttpEntity<String>(jsonContentRead, headers);
 		ResponseEntity<ApiJsonResponse> response = null;
 		try {
-			response = restTemplate.exchange(
-				"/" + id + "/calculations/",
-				HttpMethod.PUT,
-				request,
-				ApiJsonResponse.class);
+			response = restTemplate.exchange("/" + id + "/calculations/", HttpMethod.PUT, request,
+					ApiJsonResponse.class);
 		} catch (RestClientException e) {
 			log.error(e.getMessage());
 			return;
 		}
-		
-		//Check status code
+
+		// Check status code
 		int code = response.getStatusCodeValue();
-		if(!isHttpCodeValid(code, response)) {
+		if (!isHttpCodeValid(code, response)) {
 			return;
 		}
-		
+
 		int cid = response.getBody().getCid();
 		log.info("Calculation '" + cid + "' launched");
 	}
-
+	
 	/**
 	 * Stop the calculation
-	 * @param cid id of the calculation
+	 * 
+	 * @param cid
+	 *            id of the calculation
 	 */
 	@ShellMethod(value = "Stop a calculation")
 	public void stopCalculation(int cid) {
-		//Request
+		// Request
 		ResponseEntity<ApiJsonResponse> response = null;
 		try {
-			response = restTemplate.exchange(
-				"/" + id + "/calculations/" + cid,
-				HttpMethod.POST,
-				null,
-				ApiJsonResponse.class
-			);
+			response = restTemplate.exchange("/" + id + "/calculations/" + cid, HttpMethod.POST, null,
+					ApiJsonResponse.class);
 		} catch (RestClientException e) {
 			log.error(e.getMessage());
 			return;
 		}
-		
-		//Check status code
+
+		// Check status code
 		int code = response.getStatusCodeValue();
-		if(!isHttpCodeValid(code, response)) {
+		if (!isHttpCodeValid(code, response)) {
 			return;
 		}
 
 		log.info("Calculation '" + cid + "' stopped");
 	}
-	
+
 	/**
 	 * Remove the calculation
-	 * @param cid id of the calculation
+	 * 
+	 * @param cid
+	 *            id of the calculation
 	 */
 	@ShellMethod(value = "Remove a calculation")
 	public void removeCalculation(int cid) {
-		//Request
+		// Request
 		ResponseEntity<ApiJsonResponse> response = null;
 		try {
-			response = restTemplate.exchange(
-				"/" + id + "/calculations/" + cid,
-				HttpMethod.DELETE,
-				null,
-				ApiJsonResponse.class
-			);
+			response = restTemplate.exchange("/" + id + "/calculations/" + cid, HttpMethod.DELETE, null,
+					ApiJsonResponse.class);
 		} catch (RestClientException e) {
 			log.error(e.getMessage());
 			return;
 		}
-		
-		//Check status code
+
+		// Check status code
 		int code = response.getStatusCodeValue();
-		if(!isHttpCodeValid(code, response)) {
+		if (!isHttpCodeValid(code, response)) {
 			return;
 		}
 
 		log.info("Calculation '" + cid + "' deleted");
 	}
-	
+
 	/**
 	 * Create the image of the best solution of the calculation
-	 * @param cid id of the calculation
-	 * @param dst path of the generated image
-	 * @param force if set, overwrite if dst already exists
+	 * 
+	 * @param cid
+	 *            id of the calculation
+	 * @param dst
+	 *            path of the generated image
+	 * @param force
+	 *            if set, overwrite if dst already exists
 	 */
 	@ShellMethod(value = "Get the result of a calculation")
 	public void resultCalculation(int cid, String dst, @ShellOption(arity = 0, defaultValue = "false") boolean force) {
 		// Parameter validation
 		Path path = Paths.get(dst);
-		if(Files.exists(path)/* && Files.isRegularFile(path) && Files.isWritable(path)*/) {
-			if(!force) {
+		if (Files.exists(path)/* && Files.isRegularFile(path) && Files.isWritable(path) */) {
+			if (!force) {
 				log.error("A file already exists, use --force to overwrite.");
 				return;
 			}
 		}
-		
-		//Request
+
+		// Request
 		ResponseEntity<ApiJsonResponse> response = null;
 		try {
-			response = restTemplate.exchange(
-				"/" + id + "/calculations/" + cid,
-				HttpMethod.GET,
-				null,
-				ApiJsonResponse.class);
+			response = restTemplate.exchange("/" + id + "/calculations/" + cid, HttpMethod.GET, null,
+					ApiJsonResponse.class);
 		} catch (RestClientException e) {
 			log.error(e.getMessage());
 			return;
 		}
-		
-		//Check status code
+
+		// Check status code
 		int code = response.getStatusCodeValue();
-		if(!isHttpCodeValid(code, response)) {
+		if (!isHttpCodeValid(code, response)) {
 			return;
 		}
-		
-		//Writing the image
+
+		// Writing the image
 		BufferedImage img = response.getBody().getImg();
 		try {
 			ImageIO.write(img, "PNG", new File(dst));
 		} catch (IOException e) {
 			log.error("A error has occured while writing the image");
 		}
-		
+
 		log.info("The image of the result is downloaded at " + dst);
 	}
-	
+
 	/**
 	 * Launch the calculation of a snapshot
-	 * @param id id of the calculation
-	 * @param iter id of the snapshot
-	 * @param loops number of loops to calculate
+	 * 
+	 * @param id
+	 *            id of the calculation
+	 * @param iter
+	 *            id of the snapshot
+	 * @param loops
+	 *            number of loops to calculate
 	 */
 	@ShellMethod(value = "Launch a snapshot of a calculation")
 	public void launchSnapshot(int cid, int sid, int loops) {
-		//Request
+		// Request
 		HttpEntity<Integer> request = new HttpEntity<>(loops);
 		ResponseEntity<ApiJsonResponse> response = null;
 		try {
-			response = restTemplate.exchange(
-				"/" + id + "/calculations/" + cid + "/snapshots/" + sid ,
-				HttpMethod.POST,
-				request,
-				ApiJsonResponse.class
-			);
+			response = restTemplate.exchange("/" + id + "/calculations/" + cid + "/snapshots/" + sid, HttpMethod.POST,
+					request, ApiJsonResponse.class);
 		} catch (RestClientException e) {
 			log.error(e.getMessage());
 			return;
 		}
-		
-		//Check status code
+
+		// Check status code
 		int code = response.getStatusCodeValue();
-		if(!isHttpCodeValid(code, response)) {
+		if (!isHttpCodeValid(code, response)) {
 			return;
 		}
 
 		log.info("Snapshot '" + sid + "' launched");
 	}
-	
+
 	/**
 	 * Remove a snapshot
+	 * 
 	 * @param id
 	 * @param iter
 	 */
 	@ShellMethod(value = "Remove a calculation")
 	public void removeSnapshot(int id, int iter) {
-		//HTTPRequest
+		// HTTPRequest
 		log.info("snapshot removed");
 	}
-	
+
 	/* UTILS */
-	
+
 	/**
 	 * @param response
 	 * @param code
@@ -386,7 +370,7 @@ public class Commands {
 				return false;
 		}
 	}
-	
+
 	public static CellMatcher at(final int theRow, final int col) {
 		return new CellMatcher() {
 			@Override

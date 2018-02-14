@@ -37,11 +37,11 @@
 			<scope>test</scope>
 		</dependency>
 
-		<dependency>
+<!--		<dependency>
 			<groupId>fr.ordogene</groupId>
-			<artifactId>ordogene-algorithme</artifactId>
+			<artifactId>ordogene-file</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
+		</dependency> -->
 
 		<dependency>
 			<groupId>org.jacoco</groupId>

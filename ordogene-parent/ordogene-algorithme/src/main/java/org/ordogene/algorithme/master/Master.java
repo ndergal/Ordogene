@@ -119,7 +119,7 @@ public class Master {
 			// TODO donner blockingqueue a la méthode sunchronized pour get th
 			synchronized (threadMap) {
 				currentThread--;
- 				threadMap.remove(numCalc);
+				threadMap.remove(numCalc);
 				return;
 			}
 		});
