@@ -7,6 +7,7 @@ public class Calculation {
 	private int iterationNumber;
 	private int maxIteration;
 	private String date;
+	private int fitnessSaved;
 	private int lastIterationSaved;
 	
 	public Calculation() {} 
@@ -54,6 +55,14 @@ public class Calculation {
 		this.lastIterationSaved = lastIterationSaved;
 	}
 	
+	public int getFitnessSaved() {
+		return fitnessSaved;
+	}
+
+	public void setFitnessSaved(int fitnessSaved) {
+		this.fitnessSaved = fitnessSaved;
+	}
+
 	@Override
 	public String toString() {
 		return "Calculation {" +

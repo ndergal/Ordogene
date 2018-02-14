@@ -2,6 +2,7 @@ package org.ordogene.cli;
 
 import org.jline.utils.AttributedString;
 import org.jline.utils.AttributedStyle;
+import org.ordogene.cli.errorHandle.ErrorHandle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -25,7 +26,9 @@ public class App
     
     @Bean
     public RestTemplate myRestTemplate(RestTemplateBuilder builder) {
-    	return builder.rootUri(addr).build();
+    	RestTemplate rt = builder.rootUri(addr).build();
+    	rt.setErrorHandler(new ErrorHandle());
+    	return rt;
     }
     
     public static void main( String[] args )

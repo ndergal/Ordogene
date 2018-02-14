@@ -18,6 +18,7 @@ import org.ordogene.file.models.Relation;
 
 public class Model {
 	private final List<Integer> snaps;
+	private final String name;
 	private final int slots;
 	private final int execTime;
 	private final Environment startEnvironment;
@@ -28,7 +29,7 @@ public class Model {
 
 	private ActionSelector actionSelector = new ActionSelector();
 
-	public Model(List<Integer> snaps, int slots, int execTime, Environment environment, Set<Action> actions,
+	public Model(List<Integer> snaps, String name, int slots, int execTime, Environment environment, Set<Action> actions,
 			Fitness fitness) {
 		if (slots <= 0) {
 			throw new IllegalArgumentException("slots has to be a positive integer");
@@ -36,6 +37,10 @@ public class Model {
 		if (execTime <= 0) {
 			throw new IllegalArgumentException("execTime has to be a positive integer");
 		}
+		if (Objects.requireNonNull(name).isEmpty()) {
+			throw new IllegalArgumentException("The name can't be empty");
+		}
+		this.name = name;
 		this.snaps = Objects.requireNonNull(snaps);
 		this.slots = slots;
 		this.execTime = execTime;
@@ -53,7 +58,7 @@ public class Model {
 				jm.getEnvironment().stream().map(Entity::createEntity).collect(Collectors.toSet()));
 		Set<Action> actions = jm.getActions().stream().map(Action::createAction).collect(Collectors.toSet());
 		List<Integer> snaps = jm.getSnaps().stream().collect(Collectors.toList());
-		return new Model(snaps, jm.getSlots(), jm.getExecTime(), env, actions, Fitness.createFitness(jm.getFitness()));
+		return new Model(snaps, jm.getName(), jm.getSlots(), jm.getExecTime(), env, actions, Fitness.createFitness(jm.getFitness()));
 	}
 
 	/**
@@ -177,6 +182,6 @@ public class Model {
 	public Model copy() {
 		Set<Action> actions = new HashSet<>();
 		actionsInProgress.forEach((a, i) -> actions.add(a));
-		return new Model(snaps, slots, execTime, startEnvironment.copy(), actions, fitness);
+		return new Model(snaps, name, slots, execTime, startEnvironment.copy(), actions, fitness);
 	}
 }
