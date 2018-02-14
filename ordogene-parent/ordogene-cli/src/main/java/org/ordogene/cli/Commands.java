@@ -74,17 +74,10 @@ public class Commands {
 	public boolean getUser(String id) {
 		//Request
 
-		ResponseEntity<ApiJsonResponse> response = null;
 		try {
-			response = restTemplate.exchange("/" + id, HttpMethod.GET, null, ApiJsonResponse.class);
-		} catch (RestClientException e) {
-			log.error(e.getMessage());
-			return false;
-		}
-
-		// Check status code
-		int code = response.getStatusCodeValue();
-		if(!isHttpCodeValid(code, response)) {
+			restTemplate.exchange("/" + id, HttpMethod.GET, null, ApiJsonResponse.class);
+		} catch (HttpClientErrorException e) {
+			log.error(e.getStatusCode() + " -- " + e.getStatusText());
 			return false;
 		}
 
@@ -109,7 +102,7 @@ public class Commands {
 			return;
 		}
 
-		id = response.getBody().getId();
+		id = response.getBody().getUserId();
 		log.info("Your new id is " + id);
 	}
 

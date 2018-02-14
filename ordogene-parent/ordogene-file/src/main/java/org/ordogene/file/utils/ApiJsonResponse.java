@@ -3,8 +3,12 @@ package org.ordogene.file.utils;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
-public class ApiJsonResponse {
-	private String id;
+import org.ordogene.file.parser.Validable;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+public class ApiJsonResponse implements Validable{
+	private String userId;
 	private int cid;
 	private String error;
 	private List<Calculation> list;
@@ -14,8 +18,8 @@ public class ApiJsonResponse {
 		
 	}
 	
-	public ApiJsonResponse(String id, int cid, String error, List<Calculation> list, BufferedImage img) {
-		this.id = id;
+	public ApiJsonResponse(String userId, int cid, String error, List<Calculation> list, BufferedImage img) {
+		this.userId = userId;
 		this.cid = cid;
 		this.error = error;
 		this.list = list;
@@ -30,12 +34,12 @@ public class ApiJsonResponse {
 		this.img = img;
 	}
 
-	public String getId() {
-		return id;
+	public String getUserId() {
+		return userId;
 	}
 
-	public void setId(String id) {
-		this.id = id;
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 	public int getCid() {
@@ -64,8 +68,14 @@ public class ApiJsonResponse {
 
 	@Override
 	public String toString() {
-		return "ApiJsonResponse [id=" + id + ", cid=" + cid + ", error=" + error + ", list=" + list + ", img=" + img
+		return "ApiJsonResponse [id=" + userId + ", cid=" + cid + ", error=" + error + ", list=" + list + ", img=" + img
 				+ "]";
+	}
+
+	@JsonIgnore
+	@Override
+	public boolean isValid() {
+		return true;
 	}
 	
 	

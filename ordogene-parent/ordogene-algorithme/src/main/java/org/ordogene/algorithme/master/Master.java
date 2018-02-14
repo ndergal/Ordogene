@@ -63,8 +63,7 @@ public class Master {
 		this.maxThread = maxThread;
 	}
 
-	public int compute(String idUser, String jsonString) throws JsonParseException, JsonMappingException,
-			InstantiationException, IllegalAccessException, UnmarshalException, IOException, InterruptedException {
+	public int compute(String idUser, String jsonString) throws JsonParseException, JsonMappingException, UnmarshalException, IOException {
 
 		synchronized (threadMap) {
 			if (currentThread == maxThread) {
