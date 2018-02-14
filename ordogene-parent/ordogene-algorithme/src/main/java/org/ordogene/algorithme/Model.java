@@ -29,8 +29,8 @@ public class Model {
 
 	private ActionSelector actionSelector = new ActionSelector();
 
-	public Model(List<Integer> snaps, String name, int slots, int execTime, Environment environment, Set<Action> actions,
-			Fitness fitness) {
+	public Model(List<Integer> snaps, String name, int slots, int execTime, Environment environment,
+			Set<Action> actions, Fitness fitness) {
 		if (slots <= 0) {
 			throw new IllegalArgumentException("slots has to be a positive integer");
 		}
@@ -58,7 +58,12 @@ public class Model {
 				jm.getEnvironment().stream().map(Entity::createEntity).collect(Collectors.toSet()));
 		Set<Action> actions = jm.getActions().stream().map(Action::createAction).collect(Collectors.toSet());
 		List<Integer> snaps = jm.getSnaps().stream().collect(Collectors.toList());
-		return new Model(snaps, jm.getName(), jm.getSlots(), jm.getExecTime(), env, actions, Fitness.createFitness(jm.getFitness()));
+		return new Model(snaps, jm.getName(), jm.getSlots(), jm.getExecTime(), env, actions,
+				Fitness.createFitness(jm.getFitness()));
+	}
+
+	public String getName() {
+		return name;
 	}
 
 	/**
@@ -110,7 +115,7 @@ public class Model {
 		if (!workable(a)) {
 			throw new IllegalArgumentException("The Action given can be start");
 		}
-		for(Input input : a.getInputs()) {
+		for (Input input : a.getInputs()) {
 			String inputEntityName = input.getName();
 			Relation inputType = input.getRelation();
 			if (inputType == Relation.c || inputType == Relation.p) {
@@ -152,4 +157,9 @@ public class Model {
 
 		actionsInProgress.put(a, action - 1);
 	}
+
+	public int getExecTime() {
+		return execTime;
+	}
+
 }
