@@ -97,7 +97,7 @@ public class Master {
 
 				// TODO call real algorithm functions
 				try {
-					Dummy.fakeCalculation(th, idUser, numCalc, occur);
+					Dummy.fakeCalculation(th, model.getName(), idUser, numCalc, occur);
 				} catch (InterruptedException | IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
