@@ -137,7 +137,7 @@ public class Master {
 			tmpCalc.setName(model.getName());
 			try {
 				String calculationSaveDest = Const.getConst().get("ApplicationPath") + File.separator + idUser
-						+ File.separator + tmpCalc.getId() + "_Dummy" + File.separatorChar + "state.txt";
+						+ File.separator + tmpCalc.getId() + "_"+model.getName() + File.separatorChar + "state.json"; 
 				writeInFile(tmpCalc, Paths.get(calculationSaveDest));
 				System.out.println(tmpCalc + " saved in " + calculationSaveDest);
 			} catch (IOException e) {
