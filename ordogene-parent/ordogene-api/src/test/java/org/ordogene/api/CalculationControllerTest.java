@@ -9,18 +9,19 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
 
-import org.apache.commons.codec.Charsets;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.ordogene.algorithme.Model;
+import org.ordogene.algorithme.jenetics.ScheduleBuilder;
+import org.ordogene.algorithme.master.ThreadHandler;
+import org.ordogene.file.JSONModel;
+import org.ordogene.file.parser.Parser;
 import org.ordogene.file.utils.Const;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -71,6 +72,17 @@ public class CalculationControllerTest {
 
 		// System.out.println(result.getResponse().getContentAsString());
 
+	}
+	
+	@Test
+	public void testScheduleBuilder() throws Exception {
+		URL urlTestFile = CalculationControllerTest.class.getClassLoader()
+				.getResource("OrdogeneCalculationExamples" + File.separator + "fitness1.json");
+		byte[] contentFile = Files.readAllBytes(Paths.get(urlTestFile.toURI()));
+		String jsonContent = new String(contentFile);
+		
+		ScheduleBuilder sb = new ScheduleBuilder(new ThreadHandler(), Model.createModel((JSONModel) Parser.parseJsonFile(jsonContent, JSONModel.class)));
+		sb.run();;
 	}
 
 	// @Test

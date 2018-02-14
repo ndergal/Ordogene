@@ -1,5 +1,7 @@
 package org.ordogene.algorithme;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -24,9 +26,6 @@ public class Model {
 	private final Environment startEnvironment;
 	private final HashMap<Action, Integer> actionsInProgress = new HashMap<>();
 	private final Fitness fitness;
-
-	private Environment currentEnvironment;
-
 	private ActionSelector actionSelector = new ActionSelector();
 
 	public Model(List<Integer> snaps, String name, int slots, int execTime, Environment environment, Set<Action> actions,
@@ -45,10 +44,10 @@ public class Model {
 		this.slots = slots;
 		this.execTime = execTime;
 		this.startEnvironment = Objects.requireNonNull(environment);
-		this.currentEnvironment = new Environment(environment.getEntities());
 		actions.forEach(a -> {
 			this.actionsInProgress.put(Objects.requireNonNull(a), 0);
 		});
+		this.actionsInProgress.put(Action.EMPTY(), 0);
 		this.fitness = Objects.requireNonNull(fitness);
 	}
 
@@ -66,9 +65,10 @@ public class Model {
 	 * 
 	 * @param a
 	 *            The action to checked
+	 * @param currentEnvironment 
 	 * @return True if the action can be done, else False
 	 */
-	public boolean workable(Action a) {
+	public boolean workable(Action a, Environment currentEnvironment) {
 		if (actionsInProgress.get(a) == null) {
 			throw new IllegalArgumentException("The Action given don't exist in this model");
 		}
@@ -86,34 +86,32 @@ public class Model {
 
 	/**
 	 * Give an {@link Action} workable in the environment
+	 * @param currentEnvironment2 
 	 * 
 	 * @return an {@link Action workable} else the empty Action
 	 */
-	public Action getWorkableAction() {
+	public Action getWorkableAction(Environment currentEnvironment) {
 		if (!actionSelector.isReset()) {
 			// Select one action here
 			return actionSelector.select();
 		}
-		actionSelector.add(Action.EMPTY(1), 0);
+		actionSelector.add(Action.EMPTY(), 0);
 		for (Action a : actionsInProgress.keySet()) {
-			if (workable(a)) {
+			if (workable(a, currentEnvironment)) {
 				actionSelector.add(a, fitness.eval(a));
 			}
 		}
 		return actionSelector.select();
 	}
 
-	public void startAnAction(Action a) {
-		startAnAction(currentEnvironment, a);
-	}
-
 	public void startAnAction(Environment currentEnvironment, Action a) {
-		Objects.requireNonNull(a);
+		requireNonNull(a);
+		requireNonNull(currentEnvironment);
 		if (actionsInProgress.get(a) == null) {
 			throw new IllegalArgumentException("The Action given don't exist in this model");
 		}
-		if (!workable(a)) {
-			throw new IllegalArgumentException("The Action given can be start");
+		if (!workable(a, currentEnvironment)) {
+			throw new IllegalArgumentException("The Action given cannot be started");
 		}
 		for(Input input : a.getInputs()) {
 			String inputEntityName = input.getName();
@@ -130,12 +128,9 @@ public class Model {
 		actionSelector.reset();
 	}
 
-	public void endAnAction(Action a) {
-		endAnAction(currentEnvironment, a);
-	}
-
 	public void endAnAction(Environment currentEnvironment, Action a) {
-		Objects.requireNonNull(a);
+		requireNonNull(a);
+		requireNonNull(currentEnvironment);
 		Integer action = actionsInProgress.get(a);
 		if (action == null) {
 			throw new IllegalArgumentException("The Action given don't exist in this model");
@@ -174,9 +169,9 @@ public class Model {
 	public int getExecTime() {
 		return execTime;
 	}
-	
-	public Environment getCurrentEnvironment() {
-		return currentEnvironment.copy();
+
+	public Environment getStartEnvironment() {
+		return startEnvironment;
 	}
 
 	public Model copy() {

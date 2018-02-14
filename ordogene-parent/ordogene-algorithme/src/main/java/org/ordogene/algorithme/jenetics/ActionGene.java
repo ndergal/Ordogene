@@ -57,11 +57,11 @@ public class ActionGene implements Gene<Action, ActionGene> {
 	static ISeq<ActionGene> seq(
 			final IntRange lengthRange,
 			final Function<Environment, ? extends Action> factory,
-			Environment currentEnvironment,
+			//Environment currentEnvironment,
 			Model model
 		) {
 			return MSeq.<ActionGene>ofLength(random.nextInt(lengthRange, getRandom()))
-				.fill(() -> of(factory, currentEnvironment, model))
+				.fill(() -> of(factory, /*currentEnvironment*/model.getStartEnvironment(), model))
 				.toISeq();
 		}
 

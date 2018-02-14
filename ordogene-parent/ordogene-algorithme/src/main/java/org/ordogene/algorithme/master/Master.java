@@ -6,12 +6,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 
 import javax.xml.bind.UnmarshalException;
 
 import org.ordogene.algorithme.Model;
+import org.ordogene.algorithme.jenetics.ScheduleBuilder;
 import org.ordogene.file.JSONModel;
 import org.ordogene.file.parser.Parser;
 import org.ordogene.file.utils.Calculation;
@@ -28,32 +27,32 @@ public class Master {
 	private final Map<Integer, ThreadHandler> threadMap = new HashMap<>();
 	private final SimpleDateFormat formater = new SimpleDateFormat("dd/MM/yyyy-hh:mm");
 
-	static class ThreadHandler {
-		private Thread thread;
-		private final BlockingQueue<String> queue1 = new ArrayBlockingQueue<>(1);
-		private final BlockingQueue<String> queue2 = new ArrayBlockingQueue<>(1);
-
-		public void masterToThread(String str) throws InterruptedException {
-			queue1.put(str);
-		}
-
-		public String threadFromMaster() throws InterruptedException {
-			return queue1.poll();
-		}
-
-		public String masterFromThread() throws InterruptedException {
-			return queue2.take();
-		}
-
-		public void threadToMaster(String str) throws InterruptedException {
-			queue2.put(str);
-		}
-
-		public void setThread(Thread thread) {
-			this.thread = thread;
-		}
-
-	}
+//	static class ThreadHandler {
+//		private Thread thread;
+//		private final BlockingQueue<String> queue1 = new ArrayBlockingQueue<>(1);
+//		private final BlockingQueue<String> queue2 = new ArrayBlockingQueue<>(1);
+//
+//		public void masterToThread(String str) throws InterruptedException {
+//			queue1.put(str);
+//		}
+//
+//		public String threadFromMaster() throws InterruptedException {
+//			return queue1.poll();
+//		}
+//
+//		public String masterFromThread() throws InterruptedException {
+//			return queue2.take();
+//		}
+//
+//		public void threadToMaster(String str) throws InterruptedException {
+//			queue2.put(str);
+//		}
+//
+//		public void setThread(Thread thread) {
+//			this.thread = thread;
+//		}
+//
+//	}
 
 	public Master() {
 		maxThread = DEFAULT_THREAD;
@@ -86,12 +85,13 @@ public class Master {
 				System.out.println("hello world !(" + Thread.currentThread().getName() +")");
 				
 				//TODO call real algorithm functions
-				try {
-					Dummy.fakeCalculation(th, idUser, numCalc, occur);
-				} catch (InterruptedException | IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+//				try {
+					new ScheduleBuilder(th, model).run();
+//					Dummy.fakeCalculation(th, idUser, numCalc, occur);
+//				} catch (InterruptedException | IOException e1) {
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				}
 				
 				occur++;
 				

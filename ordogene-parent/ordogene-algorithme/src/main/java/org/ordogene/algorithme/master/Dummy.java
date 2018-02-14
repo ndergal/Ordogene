@@ -10,9 +10,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.concurrent.ArrayBlockingQueue;
 
-import org.ordogene.algorithme.master.Master.ThreadHandler;
 import org.ordogene.file.utils.Const;
 
 public class Dummy {

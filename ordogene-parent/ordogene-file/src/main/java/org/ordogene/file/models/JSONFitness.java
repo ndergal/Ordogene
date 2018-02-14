@@ -23,7 +23,7 @@ public class JSONFitness implements Validable {
 		return false;
 	}
 	
-	public int getValue() {
+	public Integer getValue() {
 		return value;
 	}
 

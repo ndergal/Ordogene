@@ -7,8 +7,11 @@ import org.ordogene.algorithme.models.Environment;
 import org.ordogene.file.models.Type;
 
 import io.jenetics.Genotype;
-import io.jenetics.TournamentSelector;
+import io.jenetics.Phenotype;
 import io.jenetics.engine.Engine;
+import io.jenetics.engine.EvolutionResult;
+import io.jenetics.engine.EvolutionStatistics;
+import io.jenetics.stat.DoubleMomentStatistics;
 
 public class ScheduleBuilder {
 	
@@ -22,11 +25,9 @@ public class ScheduleBuilder {
 	}
 	
 	public Action createAction(Environment currentEnvironment) {
-		return model.getWorkableAction();
-	}
-	
-	public boolean validateAction(Action action) {
-		return model.workable(action);
+		Action action = model.getWorkableAction(currentEnvironment);
+		model.startAnAction(currentEnvironment, action);
+		return action;
 	}
 
 	public void run() {
@@ -34,9 +35,21 @@ public class ScheduleBuilder {
 			.builder(this::fitness, Genotype.of(Schedule.of(this::createAction, model.getSlots(), () -> model.copy()), 1))
 			.fitnessScaler(this::fitnessScaler)
 			.populationSize(POPULATION_SIZE)
-			.selector(new TournamentSelector<>())
-			.alterers(new ScheduleCrossover(2))
+//			.selector(new TournamentSelector<>())
+			.alterers(new ScheduleCrossover(0.2))
 			.build();
+		
+		EvolutionStatistics<Double, DoubleMomentStatistics> statistics = EvolutionStatistics.ofNumber();
+		
+		Phenotype<ActionGene, Double> best = engine.stream()
+			.limit(1)
+			.peek(result -> System.out.println(result.getGeneration() + " : " + result.getBestFitness()))
+			.peek(statistics)
+			.collect(EvolutionResult.toBestPhenotype());
+		
+		System.out.println(statistics);
+		best.getGenotype().forEach(c -> c.forEach(a -> System.out.println(a.getAllele())));
+		System.out.println("\\o/");
 	}
 	
 	public Double fitnessScaler(Double value) {

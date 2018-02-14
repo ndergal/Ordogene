@@ -31,28 +31,30 @@ public class ActionSelector {
 	}
 	
 	public Action select() {
-		if(actions.isEmpty()) {
-			throw new IllegalStateException("You can select in a empty selector");
-		}
-		
-		NavigableMap<Long, Action> map = new TreeMap<>();
-		long total = 0;
-		
-		for(SimpleEntry<Action, Long> e : actions) {
-			Long weight = e.getValue();
-			if(lowerWeight <= 0) {
-				weight += Math.abs(lowerWeight) + 1;
+		synchronized (actions) {
+			if(actions.isEmpty()) {
+				throw new IllegalStateException("You cannot select in an empty selector");
 			}
-			total += weight;
-			map.put(total, e.getKey());
+			
+			NavigableMap<Long, Action> map = new TreeMap<>();
+			long total = 0;
+			
+			for(SimpleEntry<Action, Long> e : actions) {
+				Long weight = e.getValue();
+				if(lowerWeight <= 0) {
+					weight += Math.abs(lowerWeight) + 1;
+				}
+				total += weight;
+				map.put(total, e.getKey());
+			}
+			
+			if(total == 0) {
+				throw new IllegalStateException("The ActionSelector have an problem with action's weight.");
+			}
+			
+			long value = (Math.abs(random.nextLong())%total) + 1;
+			return map.ceilingEntry(value).getValue();
 		}
-		
-		if(total == 0) {
-			throw new IllegalStateException("The ActionSelector have an problem with action's weight.");
-		}
-		
-		long value = (Math.abs(random.nextLong())%total) + 1;
-		return map.ceilingEntry(value).getValue();
 	}
 	
 }
