@@ -46,6 +46,7 @@ public class CalculationController {
 	@RequestMapping(method = RequestMethod.GET, value = "/{userId}/calculations", produces = "application/json")
 	@ResponseBody
 	public ResponseEntity<ApiJsonResponse> getUserCalculations(@PathVariable String userId) {
+
 		if (userId == null || "".equals(userId)) {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
 		}
@@ -77,10 +78,7 @@ public class CalculationController {
 	 * @param jsonBody
 	 * @return
 	 */
-	@RequestMapping(value = "/{userId}/calculations", method = RequestMethod.PUT /*
-																					 * , consumes =
-																					 * MediaType.APPLICATION_JSON_VALUE
-																					 */)
+	@RequestMapping(value = "/{userId}/calculations", method = RequestMethod.PUT /*, consumes = MediaType.APPLICATION_JSON_VALUE */)
 	@ResponseBody
 	public ResponseEntity<ApiJsonResponse> launchCalculation(@PathVariable String userId,
 			@RequestBody String jsonBody) {
@@ -88,7 +86,7 @@ public class CalculationController {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
 		}
 		if (jsonBody == null) {
-			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.jsonBodyNull(),HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.jsonBodyNull(), HttpStatus.BAD_REQUEST);
 		}
 		if (!fs.userExist(userId)) {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNotExist(userId),HttpStatus.NOT_FOUND);
