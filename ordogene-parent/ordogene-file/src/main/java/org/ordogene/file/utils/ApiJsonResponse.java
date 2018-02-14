@@ -61,4 +61,12 @@ public class ApiJsonResponse {
 	public void setList(List<Calculation> list) {
 		this.list = list;
 	}
+
+	@Override
+	public String toString() {
+		return "ApiJsonResponse [id=" + id + ", cid=" + cid + ", error=" + error + ", list=" + list + ", img=" + img
+				+ "]";
+	}
+	
+	
 }

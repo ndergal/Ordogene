@@ -38,6 +38,7 @@ public class CalculationController {
 	
 	private static String JSONTest = "{\n" + 
 			"    \"snaps\" : [5,10,20,100],\n" + 
+			"    \"name\" : \"CalculTest\",\n" + 
 			"    \"slots\" : 300,\n" + 
 			"    \"exec_time\" : 10000,\n" + 
 			"    \"environment\" : [\n" + 
@@ -89,7 +90,7 @@ public class CalculationController {
 		if (userId == null) { // never
 			//return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(id + " does not exist");
 			return new ResponseEntity<ApiJsonResponse>(
-					new ApiJsonResponse(null, 0, "id can't be null", null, null),
+					new ApiJsonResponse(null, 0, "userId can't be null", null, null),
 					HttpStatus.BAD_REQUEST
 				);
 		}
@@ -100,13 +101,6 @@ public class CalculationController {
 					HttpStatus.NOT_FOUND
 				);
 		} else {
-			try {
-				masterAlgorithme.compute(userId, JSONTest);
-			} catch (InstantiationException | IllegalAccessException | UnmarshalException | IOException
-					| InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
 			List<Calculation> calculations = fs.getUserCalculations(userId);
 			StringBuilder sb = new StringBuilder();
 			calculations.forEach(c -> {
@@ -158,13 +152,13 @@ public class CalculationController {
 			calculationId= this.masterAlgo.compute(uid, jsonBody);
 		} catch (JsonParseException e) {
 			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(uid, calculationId, "Invalid JSON (JsonParseException) ", null, null),
-					HttpStatus.NOT_FOUND);
+					HttpStatus.BAD_REQUEST);
 		} catch (JsonMappingException e) {
 			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(uid, calculationId, "Invalid JSON (JsonMappingException) ", null, null),
-					HttpStatus.NOT_FOUND);
+					HttpStatus.BAD_REQUEST);
 		} catch (InstantiationException e) {
 			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(uid, calculationId, "Invalid JSON (InstantiationException) ", null, null),
-					HttpStatus.NOT_FOUND);
+					HttpStatus.BAD_REQUEST);
 		} catch (IllegalAccessException e) {
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);

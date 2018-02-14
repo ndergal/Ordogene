@@ -18,7 +18,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
@@ -29,6 +31,7 @@ import org.springframework.shell.table.CellMatcher;
 import org.springframework.shell.table.Table;
 import org.springframework.shell.table.TableBuilder;
 import org.springframework.shell.table.TableModel;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -45,6 +48,7 @@ public class Commands {
 	public void login() {
 		System.out.println();
 		System.out.print("Do you want to create a new id ? [y/N] : ");
+		@SuppressWarnings("resource") //problem if the scanner is closed
 		Scanner scanner = new Scanner(System.in);
 		String choice = scanner.nextLine();
 		switch(choice) {
@@ -52,9 +56,10 @@ public class Commands {
 			case "n":
 			case "N":
 			case "no":
-				System.out.print("Enter your id : ");
-				id = scanner.next();
-				getUser(id);
+				do {
+					System.out.print("Enter your id : ");
+					id = scanner.nextLine();
+				} while (id.isEmpty() || !getUser(id));
 				break;
 			case "y":
 			case "Y":
@@ -62,11 +67,10 @@ public class Commands {
 				createUser();
 				break;
 		}
-		//scanner.close();
 		System.out.println();
 	}
 	
-	public void getUser(String id) {
+	public boolean getUser(String id) {
 		//Request
 		ResponseEntity<ApiJsonResponse> response = null;
 		try {
@@ -78,17 +82,18 @@ public class Commands {
 				);
 		} catch (RestClientException e) {
 			log.error(e.getMessage());
-			return;
+			return false;
 		}
 		
 		//Check status code
 		int code = response.getStatusCodeValue();
 		if(!isHttpCodeValid(code, response)) {
-			return;
+			return false;
 		}
 		
 		this.id = id;
-		log.info("Welcome back #" + id);
+		log.info("Welcome back " + id);
+		return true;
 	}
 	
 	public void createUser() {
@@ -113,7 +118,7 @@ public class Commands {
 		}
 		
 		id = response.getBody().getId();
-		log.info("Your new id is #" + id);
+		log.info("Your new id is " + id);
 	}
 
 	/**
@@ -156,14 +161,14 @@ public class Commands {
 		}
 		for(int i = 0; i < list.size(); i++) {
 			Calculation c = list.get(i);
-			data[i+1][0] = String.valueOf(c.getId());
-			data[i+1][1] = c.getName();
-			data[i+1][2] = c.getDate();
-			data[i+1][3] = String.valueOf(c.isRunning());
-			data[i+1][4] = String.valueOf(c.getFitnessSaved());
-			data[i+1][5] = String.valueOf(c.getIterationNumber());
-			data[i+1][6] = String.valueOf(c.getLastIterationSaved());
-			data[i+1][7] = String.valueOf(c.getMaxIteration());
+			data[i + 1][0] = String.valueOf(c.getId());
+			data[i + 1][1] = c.getName();
+			data[i + 1][2] = c.getDate();
+			data[i + 1][3] = String.valueOf(c.isRunning());
+			data[i + 1][4] = String.valueOf(c.getFitnessSaved());
+			data[i + 1][5] = String.valueOf(c.getIterationNumber());
+			data[i + 1][6] = String.valueOf(c.getLastIterationSaved());
+			data[i + 1][7] = String.valueOf(c.getMaxIteration());
 		}
 		return builder.addFullBorder(BorderStyle.oldschool).build();
 	}
@@ -173,17 +178,28 @@ public class Commands {
 	 * @param model path to model to send
 	 */
 	@ShellMethod(value = "Launch a calculation from a model")
-	public void launchCalculation(String model) {
-		//Parameter validation
-		Path path = Paths.get(model);
-		if(Files.notExists(path)) {
+	public void launchCalculation(File model) {
+		// Parameter validation
+		Path jsonPath = model.toPath();
+		if (Files.notExists(jsonPath)) {
 			log.error("The path does not exist. Try again.");
 			return;
 		}
-		File file = new File(model);
-		
-		//Request
-		HttpEntity<File> request = new HttpEntity<>(file);
+		if (Files.isDirectory(jsonPath)) {
+			log.error(jsonPath + " is a directory. Try again.");
+		}
+		String jsonContentRead = null;
+		try {
+			jsonContentRead = new String(Files.readAllBytes(jsonPath));
+		} catch (IOException e1) {
+			log.error("Error while reading " + model);
+			return;
+		}
+
+		// Request
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		HttpEntity<String> request = new HttpEntity<String>(jsonContentRead, headers);
 		ResponseEntity<ApiJsonResponse> response = null;
 		try {
 			response = restTemplate.exchange(
@@ -203,10 +219,9 @@ public class Commands {
 		}
 		
 		int cid = response.getBody().getCid();
-		log.info("Calculation #" + cid + "launched");
+		log.info("Calculation '" + cid + "' launched");
 	}
-	
-	
+
 	/**
 	 * Stop the calculation
 	 * @param cid id of the calculation
@@ -232,8 +247,8 @@ public class Commands {
 		if(!isHttpCodeValid(code, response)) {
 			return;
 		}
-		
-		log.info("Calculation #" + cid + " stopped");
+
+		log.info("Calculation '" + cid + "' stopped");
 	}
 	
 	/**
@@ -261,8 +276,8 @@ public class Commands {
 		if(!isHttpCodeValid(code, response)) {
 			return;
 		}
-		
-		log.info("Calculation #" + cid + " deleted");
+
+		log.info("Calculation '" + cid + "' deleted");
 	}
 	
 	/**
@@ -272,8 +287,8 @@ public class Commands {
 	 * @param force if set, overwrite if dst already exists
 	 */
 	@ShellMethod(value = "Get the result of a calculation")
-	public void resultCalculation(int cid, String dst, @ShellOption(arity=0, defaultValue="false") boolean force) {
-		//Parameter validation
+	public void resultCalculation(int cid, String dst, @ShellOption(arity = 0, defaultValue = "false") boolean force) {
+		// Parameter validation
 		Path path = Paths.get(dst);
 		if(Files.exists(path)/* && Files.isRegularFile(path) && Files.isWritable(path)*/) {
 			if(!force) {
@@ -340,8 +355,8 @@ public class Commands {
 		if(!isHttpCodeValid(code, response)) {
 			return;
 		}
-		
-		log.info("Snapshot #" + sid + "launched");
+
+		log.info("Snapshot '" + sid + "' launched");
 	}
 	
 	/**
@@ -366,6 +381,7 @@ public class Commands {
 			case 200:
 				return true;
 			default:
+				System.out.println("|" + response.getBody().toString() + "|");
 				log.error("%d : %s", code, response.getBody().getError());
 				return false;
 		}
