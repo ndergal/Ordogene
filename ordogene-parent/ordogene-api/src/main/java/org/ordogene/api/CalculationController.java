@@ -35,9 +35,6 @@ public class CalculationController {
 	@Autowired
 	private Master masterAlgorithme;
 
-	@Autowired
-	Master masterAlgo;
-
 	/**
 	 * 
 	 * @param userId
@@ -46,6 +43,7 @@ public class CalculationController {
 	@RequestMapping(method = RequestMethod.GET, value = "/{userId}/calculations", produces = "application/json")
 	@ResponseBody
 	public ResponseEntity<ApiJsonResponse> getUserCalculations(@PathVariable String userId) {
+
 		if (userId == null || "".equals(userId)) {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
 		}
@@ -88,27 +86,38 @@ public class CalculationController {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
 		}
 		if (jsonBody == null) {
-			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.jsonBodyNull(),HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.jsonBodyNull(), HttpStatus.BAD_REQUEST);
 		}
 		if (!fs.userExist(userId)) {
-			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNotExist(userId),HttpStatus.NOT_FOUND);
+			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNotExist(userId),
+					HttpStatus.NOT_FOUND);
 		}
 
 		try {
-			int calculationId = this.masterAlgo.compute(userId, jsonBody);
-			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(userId, calculationId, null, null, null),HttpStatus.OK);
+
+			int calculationId = this.masterAlgorithme.compute(userId, jsonBody);
+			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(userId, calculationId, null, null, null),
+					HttpStatus.OK);
+
 		} catch (JsonParseException e) {
 			log.error("Problem during Json parsing", e);
-			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.jsonInvalid(userId, "JsonParseException"),HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.jsonInvalid(userId, "JsonParseException"),
+					HttpStatus.BAD_REQUEST);
+
 		} catch (JsonMappingException e) {
+
 			log.error("Problem during Json mapping", e);
-			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.jsonInvalid(userId, "JsonMappingException"),HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<ApiJsonResponse>(
+					ApiJsonResponseCreator.jsonInvalid(userId, "JsonMappingException"), HttpStatus.BAD_REQUEST);
 		} catch (UnmarshalException e) {
 			log.error("Missing fields in the JSON", e);
-			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.jsonInvalid(userId, "Missing fields in the JSON"),HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<ApiJsonResponse>(
+					ApiJsonResponseCreator.jsonInvalid(userId, "Missing fields in the JSON"), HttpStatus.BAD_REQUEST);
 		} catch (IOException e) {
 			log.error("I/O problem", e);
-			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.InternalServerError(),HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.InternalServerError(),
+					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+
 	}
 }

@@ -17,15 +17,16 @@ import org.ordogene.file.utils.Const;
 
 public class Dummy {
 
-	public static void fakeCalculation(ThreadHandler th, String uid, int cid, int occur) throws InterruptedException, IOException {
+	
+	public static void fakeCalculation(ThreadHandler th, String calculationName, String uid, int cid, int occur) throws InterruptedException, IOException {
 		if (uid == null) {
 			System.err.println("Pas de dossier ou écrire spécifié en argument!");
 		}
 		String location = Const.getConst().get("ApplicationPath");
-		if (location == null) {
+		if (location == null) { // avoid problem with noconfig file : only for the dev
 			location = "/home/ordogene/testProjectFiles/";
 		}
-		location = location + File.separator + uid + File.separator + cid + "_Dummy";
+		location = location + File.separator + uid + File.separator + cid + "_"+calculationName;
 		if (!Files.exists(Paths.get(location))) {
 			Files.createDirectories(Paths.get(location));
 		}
