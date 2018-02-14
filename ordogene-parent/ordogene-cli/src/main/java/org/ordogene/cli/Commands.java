@@ -31,6 +31,7 @@ import org.springframework.shell.table.CellMatcher;
 import org.springframework.shell.table.Table;
 import org.springframework.shell.table.TableBuilder;
 import org.springframework.shell.table.TableModel;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -48,45 +49,41 @@ public class Commands {
 	public void login() {
 		System.out.println();
 		System.out.print("Do you want to create a new id ? [y/N] : ");
+		@SuppressWarnings("resource") //problem if the scanner is closed
 		Scanner scanner = new Scanner(System.in);
 		String choice = scanner.nextLine();
-		switch (choice) {
-		case "":
-		case "n":
-		case "N":
-		case "no":
-			System.out.print("Enter your id : ");
-			id = scanner.next();
-			getUser(id);
-			break;
-		case "y":
-		case "Y":
-		case "yes":
-			createUser();
-			break;
+		switch(choice) {
+			case "":
+			case "n":
+			case "N":
+			case "no":
+				do {
+					System.out.print("Enter your id : ");
+					id = scanner.nextLine();
+				} while (id.isEmpty() || !getUser(id));
+				break;
+			case "y":
+			case "Y":
+			case "yes":
+				createUser();
+				break;
 		}
-		// scanner.close();
 		System.out.println();
 	}
+	
+	public boolean getUser(String id) {
+		//Request
 
-	public void getUser(String id) {
-		// Request
-		ResponseEntity<ApiJsonResponse> response = null;
 		try {
-			response = restTemplate.exchange("/" + id, HttpMethod.GET, null, ApiJsonResponse.class);
-		} catch (RestClientException e) {
-			log.error(e.getMessage());
-			return;
-		}
-
-		// Check status code
-		int code = response.getStatusCodeValue();
-		if (!isHttpCodeValid(code, response)) {
-			return;
+			restTemplate.exchange("/" + id, HttpMethod.GET, null, ApiJsonResponse.class);
+		} catch (HttpClientErrorException e) {
+			log.error(e.getStatusCode() + " -- " + e.getStatusText());
+			return false;
 		}
 
 		this.id = id;
-		log.info("Welcome back #" + id);
+		log.info("Welcome back " + id);
+		return true;
 	}
 
 	public void createUser() {
@@ -105,8 +102,8 @@ public class Commands {
 			return;
 		}
 
-		id = response.getBody().getId();
-		log.info("Your new id is #" + id);
+		id = response.getBody().getUserId();
+		log.info("Your new id is " + id);
 	}
 
 	/**
@@ -163,51 +160,6 @@ public class Commands {
 	 *            path to model to send
 	 */
 	@ShellMethod(value = "Launch a calculation from a model")
-	public void launchCalculationOld(String model) {
-		// Parameter validation
-		Path jsonPath = Paths.get(model);
-		if (Files.notExists(jsonPath)) {
-			log.error("The path does not exist. Try again.");
-			return;
-		}
-		String jsonContentRead = null;
-		try {
-			jsonContentRead = new String(Files.readAllBytes(jsonPath));
-		} catch (IOException e1) {
-			log.error("Error while reading " + model);
-			return;
-		}
-
-		// Request
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		HttpEntity<String> request = new HttpEntity<String>(jsonContentRead, headers);
-		ResponseEntity<ApiJsonResponse> response = null;
-		try {
-			response = restTemplate.exchange("/" + id + "/calculations/", HttpMethod.PUT, request,
-					ApiJsonResponse.class);
-		} catch (RestClientException e) {
-			log.error(e.getMessage());
-			return;
-		}
-
-		// Check status code
-		int code = response.getStatusCodeValue();
-		if (!isHttpCodeValid(code, response)) {
-			return;
-		}
-
-		int cid = response.getBody().getCid();
-		log.info("Calculation '" + cid + "' launched");
-	}
-
-	/**
-	 * Launch a calculation based on the model
-	 * 
-	 * @param model
-	 *            path to model to send
-	 */
-	@ShellMethod(value = "Launch a calculation from a model")
 	public void launchCalculation(File model) {
 		// Parameter validation
 		Path jsonPath = model.toPath();
@@ -248,7 +200,7 @@ public class Commands {
 		int cid = response.getBody().getCid();
 		log.info("Calculation '" + cid + "' launched");
 	}
-
+	
 	/**
 	 * Stop the calculation
 	 * 
@@ -402,12 +354,13 @@ public class Commands {
 	 * @param code
 	 */
 	public boolean isHttpCodeValid(int code, ResponseEntity<ApiJsonResponse> response) {
-		switch (code) {
-		case 200:
-			return true;
-		default:
-			log.error("%d : %s", code, response.getBody().getError());
-			return false;
+		switch(code) {
+			case 200:
+				return true;
+			default:
+				System.out.println("|" + response.getBody().toString() + "|");
+				log.error("%d : %s", code, response.getBody().getError());
+				return false;
 		}
 	}
 

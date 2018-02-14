@@ -70,8 +70,7 @@ public class Master {
 		this.maxThread = maxThread;
 	}
 
-	public int compute(String idUser, String jsonString) throws JsonParseException, JsonMappingException,
-			InstantiationException, IllegalAccessException, UnmarshalException, IOException, InterruptedException {
+	public int compute(String idUser, String jsonString) throws JsonParseException, JsonMappingException, UnmarshalException, IOException {
 
 		synchronized (threadMap) {
 			if (currentThread == maxThread) {
@@ -83,7 +82,12 @@ public class Master {
 
 		JSONModel jmodel = (JSONModel) Parser.parseJsonFile(jsonString, JSONModel.class);
 		Model model = Model.createModel(jmodel);
-		int numCalc = jsonString.hashCode();
+
+
+		String toHash = jsonString + (new Date()).toString();
+		int numCalc = toHash.hashCode();
+
+
 		ThreadHandler th = new ThreadHandler();
 
 		Thread t = new Thread(() -> {
@@ -187,12 +191,8 @@ public class Master {
 			// IsRunning
 			try {
 				th.masterToThread("state");
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			try {
-				// Format: epoch_iterationNumber_lastIterationSaved_maxIteration_fitness
+
+				//Format: epoch_iterationNumber_lastIterationSaved_maxIteration_fitness
 				String[] state = th.masterFromThread().split("_");
 				try {
 					Date date = new Date(Long.valueOf(state[0]));
@@ -209,6 +209,7 @@ public class Master {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			cal.setRunning(true);
 		} else {
 			cal.setRunning(false);
 		}

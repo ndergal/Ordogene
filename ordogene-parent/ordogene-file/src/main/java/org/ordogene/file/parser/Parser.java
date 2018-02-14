@@ -20,21 +20,19 @@ public class Parser {
 	}
 
 	public static Validable parseJsonFile(Path jsonPath, Class<? extends Validable> classe)
-			throws IOException, JsonParseException, JsonMappingException, InstantiationException,
-			IllegalAccessException, UnmarshalException {
+			throws IOException, JsonParseException, JsonMappingException, IllegalAccessException, UnmarshalException {
 		byte[] jsonData = Files.readAllBytes(jsonPath);
-		ObjectMapper objectMapper = new ObjectMapper();
-		Validable instance = objectMapper.readValue(jsonData, classe);
-		if (!instance.isValid()) {
-			throw new UnmarshalException("Missing fields in the JSON");
-		}
-		return instance;
+		return parseJsonFile(jsonData, classe);
 	}
 
 	public static Validable parseJsonFile(String jsonString, Class<? extends Validable> classe)
-			throws IOException, JsonParseException, JsonMappingException, InstantiationException,
-			IllegalAccessException, UnmarshalException {
+			throws JsonParseException, JsonMappingException, IOException, UnmarshalException {
 		byte[] jsonData = jsonString.getBytes();
+		return parseJsonFile(jsonData, classe);
+	}
+
+	public static Validable parseJsonFile(byte[] jsonData, Class<? extends Validable> classe)
+			throws JsonParseException, JsonMappingException, IOException, UnmarshalException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		Validable instance = objectMapper.readValue(jsonData, classe);
 		if (!instance.isValid()) {
