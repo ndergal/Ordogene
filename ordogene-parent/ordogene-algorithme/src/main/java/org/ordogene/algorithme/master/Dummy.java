@@ -22,7 +22,7 @@ public class Dummy {
 			System.err.println("Pas de dossier ou écrire spécifié en argument!");
 		}
 		String location = Const.getConst().get("ApplicationPath");
-		if (location == null) {
+		if (location == null) { // avoid problem with noconfig file : only for the dev
 			location = "/home/ordogene/testProjectFiles/";
 		}
 		location = location + File.separator + uid + File.separator + cid + "_Dummy";

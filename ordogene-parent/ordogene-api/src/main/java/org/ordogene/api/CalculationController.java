@@ -32,49 +32,25 @@ public class CalculationController {
 
 	@Autowired
 	private FileService fs;
-	
+
 	@Autowired
 	private Master masterAlgorithme;
-	
-	private static String JSONTest = "{\n" + 
-			"    \"snaps\" : [5,10,20,100],\n" + 
-			"    \"slots\" : 300,\n" + 
-			"    \"exec_time\" : 10000,\n" + 
-			"    \"environment\" : [\n" + 
-			"		{\"name\" : \"FUEL\", \"quantity\" : 200},\n" + 
-			"		{\"name\" : \"BIG_GOOD\", \"quantity\" : 0},\n" + 
-			"		{\"name\" : \"SMALL_BAD\", \"quantity\" : 0}\n" + 
-			"    ],\n" + 
-			"    \"actions\" : [\n" + 
-			"		{\n" + 
-			"			\"name\" : \"MAKE_GOOD\", \"time\" : 5,\n" + 
-			"			\"input\" : [\n" + 
-			"		     	{ \"name\" : \"FUEL\", \"quantity\" : 60, \"relation\" : \"c\" }\n" + 
-			"		 	],\n" + 
-			"		 	\"output\" : [\n" + 
-			"		    	{\"name\" : \"BIG_GOOD\", \"quantity\" : 1}\n" + 
-			"		 	]\n" + 
-			"		},\n" + 
-			"		{\n" + 
-			"			\"name\" : \"MAKE_BAD\", \"time\" : 2,\n" + 
-			"		 	\"input\" : [\n" + 
-			"		     	{ \"name\" : \"FUEL\", \"quantity\" : 6, \"relation\" : \"c\" }\n" + 
-			"		 	],\n" + 
-			"		 	\"output\" : [\n" + 
-			"		     	{\"name\" : \"SMALL_BAD\", \"quantity\" : 1}\n" + 
-			"		 	]\n" + 
-			"		}\n" + 
-			"    ],\n" + 
-			"    \"fitness\" : {\n" + 
-			"		\"type\" : \"max\",\n" + 
-			"		\"operands\" : [\n" + 
-			"		    {\"name\" : \"BIG_GOOD\", \"coef\" : 11},\n" + 
-			"		    {\"name\" : \"SMALL_BAD\", \"coef\" : 1}\n" + 
-			"		]\n" + 
-			"    }\n" + 
-			"}";
-	
-	
+
+	private static String JSONTest = "{\n" + "    \"snaps\" : [5,10,20,100],\n" + "    \"slots\" : 300,\n"
+			+ "    \"exec_time\" : 10000,\n" + "    \"environment\" : [\n"
+			+ "		{\"name\" : \"FUEL\", \"quantity\" : 200},\n"
+			+ "		{\"name\" : \"BIG_GOOD\", \"quantity\" : 0},\n"
+			+ "		{\"name\" : \"SMALL_BAD\", \"quantity\" : 0}\n" + "    ],\n" + "    \"actions\" : [\n" + "		{\n"
+			+ "			\"name\" : \"MAKE_GOOD\", \"time\" : 5,\n" + "			\"input\" : [\n"
+			+ "		     	{ \"name\" : \"FUEL\", \"quantity\" : 60, \"relation\" : \"c\" }\n" + "		 	],\n"
+			+ "		 	\"output\" : [\n" + "		    	{\"name\" : \"BIG_GOOD\", \"quantity\" : 1}\n"
+			+ "		 	]\n" + "		},\n" + "		{\n" + "			\"name\" : \"MAKE_BAD\", \"time\" : 2,\n"
+			+ "		 	\"input\" : [\n"
+			+ "		     	{ \"name\" : \"FUEL\", \"quantity\" : 6, \"relation\" : \"c\" }\n" + "		 	],\n"
+			+ "		 	\"output\" : [\n" + "		     	{\"name\" : \"SMALL_BAD\", \"quantity\" : 1}\n"
+			+ "		 	]\n" + "		}\n" + "    ],\n" + "    \"fitness\" : {\n" + "		\"type\" : \"max\",\n"
+			+ "		\"operands\" : [\n" + "		    {\"name\" : \"BIG_GOOD\", \"coef\" : 11},\n"
+			+ "		    {\"name\" : \"SMALL_BAD\", \"coef\" : 1}\n" + "		]\n" + "    }\n" + "}";
 
 	@Autowired
 	Master masterAlgo;
@@ -82,31 +58,22 @@ public class CalculationController {
 	private static final Map<Integer, String> currentCalculation = new HashMap<>();
 	private final Object token = new Object();
 
-
 	@RequestMapping(method = RequestMethod.GET, value = "/{userId}/calculations", produces = "application/json")
 	@ResponseBody
 	public ResponseEntity<ApiJsonResponse> getUserCalculations(@PathVariable String userId) {
 		if (userId == null) { // never
-			//return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(id + " does not exist");
-			return new ResponseEntity<ApiJsonResponse>(
-					new ApiJsonResponse(null, 0, "id can't be null", null, null),
-					HttpStatus.BAD_REQUEST
-				);
+			// return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(id + " does not
+			// exist");
+			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(null, 0, "id can't be null", null, null),
+					HttpStatus.BAD_REQUEST);
 		}
 		if (!fs.userExist(userId)) {
-			//return ResponseEntity.status(HttpStatus.NOT_FOUND).body(id + " does not exist");
+			// return ResponseEntity.status(HttpStatus.NOT_FOUND).body(id + " does not
+			// exist");
 			return new ResponseEntity<ApiJsonResponse>(
-					new ApiJsonResponse(null, 0, userId + " does not exist", null, null),
-					HttpStatus.NOT_FOUND
-				);
+					new ApiJsonResponse(null, 0, userId + " does not exist", null, null), HttpStatus.NOT_FOUND);
 		} else {
-			try {
-				masterAlgorithme.compute(userId, JSONTest);
-			} catch (InstantiationException | IllegalAccessException | UnmarshalException | IOException
-					| InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+
 			List<Calculation> calculations = fs.getUserCalculations(userId);
 			StringBuilder sb = new StringBuilder();
 			calculations.forEach(c -> {
@@ -118,14 +85,15 @@ public class CalculationController {
 				}
 				sb.append(c).append('\n');
 			});
-			return new ResponseEntity<ApiJsonResponse>(
-					new ApiJsonResponse(null, 0, null, calculations, null),
-					HttpStatus.OK
-				);
+			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(null, 0, null, calculations, null),
+					HttpStatus.OK);
 		}
 	}
 
-	@RequestMapping(value = "/{uid}/calculations", method = RequestMethod.PUT /*, consumes = MediaType.APPLICATION_JSON_VALUE */)
+	@RequestMapping(value = "/{uid}/calculations", method = RequestMethod.PUT /*
+																				 * , consumes =
+																				 * MediaType.APPLICATION_JSON_VALUE
+																				 */)
 	@ResponseBody
 	public ResponseEntity<ApiJsonResponse> launchCalculation(@PathVariable String uid, @RequestBody String jsonBody) {
 
@@ -149,21 +117,24 @@ public class CalculationController {
 		if (!exist) {
 			// return ResponseEntity.status(HttpStatus.NOT_FOUND).body(id + " does not
 			// exist");
-			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(null, 0, uid + " does not exist", null, null),
-					HttpStatus.NOT_FOUND);
+			return new ResponseEntity<ApiJsonResponse>(
+					new ApiJsonResponse(null, 0, uid + " does not exist", null, null), HttpStatus.NOT_FOUND);
 		}
-			
+
 		int calculationId = 0;
 		try {
-			calculationId= this.masterAlgo.compute(uid, jsonBody);
+			calculationId = this.masterAlgo.compute(uid, jsonBody);
 		} catch (JsonParseException e) {
-			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(uid, calculationId, "Invalid JSON (JsonParseException) ", null, null),
+			return new ResponseEntity<ApiJsonResponse>(
+					new ApiJsonResponse(uid, calculationId, "Invalid JSON (JsonParseException) ", null, null),
 					HttpStatus.NOT_FOUND);
 		} catch (JsonMappingException e) {
-			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(uid, calculationId, "Invalid JSON (JsonMappingException) ", null, null),
+			return new ResponseEntity<ApiJsonResponse>(
+					new ApiJsonResponse(uid, calculationId, "Invalid JSON (JsonMappingException) ", null, null),
 					HttpStatus.NOT_FOUND);
 		} catch (InstantiationException e) {
-			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(uid, calculationId, "Invalid JSON (InstantiationException) ", null, null),
+			return new ResponseEntity<ApiJsonResponse>(
+					new ApiJsonResponse(uid, calculationId, "Invalid JSON (InstantiationException) ", null, null),
 					HttpStatus.NOT_FOUND);
 		} catch (IllegalAccessException e) {
 			StringWriter sw = new StringWriter();
@@ -194,6 +165,7 @@ public class CalculationController {
 			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(uid, calculationId, sStackTrace, null, null),
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(uid, calculationId, null, null, null), HttpStatus.OK);
+		return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(uid, calculationId, null, null, null),
+				HttpStatus.OK);
 	}
 }
