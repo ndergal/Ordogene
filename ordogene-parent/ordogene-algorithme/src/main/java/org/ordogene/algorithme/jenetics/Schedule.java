@@ -1,54 +1,53 @@
 package org.ordogene.algorithme.jenetics;
 
-import java.util.Iterator;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
+import org.ordogene.algorithme.Model;
+import org.ordogene.algorithme.models.Action;
+import org.ordogene.algorithme.models.Environment;
+
+import io.jenetics.AbstractChromosome;
 import io.jenetics.Chromosome;
 import io.jenetics.util.ISeq;
+import io.jenetics.util.IntRange;
 
-public class Schedule implements Chromosome<ActionGene> {
+public class Schedule extends AbstractChromosome<ActionGene> {
 	
-	private ISeq<ActionGene> iSeq;
-
-	@Override
-	public boolean isValid() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public Iterator<ActionGene> iterator() {
-		// TODO Auto-generated method stub
-		return null;
+	private static final long serialVersionUID = 1L;
+	
+	private Function<Environment, ? extends Action> factory;
+	private Model model;
+	private int length;
+	private Supplier<Model> modelSupplier;
+	
+	public Schedule(
+			ISeq<ActionGene> seq, 
+			Function<Environment, ? extends Action> factory,
+			Supplier<Model> modelSupplier,
+			int length) {
+		super(seq);
+		this.modelSupplier = modelSupplier;
+		this.factory = factory;
+		this.length = length;
 	}
 
 	@Override
 	public Chromosome<ActionGene> newInstance() {
-		// TODO Auto-generated method stub
-		return null;
+		return new Schedule(ActionGene.seq(IntRange.of(length), factory, model.getCurrentEnvironment(), modelSupplier.get())
+				, factory, modelSupplier, length);
 	}
 
 	@Override
-	public ActionGene getGene(int arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	public Chromosome<ActionGene> newInstance(ISeq<ActionGene> genes) {
+		return new Schedule(genes, factory, modelSupplier, length);
+	}
+	
+	public static Schedule of(Function<Environment, ? extends Action> factory, int length, Supplier<Model> modelSupplier) {
+		Model modelCopy = modelSupplier.get();
+		return new Schedule(ActionGene.seq(IntRange.of(length), factory, modelCopy.getCurrentEnvironment(), modelCopy)
+				, factory, modelSupplier, length);
 	}
 
-	@Override
-	public int length() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public Chromosome<ActionGene> newInstance(ISeq<ActionGene> arg0) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ISeq<ActionGene> toSeq() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 }

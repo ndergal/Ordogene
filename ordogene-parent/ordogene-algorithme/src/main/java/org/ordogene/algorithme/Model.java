@@ -1,7 +1,7 @@
 package org.ordogene.algorithme;
 
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -67,15 +67,16 @@ public class Model {
 		if (actionsInProgress.get(a) == null) {
 			throw new IllegalArgumentException("The Action given don't exist in this model");
 		}
-		Iterator<Input> it = a.getInputs().iterator();
-		while (it.hasNext()) {
-			Input input = it.next();
-			Entity entityToChecked = currentEnvironment.getEntity(input.getName());
-			if (entityToChecked.getQuantity() < input.getQuantity()) {
-				return false;
-			}
-		}
-		return true;
+//		Iterator<Input> it = a.getInputs().iterator();
+//		while (it.hasNext()) {
+//			Input input = it.next();
+//			Entity entityToChecked = currentEnvironment.getEntity(input.getName());
+//			if (entityToChecked.getQuantity() < input.getQuantity()) {
+//				return false;
+//			}
+//		}
+//		return true;
+		return a.getInputs().stream().allMatch(input -> input.getQuantity() <= currentEnvironment.getEntity(input.getName()).getQuantity());
 	}
 
 	/**
@@ -98,6 +99,10 @@ public class Model {
 	}
 
 	public void startAnAction(Action a) {
+		startAnAction(currentEnvironment, a);
+	}
+
+	public void startAnAction(Environment currentEnvironment, Action a) {
 		Objects.requireNonNull(a);
 		if (actionsInProgress.get(a) == null) {
 			throw new IllegalArgumentException("The Action given don't exist in this model");
@@ -117,9 +122,14 @@ public class Model {
 		actionsInProgress.compute(a, (k, i) -> {
 			return i + 1;
 		});
+		actionSelector.reset();
 	}
 
 	public void endAnAction(Action a) {
+		endAnAction(currentEnvironment, a);
+	}
+
+	public void endAnAction(Environment currentEnvironment, Action a) {
 		Objects.requireNonNull(a);
 		Integer action = actionsInProgress.get(a);
 		if (action == null) {
@@ -150,5 +160,23 @@ public class Model {
 	
 	public Fitness getFitness() {
 		return fitness;
+	}
+	
+	public int getSlots() {
+		return slots;
+	}
+
+	public int getExecTime() {
+		return execTime;
+	}
+	
+	public Environment getCurrentEnvironment() {
+		return currentEnvironment.copy();
+	}
+
+	public Model copy() {
+		Set<Action> actions = new HashSet<>();
+		actionsInProgress.forEach((a, i) -> actions.add(a));
+		return new Model(snaps, slots, execTime, startEnvironment.copy(), actions, fitness);
 	}
 }
