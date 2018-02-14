@@ -135,4 +135,37 @@ public class Master {
 		th.masterToThread("something");
 		return th.masterFromThread();
 	}
+	
+	//TODO connection with Thread
+	public void updateCalculation(Calculation cal) {
+		ThreadHandler th = threadMap.get(cal.getId());
+		if(th != null) {
+			//IsRunning
+			try {
+				th.masterToThread("state");
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			try {
+				//Format: epoch_iterationNumber_lastIterationSaved_maxIteration_fitness
+				String[] state = th.masterFromThread().split("_");
+				try {
+					Date date = new Date(Long.valueOf(state[0]));
+					cal.setDate(formater.format(date));
+					cal.setIterationNumber(Integer.valueOf(state[1]));
+					cal.setLastIterationSaved(Integer.valueOf(state[2]));
+					cal.setMaxIteration(Integer.valueOf(state[3]));
+					cal.setFitnessSaved(Integer.valueOf(state[4]));
+				} catch(NumberFormatException | ArrayIndexOutOfBoundsException e) {
+					throw new InternalError("Problem with calculation format informations");
+				}
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else {
+			cal.setRunning(false);
+		}
+	}
 }

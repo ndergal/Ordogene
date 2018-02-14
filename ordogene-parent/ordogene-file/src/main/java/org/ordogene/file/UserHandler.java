@@ -14,7 +14,7 @@ import org.ordogene.file.utils.Const;
 public class UserHandler {
 
 	boolean checkUserExists(String username) {
-		if (username == null || username.equals("")) {
+		if (username == null || username.isEmpty()) {
 			return false;
 		} else {
 			Path path = Paths.get(Const.getConst().get("ApplicationPath") + File.separatorChar + username);
@@ -23,7 +23,7 @@ public class UserHandler {
 	}
 
 	boolean createAnUser(String username) {
-		if (username == null || username.equals("")) {
+		if (username == null || username.isEmpty()) {
 			return false;
 		} else {
 			try {
@@ -40,7 +40,7 @@ public class UserHandler {
 	}
 
 	boolean removeUser(String username) {
-		if (username == null || username.equals("")) {
+		if (username == null || username.isEmpty()) {
 			return false;
 		} else {
 

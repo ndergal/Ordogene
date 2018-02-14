@@ -37,7 +37,7 @@ public class Commands {
 	
 	private String id;
 	private static final Logger log = LoggerFactory.getLogger(Commands.class);
-	private final String[] headers = {"id", "name", "status", "progress", "date", "max fitness"};
+	private final String[] headers = {"Id", "Name", "Date", "Running", "Fitness", "Iteration done", "Last iteration saved", "Max iteration"};
 	@Autowired
 	private RestTemplate restTemplate;
 	
@@ -158,10 +158,12 @@ public class Commands {
 			Calculation c = list.get(i);
 			data[i+1][0] = String.valueOf(c.getId());
 			data[i+1][1] = c.getName();
-			data[i+1][2] = String.valueOf(c.getIterationNumber());
-			data[i+1][3] = String.valueOf(c.getMaxIteration());
-			data[i+1][4] = c.getDate();
-			data[i+1][5] = String.valueOf(c.getLastIterationSaved());
+			data[i+1][2] = c.getDate();
+			data[i+1][3] = String.valueOf(c.isRunning());
+			data[i+1][4] = String.valueOf(c.getFitnessSaved());
+			data[i+1][5] = String.valueOf(c.getIterationNumber());
+			data[i+1][6] = String.valueOf(c.getLastIterationSaved());
+			data[i+1][7] = String.valueOf(c.getMaxIteration());
 		}
 		return builder.addFullBorder(BorderStyle.oldschool).build();
 	}

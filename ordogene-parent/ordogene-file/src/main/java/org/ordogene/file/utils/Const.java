@@ -52,8 +52,8 @@ public class Const {
 			}
 		}
 		return true;
-
 	}
+	
 	public static Map<String, String> getConst() {
 		return Collections.unmodifiableMap(resourcesMap);
 	}

@@ -33,7 +33,7 @@ public class FileService {
 	}
 	
 	public List<Calculation> getUserCalculations(String username){
-		return ch.getCallculations(username);
+		return ch.getCalculations(username);
 	}
 
 }
