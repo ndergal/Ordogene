@@ -1,16 +1,16 @@
 package org.ordogene.cli;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
 import javax.annotation.PostConstruct;
-import javax.imageio.ImageIO;
 
 import org.ordogene.file.utils.ApiJsonResponse;
 import org.ordogene.file.utils.Calculation;
@@ -38,6 +38,7 @@ import org.springframework.web.client.RestTemplate;
 @ShellComponent
 public class Commands {
 
+	private final SimpleDateFormat formater = new SimpleDateFormat("dd/MM/yyyy-hh:mm");
 	private String id;
 	private static final Logger log = LoggerFactory.getLogger(Commands.class);
 	private final String[] headers = { "Id", "Name", "Date", "Running", "Fitness", "Iteration done",
@@ -141,9 +142,10 @@ public class Commands {
 		}
 		for (int i = 0; i < list.size(); i++) {
 			Calculation c = list.get(i);
+			log.info(c.toString());
 			data[i + 1][0] = String.valueOf(c.getId());
 			data[i + 1][1] = c.getName();
-			data[i + 1][2] = c.getDate();
+			data[i + 1][2] = formater.format(new Date(c.getStartTimestamp()));
 			data[i + 1][3] = String.valueOf(c.isRunning());
 			data[i + 1][4] = String.valueOf(c.getFitnessSaved());
 			data[i + 1][5] = String.valueOf(c.getIterationNumber());
@@ -293,16 +295,10 @@ public class Commands {
 		}
 
 		// Writing the image
-		String imgb64 = response.getBody().getImg();
-		
-		 //TODO ; transform imgb64 to Png
-		/*
-		try {
-			ImageIO.write(imgb64, "PNG", new File(dst));
-		} catch (IOException e) {
-			log.error("A error has occured while writing the image");
-		}
-*/
+
+		String base64img = response.getBody().getBase64img();
+		FileService.decodeAndSaveImage(base64img, dst);
+
 		log.info("The image of the result is downloaded at " + dst);
 	}
 
