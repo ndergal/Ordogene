@@ -293,13 +293,16 @@ public class Commands {
 		}
 
 		// Writing the image
-		BufferedImage img = response.getBody().getImg();
+		String imgb64 = response.getBody().getImg();
+		
+		 //TODO ; transform imgb64 to Png
+		/*
 		try {
-			ImageIO.write(img, "PNG", new File(dst));
+			ImageIO.write(imgb64, "PNG", new File(dst));
 		} catch (IOException e) {
 			log.error("A error has occured while writing the image");
 		}
-
+*/
 		log.info("The image of the result is downloaded at " + dst);
 	}
 

@@ -1,5 +1,6 @@
 package org.ordogene.file;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -46,5 +47,15 @@ public class FileServiceTest {
 			fs.addUser("bwana");
 
 		assertTrue(fs.removeUser("bwana"));
+	}
+	
+
+	@Test
+	public void getRandomUid() {
+		FileService fs = new FileService();
+		int size=89;
+		String ruid = fs.generateRandomUserId(size);
+		assertFalse(ruid==null);
+		assertEquals(size,ruid.length());
 	}
 }

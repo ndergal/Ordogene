@@ -15,8 +15,9 @@ import org.ordogene.file.utils.Const;
 
 public class Dummy {
 
-	
+
 	public static void fakeCalculation(String calculationName, String uid, int cid, int occur) throws InterruptedException, IOException {
+
 		if (uid == null) {
 			System.err.println("Pas de dossier ou écrire spécifié en argument!");
 		}
@@ -24,7 +25,8 @@ public class Dummy {
 		if (location == null) { // avoid problem with noconfig file : only for the dev
 			location = "/home/ordogene/testProjectFiles/";
 		}
-		location = location + File.separator + uid + File.separator + cid + "_"+calculationName;
+		
+		location = location + File.separator + uid + File.separator + cid + "_" + calculationName;
 		if (!Files.exists(Paths.get(location))) {
 			Files.createDirectories(Paths.get(location));
 		}
@@ -36,12 +38,23 @@ public class Dummy {
 		}
 
 		Thread.sleep(900);
-		try (FileOutputStream fos = new FileOutputStream(location + File.separator + "result" + occur + ".jpg")) {
-			URL doge = new URL("https://quiteirregular.files.wordpress.com/2014/02/doge.png");
-			ReadableByteChannel rbc = Channels.newChannel(doge.openStream());
-			fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-		} catch (FileAlreadyExistsException e) {
-			System.err.println("already exists: " + e.getMessage());
+		if (occur == 0) {
+
+			try (FileOutputStream fos = new FileOutputStream(location + File.separator + "result" + ".png")) {
+				URL doge = new URL("https://quiteirregular.files.wordpress.com/2014/02/doge.png");
+				ReadableByteChannel rbc = Channels.newChannel(doge.openStream());
+				fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+			} catch (FileAlreadyExistsException e) {
+				System.err.println("already exists: " + e.getMessage());
+			}
+		} else {
+			try (FileOutputStream fos = new FileOutputStream(location + File.separator + "result" + occur + ".png")) {
+				URL doge = new URL("https://quiteirregular.files.wordpress.com/2014/02/doge.png");
+				ReadableByteChannel rbc = Channels.newChannel(doge.openStream());
+				fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+			} catch (FileAlreadyExistsException e) {
+				System.err.println("already exists: " + e.getMessage());
+			}
 		}
 	}
 
