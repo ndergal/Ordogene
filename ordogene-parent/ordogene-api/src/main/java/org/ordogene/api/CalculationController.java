@@ -56,7 +56,7 @@ public class CalculationController {
 			StringBuilder sb = new StringBuilder();
 			calculations.forEach(c -> {
 				try {
-					masterAlgorithme.updateCalculation(c);
+					masterAlgorithme.updateCalculation(c, userId);
 				} catch (InternalError e) {
 					System.err.println("Problem with calculation format informations");
 					return;
@@ -89,20 +89,15 @@ public class CalculationController {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNotExist(userId),
 					HttpStatus.NOT_FOUND);
 		}
-
 		try {
-
 			int calculationId = this.masterAlgorithme.compute(userId, jsonBody);
 			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(userId, calculationId, null, null, null),
 					HttpStatus.OK);
-
 		} catch (JsonParseException e) {
 			log.error("Problem during Json parsing", e);
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.jsonInvalid(userId, "JsonParseException"),
 					HttpStatus.BAD_REQUEST);
-
 		} catch (JsonMappingException e) {
-
 			log.error("Problem during Json mapping", e);
 			return new ResponseEntity<ApiJsonResponse>(
 					ApiJsonResponseCreator.jsonInvalid(userId, "JsonMappingException"), HttpStatus.BAD_REQUEST);

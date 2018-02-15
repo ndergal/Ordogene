@@ -10,15 +10,13 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.concurrent.ArrayBlockingQueue;
 
-import org.ordogene.algorithme.master.Master.ThreadHandler;
 import org.ordogene.file.utils.Const;
 
 public class Dummy {
 
 	
-	public static void fakeCalculation(ThreadHandler th, String calculationName, String uid, int cid, int occur) throws InterruptedException, IOException {
+	public static void fakeCalculation(String calculationName, String uid, int cid, int occur) throws InterruptedException, IOException {
 		if (uid == null) {
 			System.err.println("Pas de dossier ou écrire spécifié en argument!");
 		}

@@ -43,7 +43,7 @@ public class DummyTest {
 		String jsonContentPost = new String(contentFileTest);
 		// System.out.println(jsonContentPost);
 		int randomNum = ThreadLocalRandom.current().nextInt();
-		Dummy.fakeCalculation(new Master.ThreadHandler(), "lol", "tester", randomNum, 1);
+		Dummy.fakeCalculation("lol", "tester", randomNum, 1);
 
 	}
 

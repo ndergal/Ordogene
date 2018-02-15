@@ -1,21 +1,25 @@
 package org.ordogene.file.utils;
 
-import java.security.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Objects;
 
-public class Calculation implements java.io.Serializable {
+import org.ordogene.file.parser.Validable;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+public class Calculation implements Validable{
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 2865737871685409060L;
 	private static final DateFormat dateFormater = new SimpleDateFormat("dd/MM/yyyy-hh:mm");
 	private int id;
 	private String name;
+	@JsonIgnore
 	private boolean running;
 	private int iterationNumber;
 	private int maxIteration;
@@ -47,7 +51,7 @@ public class Calculation implements java.io.Serializable {
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		this.name = Objects.requireNonNull(name);
 	}
 
 	public boolean isRunning() {
@@ -79,19 +83,6 @@ public class Calculation implements java.io.Serializable {
 		return dateFormater.format(date);
 	}
 
-	public void setDate(String dateStr) throws ParseException {
-		Date date = dateFormater.parse(dateStr);
-		Calendar cal = GregorianCalendar.getInstance();
-		cal.setTime(date);
-		startTimestamp = cal.getTimeInMillis();
-	}
-
-	public void setDate(Date date) {
- 		Calendar cal = GregorianCalendar.getInstance();
-		cal.setTime(date);
-		startTimestamp = cal.getTimeInMillis();
-	}
-
 	public int getLastIterationSaved() {
 		return lastIterationSaved;
 	}
@@ -114,5 +105,22 @@ public class Calculation implements java.io.Serializable {
 				+ " iterationNumber='" + iterationNumber + "'" + " maxIteration='" + maxIteration + "'" + " startDate='"
 				+ dateFormater.format(new Date(startTimestamp)) + "'" + " lastIterationSaved='" + lastIterationSaved
 				+ "'" + "}";
+	}
+
+	@JsonIgnore
+	@Override
+	public boolean isValid() {
+		return name != null;
+	}
+	
+	@JsonIgnore
+	public void setCalculation(long startTimestamp, int iterationNumber, int lstIterationSaved, int maxIteration, int id, String name, int fitness) {
+		setStartTimestamp(startTimestamp);
+		setIterationNumber(iterationNumber);
+		setLastIterationSaved(lstIterationSaved);
+		setMaxIteration(maxIteration);
+		setId(id);
+		setName(name);
+		setFitnessSaved(fitness);
 	}
 }
