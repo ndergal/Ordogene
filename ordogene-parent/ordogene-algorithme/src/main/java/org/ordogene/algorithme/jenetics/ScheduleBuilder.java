@@ -34,20 +34,14 @@ public class ScheduleBuilder {
 	public void run() {
 		Engine<ActionGene, Double> engine = Engine
 			.builder(this::fitness, Genotype.of(Schedule.of(this::createAction, model.getSlots(), () -> model.copy()), 1))
-			.optimize(Type.min.equals(model.getFitness().getType())?Optimize.MINIMUM:Optimize.MAXIMUM)
-			.fitnessScaler(this::fitnessScaler)
+//			.optimize(Type.min.equals(model.getFitness().getType())?Optimize.MINIMUM:Optimize.MAXIMUM)
+//			.fitnessScaler(this::fitnessScaler)
 			.populationSize(POPULATION_SIZE)
 //			.selector(new TournamentSelector<>())
 			.alterers(new ScheduleCrossover(0.2))
 			.build();
 		
 		EvolutionStatistics<Double, DoubleMomentStatistics> statistics = EvolutionStatistics.ofNumber();
-		
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 		
 		Phenotype<ActionGene, Double> best = engine.stream()
 			.limit(1)

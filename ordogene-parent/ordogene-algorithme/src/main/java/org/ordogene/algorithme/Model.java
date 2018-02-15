@@ -93,7 +93,6 @@ public class Model {
 			// Select one action here
 			return actionSelector.select();
 		}
-		actionSelector.add(Action.EMPTY(), 0);
 		for (Action a : actionsInProgress.keySet()) {
 			if (workable(a, currentEnvironment)) {
 				actionSelector.add(a, fitness.eval(a));
