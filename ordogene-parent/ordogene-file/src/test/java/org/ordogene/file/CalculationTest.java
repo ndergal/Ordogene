@@ -32,7 +32,6 @@ public class CalculationTest {
  		c.setFitnessSaved(fitness);
 		c.setLastIterationSaved(lastIter);
 		c.setMaxIteration(iter);
-		assertTrue(ts == (c.getStartTimestamp()));
 		c.setStartTimestamp(ts);
 		assertTrue(ts == (c.getStartTimestamp()));
 		assertEquals(id, c.getId());
