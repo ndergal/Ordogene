@@ -6,7 +6,7 @@ import org.ordogene.file.parser.Validable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public class ApiJsonResponse implements Validable{
+public class ApiJsonResponse implements Validable {
 	private String userId;
 	private int cid;
 	private String error;
@@ -14,9 +14,13 @@ public class ApiJsonResponse implements Validable{
 	private String img; // Base64 img
 
 	public ApiJsonResponse() {
-		
+
 	}
+<<<<<<< HEAD
 	
+=======
+
+>>>>>>> branch 'dev' of https://ThibaultGIRARD@bitbucket.org/darwinners/ordogene.git
 	public ApiJsonResponse(String userId, int cid, String error, List<Calculation> list, String img) {
 		this.userId = userId;
 		this.cid = cid;
