@@ -1,13 +1,11 @@
 package org.ordogene.api;
 
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
-
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -42,6 +40,8 @@ public class CalculationController {
 
 	@Autowired
 	private Master masterAlgorithme;
+	private static final Map<Integer, String> currentCalculation = new HashMap<>();
+	private final Object token = new Object();
 
 	/**
 	 * 
@@ -52,12 +52,9 @@ public class CalculationController {
 	@ResponseBody
 	public ResponseEntity<ApiJsonResponse> getUserCalculations(@PathVariable String userId) {
 
-
 		if (userId == null || "".equals(userId)) {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
-
 		}
-
 		if (!fs.userExist(userId)) {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNotExist(userId),
 					HttpStatus.NOT_FOUND);
@@ -65,7 +62,6 @@ public class CalculationController {
 			// Do list
 			List<Calculation> calculations = fs.getUserCalculations(userId);
 			calculations.forEach(c -> {
-
 				try {
 					masterAlgorithme.updateCalculation(c, userId);
 				} catch (InternalError e) {
@@ -85,7 +81,10 @@ public class CalculationController {
 	 * @param jsonBody
 	 * @return
 	 */
-	@RequestMapping(value = "/{userId}/calculations", method = RequestMethod.PUT /*, consumes = MediaType.APPLICATION_JSON_VALUE */)
+	@RequestMapping(value = "/{userId}/calculations", method = RequestMethod.PUT /*
+																					 * , consumes =
+																					 * MediaType.APPLICATION_JSON_VALUE
+																					 */)
 	@ResponseBody
 	public ResponseEntity<ApiJsonResponse> launchCalculation(@PathVariable String userId,
 			@RequestBody String jsonBody) {
@@ -120,6 +119,72 @@ public class CalculationController {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.InternalServerError(),
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+	}
 
+	@RequestMapping(value = "/{id}/calculations/{calculationid}")
+	@ResponseBody
+	public ResponseEntity<ApiJsonResponse> getCalculation(@PathVariable String id, @PathVariable int calculationid) {
+
+		if (id == null) {
+			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(null, 0, "id can't be null", null, null),
+					HttpStatus.BAD_REQUEST);
+		}
+
+		if (!fs.userExist(id)) {
+			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(null, 0, id + " does not exist", null, null),
+					HttpStatus.NOT_FOUND);
+		} else {
+			List<Calculation> calculations = fs.getUserCalculations(id);
+			Optional<Calculation> calcul = calculations.stream().filter(x -> x.getId() == calculationid).findFirst();
+			if (calcul.isPresent()) {
+
+				try {
+					Path imgPath = Paths.get(FileService.getCalculationPath(id, calcul.get()));
+					String base64img = FileService.encodeImage(imgPath);
+					return new ResponseEntity<ApiJsonResponse>(
+							new ApiJsonResponse(id, calculationid, null, null, base64img), HttpStatus.OK);
+				} catch (FileNotFoundException e) {
+					return new ResponseEntity<ApiJsonResponse>(
+							new ApiJsonResponse(id, 0, "cannot find calculation path", null, null),
+							HttpStatus.NOT_FOUND);
+				} catch (IOException e) {
+					return new ResponseEntity<ApiJsonResponse>(
+							new ApiJsonResponse(id, 0, "cannot open calculation path", null, null),
+							HttpStatus.NOT_FOUND);
+				}
+
+			}
+			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(id, 0,
+					"calculation " + calculationid + " does not exist for user " + id, null, null),
+					HttpStatus.NOT_FOUND);
+		}
+	}
+
+	private void asynchronousDeletePid(Process proc, int pid, String id) {
+
+		Runnable waitAndDeletePid = new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					// int exitVal = proc.waitFor();
+					int exitVal = proc.waitFor();
+					synchronized (token) {
+						if (currentCalculation.containsKey(pid)) {
+							currentCalculation.remove(pid);
+							System.out.println("remove " + pid + " from the map");
+						}
+					}
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
+		};
+
+		Thread t = new Thread(waitAndDeletePid);
+		t.setDaemon(true);
+		t.start();
 	}
 }
