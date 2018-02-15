@@ -17,6 +17,7 @@ import java.util.concurrent.BlockingQueue;
 import javax.xml.bind.UnmarshalException;
 
 import org.ordogene.algorithme.Model;
+import org.ordogene.file.FileService;
 import org.ordogene.file.JSONModel;
 import org.ordogene.file.parser.Parser;
 import org.ordogene.file.utils.Calculation;
@@ -143,7 +144,7 @@ public class Master {
 			try {
 				String calculationSaveDest = Const.getConst().get("ApplicationPath") + File.separator + idUser
 						+ File.separator + tmpCalc.getId() + "_"+model.getName() + File.separatorChar + "state.json"; 
-				writeInFile(tmpCalc, Paths.get(calculationSaveDest));
+				FileService.writeInFile(tmpCalc, Paths.get(calculationSaveDest));
 				System.out.println(tmpCalc + " saved in " + calculationSaveDest);
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -170,20 +171,7 @@ public class Master {
 		return th.masterFromThread();
 	}
 
-	private static void writeInFile(Object content, Path dest) throws IOException {
 
-		if (Files.exists(dest)) {
-			Files.delete(dest);
-		}
-		Files.createDirectories(dest.getParent());
-		Files.createFile(dest);
-
-		ObjectMapper mapper = new ObjectMapper();
-
-		// Object to JSON in file
-		mapper.writeValue(dest.toFile(), content);
-
-	}
 
 	// TODO connection with Thread
 	public void updateCalculation(Calculation cal) {
