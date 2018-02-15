@@ -1,7 +1,15 @@
 package org.ordogene.api;
 
+
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.List;
+import java.lang.reflect.Field;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+
+import java.util.Map;
+import java.util.Optional;
 
 import javax.xml.bind.UnmarshalException;
 
@@ -44,9 +52,12 @@ public class CalculationController {
 	@ResponseBody
 	public ResponseEntity<ApiJsonResponse> getUserCalculations(@PathVariable String userId) {
 
+
 		if (userId == null || "".equals(userId)) {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
+
 		}
+
 		if (!fs.userExist(userId)) {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNotExist(userId),
 					HttpStatus.NOT_FOUND);
@@ -54,6 +65,7 @@ public class CalculationController {
 			// Do list
 			List<Calculation> calculations = fs.getUserCalculations(userId);
 			calculations.forEach(c -> {
+
 				try {
 					masterAlgorithme.updateCalculation(c, userId);
 				} catch (InternalError e) {

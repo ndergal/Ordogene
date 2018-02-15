@@ -11,26 +11,26 @@ public class ApiJsonResponse implements Validable {
 	private int cid;
 	private String error;
 	private List<Calculation> list;
-	private String img; // Base64 img
+	private String base64img;
 
 	public ApiJsonResponse() {
 
 	}
-	
-	public ApiJsonResponse(String userId, int cid, String error, List<Calculation> list, String img) {
+
+	public ApiJsonResponse(String userId, int cid, String error, List<Calculation> list, String base64img) {
 		this.userId = userId;
 		this.cid = cid;
 		this.error = error;
 		this.list = list;
-		this.img = img;
+		this.base64img = base64img;
 	}
 
-	public String getImg() {
-		return img;
+	public String getBase64img() {
+		return base64img;
 	}
 
-	public void setImg(String img) {
-		this.img = img;
+	public void setBase64img(String base64img) {
+		this.base64img = base64img;
 	}
 
 	public String getUserId() {
@@ -106,9 +106,9 @@ public class ApiJsonResponse implements Validable {
 		} else if (!error.equals(other.error))
 			return false;
 		if (img == null) {
-			if (other.img != null)
+			if (other.base64img != null)
 				return false;
-		} else if (!img.equals(other.img))
+		} else if (!base64img.equals(other.base64img))
 			return false;
 		if (list == null) {
 			if (other.list != null)
