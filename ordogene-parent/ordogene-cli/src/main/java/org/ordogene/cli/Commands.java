@@ -53,34 +53,33 @@ public class Commands {
 	public void login() {
 		System.out.println();
 		System.out.print("Do you want to create a new id ? [y/N] : ");
-		@SuppressWarnings("resource") //problem if the scanner is closed
+		@SuppressWarnings("resource") // problem if the scanner is closed
 		Scanner scanner = new Scanner(System.in);
 		String choice = scanner.nextLine();
 
-		switch(choice) {
-			case "":
-			case "n":
-			case "N":
-			case "no":
-				do {
-					System.out.print("Enter your id : ");
-					id = scanner.nextLine();
-				} while (id.isEmpty() || !getUser(id));
-				break;
-			case "y":
-			case "Y":
-			case "yes":
-				createUser();
-				break;
+		switch (choice) {
+		case "":
+		case "n":
+		case "N":
+		case "no":
+			do {
+				System.out.print("Enter your id : ");
+				id = scanner.nextLine();
+			} while (id.isEmpty() || !getUser(id));
+			break;
+		case "y":
+		case "Y":
+		case "yes":
+			createUser();
+			break;
 
 		}
 
 		System.out.println();
 	}
 
-	
 	public boolean getUser(String id) {
-		//Request
+		// Request
 
 		try {
 
@@ -90,7 +89,6 @@ public class Commands {
 			return false;
 
 		}
-
 
 		this.id = id;
 		log.info("Welcome back " + id);
@@ -290,11 +288,9 @@ public class Commands {
 	public void resultCalculation(int cid, String dst, @ShellOption(arity = 0, defaultValue = "false") boolean force) {
 		// Parameter validation
 		Path path = Paths.get(dst);
-		if (Files.exists(path)/* && Files.isRegularFile(path) && Files.isWritable(path) */) {
-			if (!force) {
-				log.error("A file already exists, use --force to overwrite.");
-				return;
-			}
+		if (Files.exists(path) && !force/* && Files.isRegularFile(path) && Files.isWritable(path) */) {
+			log.error("A file already exists, use --force to overwrite.");
+			return;
 		}
 
 		// Request
@@ -373,13 +369,13 @@ public class Commands {
 	 * @param code
 	 */
 	public boolean isHttpCodeValid(int code, ResponseEntity<ApiJsonResponse> response) {
-		switch(code) {
-			case 200:
-				return true;
-			default:
-				System.out.println("|" + response.getBody().toString() + "|");
-				log.error("%d : %s", code, response.getBody().getError());
-				return false;
+		switch (code) {
+		case 200:
+			return true;
+		default:
+			System.out.println("|" + response.getBody().toString() + "|");
+			log.error("%d : %s", code, response.getBody().getError());
+			return false;
 
 		}
 	}

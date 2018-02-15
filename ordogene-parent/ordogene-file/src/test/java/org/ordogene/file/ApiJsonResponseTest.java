@@ -44,7 +44,7 @@ public class ApiJsonResponseTest {
 	@Test
 	public void UnserializeApiJsonResponse() throws IOException {
 
-		String jsonAjr = "{\"userId\":\"tester\",\"cid\":0,\"error\":\"test error ?\",\"list\":[],\"img\":\"Random\"}\n"
+		String jsonAjr = "{\"userId\":\"tester\",\"cid\":0,\"error\":\"test error ?\",\"list\":[],\"base64img\":\"Random\"}\n"
 				+ "";
 		ApiJsonResponse ajr2 = mapper.readValue(jsonAjr, ApiJsonResponse.class);
 		assertEquals(ajr, ajr2);
