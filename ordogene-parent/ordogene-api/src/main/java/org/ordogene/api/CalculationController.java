@@ -53,7 +53,6 @@ public class CalculationController {
 		} else {
 			// Do list
 			List<Calculation> calculations = fs.getUserCalculations(userId);
-			StringBuilder sb = new StringBuilder();
 			calculations.forEach(c -> {
 				try {
 					masterAlgorithme.updateCalculation(c, userId);
@@ -61,7 +60,6 @@ public class CalculationController {
 					System.err.println("Problem with calculation format informations");
 					return;
 				}
-				sb.append(c).append('\n');
 			});
 			// Return it
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.listCalculation(calculations),
