@@ -1,9 +1,14 @@
 package org.ordogene.file;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.SecureRandom;
 import java.util.List;
 
 import org.ordogene.file.utils.Calculation;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class FileService {
 
@@ -31,9 +36,24 @@ public class FileService {
 			sb.append(AB.charAt(rnd.nextInt(AB.length())));
 		return sb.toString();
 	}
-	
-	public List<Calculation> getUserCalculations(String username){
+
+	public List<Calculation> getUserCalculations(String username) {
 		return ch.getCalculations(username);
+	}
+
+	public static void writeInFile(Object content, Path dest) throws IOException {
+
+		if (Files.exists(dest)) {
+			Files.delete(dest);
+		}
+		Files.createDirectories(dest.getParent());
+		Files.createFile(dest);
+
+		ObjectMapper mapper = new ObjectMapper();
+
+		// Object to JSON in file
+		mapper.writeValue(dest.toFile(), content);
+
 	}
 
 }

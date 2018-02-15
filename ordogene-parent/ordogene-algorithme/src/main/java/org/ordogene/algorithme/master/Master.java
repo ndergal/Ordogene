@@ -64,7 +64,6 @@ public class Master {
 
 		Thread t = new Thread(() -> {
 
-			
 		});
 		
 
@@ -83,7 +82,7 @@ public class Master {
 		th.masterToThread("something");
 		return th.masterFromThread();
 	}
-
+	
 	// TODO connection with Thread
 	public void updateCalculation(Calculation cal, String userId) {
 		ThreadHandler th = threadMap.get(cal.getId());
