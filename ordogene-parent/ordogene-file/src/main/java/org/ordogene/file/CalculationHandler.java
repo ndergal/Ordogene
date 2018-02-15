@@ -66,33 +66,5 @@ public class CalculationHandler {
 		return true;
 	}
 
-	public static void startJar() {
-		List<String> cmd = new ArrayList<>();
-		String jarPath = Const.getConst().get("JarAlgorithmPath");
-		Process launchedJarProcess;
-		if (jarPath == null) {
-			System.err.println("Error : The Algorithm path (in .jar) is not well defined in config.json");
-		}
-		cmd.add("java");
-		cmd.add("-jar");
-		cmd.add(jarPath);
-		try {
-			ProcessBuilder b = new ProcessBuilder(cmd);
-			launchedJarProcess = b.start();
-
-			// display the Process :
-			InputStreamReader isreader = new InputStreamReader(launchedJarProcess.getInputStream());
-			BufferedReader buff = new BufferedReader(isreader);
-			String processLine;
-			while ((processLine = buff.readLine()) != null) {
-				System.out.print(processLine);
-			}
-
-			System.exit(0);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-	}
-
+	 
 }
