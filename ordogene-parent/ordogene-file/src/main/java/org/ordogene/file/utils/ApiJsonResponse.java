@@ -67,8 +67,8 @@ public class ApiJsonResponse implements Validable {
 
 	@Override
 	public String toString() {
-		return "ApiJsonResponse [id=" + userId + ", cid=" + cid + ", error=" + error + ", list=" + list + ", img=" + img
-				+ "]";
+		return "ApiJsonResponse [id=" + userId + ", cid=" + cid + ", error=" + error + ", list=" + list + ", img="
+				+ base64img + "]";
 	}
 
 	@JsonIgnore
@@ -83,7 +83,7 @@ public class ApiJsonResponse implements Validable {
 		int result = 1;
 		result = prime * result + cid;
 		result = prime * result + ((error == null) ? 0 : error.hashCode());
-		result = prime * result + ((img == null) ? 0 : img.hashCode());
+		result = prime * result + ((base64img == null) ? 0 : base64img.hashCode());
 		result = prime * result + ((list == null) ? 0 : list.hashCode());
 		result = prime * result + ((userId == null) ? 0 : userId.hashCode());
 		return result;
@@ -105,7 +105,7 @@ public class ApiJsonResponse implements Validable {
 				return false;
 		} else if (!error.equals(other.error))
 			return false;
-		if (img == null) {
+		if (base64img == null) {
 			if (other.base64img != null)
 				return false;
 		} else if (!base64img.equals(other.base64img))
