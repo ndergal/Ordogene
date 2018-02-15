@@ -1,9 +1,14 @@
 package org.ordogene.api;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.ordogene.file.FileService;
 import org.ordogene.file.utils.ApiJsonResponse;
@@ -31,28 +36,24 @@ public class CalculationController {
 	public ResponseEntity<ApiJsonResponse> getUserCalculations(@PathVariable String id) {
 
 		if (id == null) { // never
-			//return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(id + " does not exist");
-			return new ResponseEntity<ApiJsonResponse>(
-					new ApiJsonResponse(null, 0, "id can't be null", null, null),
-					HttpStatus.BAD_REQUEST
-				);
+			// return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(id + " does not
+			// exist");
+			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(null, 0, "id can't be null", null, null),
+					HttpStatus.BAD_REQUEST);
 		}
 
 		if (!fs.userExist(id)) {
-			//return ResponseEntity.status(HttpStatus.NOT_FOUND).body(id + " does not exist");
-			return new ResponseEntity<ApiJsonResponse>(
-					new ApiJsonResponse(null, 0, id + " does not exist", null, null),
-					HttpStatus.NOT_FOUND
-				);
+			// return ResponseEntity.status(HttpStatus.NOT_FOUND).body(id + " does not
+			// exist");
+			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(null, 0, id + " does not exist", null, null),
+					HttpStatus.NOT_FOUND);
 		} else {
 			List<Calculation> calculations = fs.getUserCalculations(id);
 			StringBuilder sb = new StringBuilder();
 			calculations.forEach(c -> sb.append(c).append('\n'));
-			//return ResponseEntity.ok().body(sb.toString());
-			return new ResponseEntity<ApiJsonResponse>(
-					new ApiJsonResponse(null, 0, null, calculations, null),
-					HttpStatus.OK
-				);
+			// return ResponseEntity.ok().body(sb.toString());
+			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(null, 0, null, calculations, null),
+					HttpStatus.OK);
 		}
 	}
 
@@ -61,21 +62,19 @@ public class CalculationController {
 	public ResponseEntity<ApiJsonResponse> launchCalculation(@PathVariable String id) {
 
 		if (id == null) {
-			//return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(id + " does not exist");
-			return new ResponseEntity<ApiJsonResponse>(
-					new ApiJsonResponse(null, 0, id + " does not exist", null, null),
-					HttpStatus.BAD_REQUEST
-				);
+			// return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(id + " does not
+			// exist");
+			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(null, 0, id + " does not exist", null, null),
+					HttpStatus.BAD_REQUEST);
 		}
 
 		boolean exist = fs.userExist(id);
 
 		if (!exist) {
-			//return ResponseEntity.status(HttpStatus.NOT_FOUND).body(id + " does not exist");
-			return new ResponseEntity<ApiJsonResponse>(
-					new ApiJsonResponse(null, 0, id + " does not exist", null, null),
-					HttpStatus.NOT_FOUND
-				);
+			// return ResponseEntity.status(HttpStatus.NOT_FOUND).body(id + " does not
+			// exist");
+			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(null, 0, id + " does not exist", null, null),
+					HttpStatus.NOT_FOUND);
 		}
 
 		int pid = 0;
@@ -90,17 +89,53 @@ public class CalculationController {
 			}
 			asynchronousDeletePid(proc, pid, id);
 		} catch (Exception e) {
-			//return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unknow error... Sorry.");
+			// return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unknow
+			// error... Sorry.");
 			return new ResponseEntity<ApiJsonResponse>(
 					new ApiJsonResponse(null, 0, "Unknow error... Sorry.", null, null),
-					HttpStatus.INTERNAL_SERVER_ERROR
-				);
+					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		//return ResponseEntity.ok().body("" + pid);
-		return new ResponseEntity<ApiJsonResponse>(
-				new ApiJsonResponse(null, 0, null, null, null),
-				HttpStatus.OK
-			);
+		// return ResponseEntity.ok().body("" + pid);
+		return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(null, 0, null, null, null), HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/{id}/calculations/{calculationid}")
+	@ResponseBody
+	public ResponseEntity<ApiJsonResponse> getCalculation(@PathVariable String id, @PathVariable int calculationid) {
+
+		if (id == null) {
+			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(null, 0, "id can't be null", null, null),
+					HttpStatus.BAD_REQUEST);
+		}
+
+		if (!fs.userExist(id)) {
+			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(null, 0, id + " does not exist", null, null),
+					HttpStatus.NOT_FOUND);
+		} else {
+			List<Calculation> calculations = fs.getUserCalculations(id);
+			Optional<Calculation> calcul = calculations.stream().filter(x -> x.getId() == calculationid).findFirst();
+			if (calcul.isPresent()) {
+
+				try {
+					Path imgPath = Paths.get(FileService.getCalculationPath(id, calcul.get()));
+					String base64img = FileService.encodeImage(imgPath);
+					return new ResponseEntity<ApiJsonResponse>(
+							new ApiJsonResponse(id, calculationid, null, null, base64img), HttpStatus.OK);
+				} catch (FileNotFoundException e) {
+					return new ResponseEntity<ApiJsonResponse>(
+							new ApiJsonResponse(id, 0, "cannot find calculation path", null, null),
+							HttpStatus.NOT_FOUND);
+				} catch (IOException e) {
+					return new ResponseEntity<ApiJsonResponse>(
+							new ApiJsonResponse(id, 0, "cannot open calculation path", null, null),
+							HttpStatus.NOT_FOUND);
+				}
+
+			}
+			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(id, 0,
+					"calculation " + calculationid + " does not exist for user " + id, null, null),
+					HttpStatus.NOT_FOUND);
+		}
 	}
 
 	private void asynchronousDeletePid(Process proc, int pid, String id) {

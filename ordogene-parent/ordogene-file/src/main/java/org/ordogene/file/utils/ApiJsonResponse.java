@@ -1,6 +1,5 @@
 package org.ordogene.file.utils;
 
-import java.awt.image.BufferedImage;
 import java.util.List;
 
 public class ApiJsonResponse {
@@ -8,26 +7,26 @@ public class ApiJsonResponse {
 	private int cid;
 	private String error;
 	private List<Calculation> list;
-	private BufferedImage img;
-	
+	private String base64img;
+
 	public ApiJsonResponse() {
-		
+
 	}
-	
-	public ApiJsonResponse(String id, int cid, String error, List<Calculation> list, BufferedImage img) {
+
+	public ApiJsonResponse(String id, int cid, String error, List<Calculation> list, String base64img) {
 		this.id = id;
 		this.cid = cid;
 		this.error = error;
 		this.list = list;
-		this.img = img;
+		this.base64img = base64img;
 	}
 
-	public BufferedImage getImg() {
-		return img;
+	public String getBase64img() {
+		return base64img;
 	}
 
-	public void setImg(BufferedImage img) {
-		this.img = img;
+	public void setBase64img(String base64img) {
+		this.base64img = base64img;
 	}
 
 	public String getId() {
