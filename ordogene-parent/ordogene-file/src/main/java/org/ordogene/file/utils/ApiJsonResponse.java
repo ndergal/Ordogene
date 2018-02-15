@@ -1,6 +1,5 @@
 package org.ordogene.file.utils;
 
-import java.awt.image.BufferedImage;
 import java.util.List;
 
 import org.ordogene.file.parser.Validable;
@@ -17,7 +16,7 @@ public class ApiJsonResponse implements Validable {
 	public ApiJsonResponse() {
 
 	}
-
+	
 	public ApiJsonResponse(String userId, int cid, String error, List<Calculation> list, String img) {
 		this.userId = userId;
 		this.cid = cid;

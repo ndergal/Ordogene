@@ -73,7 +73,6 @@ public class Commands {
 	
 	public boolean getUser(String id) {
 		//Request
-
 		try {
 			restTemplate.exchange("/" + id, HttpMethod.GET, null, ApiJsonResponse.class);
 		} catch (HttpClientErrorException e) {
@@ -93,6 +92,7 @@ public class Commands {
 			response = restTemplate.exchange("/", HttpMethod.PUT, null, ApiJsonResponse.class);
 		} catch (RestClientException e) {
 			log.error(e.getMessage());
+			log.error("here");
 			return;
 		}
 
@@ -128,7 +128,7 @@ public class Commands {
 
 		// Build ascii table
 		List<Calculation> list = response.getBody().getList();
-		if (list == null) {
+		if (!(list != null && !list.isEmpty())) {
 			log.info("No calculations yet");
 			return null;
 		}
