@@ -16,11 +16,7 @@ public class ApiJsonResponse implements Validable {
 	public ApiJsonResponse() {
 
 	}
-<<<<<<< HEAD
 	
-=======
-
->>>>>>> branch 'dev' of https://ThibaultGIRARD@bitbucket.org/darwinners/ordogene.git
 	public ApiJsonResponse(String userId, int cid, String error, List<Calculation> list, String img) {
 		this.userId = userId;
 		this.cid = cid;
