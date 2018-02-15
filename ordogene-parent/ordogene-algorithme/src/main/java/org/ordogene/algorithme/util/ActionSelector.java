@@ -2,6 +2,7 @@ package org.ordogene.algorithme.util;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.NavigableMap;
 import java.util.Random;
 import java.util.TreeMap;
@@ -14,7 +15,7 @@ public class ActionSelector {
 	private Random random = RandomRegistry.getRandom();
 	
 	private long lowerWeight = 0;
-	private ArrayList<SimpleEntry<Action, Long>> actions = new ArrayList<>();
+	private List<SimpleEntry<Action, Long>> actions = new ArrayList<>();
 	
 	public boolean isReset() {
 		return actions.isEmpty();
@@ -31,30 +32,28 @@ public class ActionSelector {
 	}
 	
 	public Action select() {
-		synchronized (actions) {
-			if(actions.isEmpty()) {
-				throw new IllegalStateException("You cannot select in an empty selector");
-			}
-			
-			NavigableMap<Long, Action> map = new TreeMap<>();
-			long total = 0;
-			
-			for(SimpleEntry<Action, Long> e : actions) {
-				Long weight = e.getValue();
-				if(lowerWeight <= 0) {
-					weight += Math.abs(lowerWeight) + 1;
-				}
-				total += weight;
-				map.put(total, e.getKey());
-			}
-			
-			if(total == 0) {
-				throw new IllegalStateException("The ActionSelector have an problem with action's weight.");
-			}
-			
-			long value = (Math.abs(random.nextLong())%total) + 1;
-			return map.ceilingEntry(value).getValue();
+		if(actions.isEmpty()) {
+			throw new IllegalStateException("You cannot select in an empty selector");
 		}
+		
+		NavigableMap<Long, Action> map = new TreeMap<>();
+		long total = 0;
+		
+		for(SimpleEntry<Action, Long> e : actions) {
+			Long weight = e.getValue();
+			if(lowerWeight <= 0) {
+				weight += Math.abs(lowerWeight) + 1;
+			}
+			total += weight;
+			map.put(total, e.getKey());
+		}
+		
+		if(total == 0) {
+			throw new IllegalStateException("The ActionSelector have an problem with action's weight.");
+		}
+		
+		long value = (Math.abs(random.nextLong())%total) + 1;
+		return map.ceilingEntry(value).getValue();
 	}
 	
 }

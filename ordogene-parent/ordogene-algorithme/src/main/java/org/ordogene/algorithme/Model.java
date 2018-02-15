@@ -44,9 +44,7 @@ public class Model {
 		this.slots = slots;
 		this.execTime = execTime;
 		this.startEnvironment = Objects.requireNonNull(environment);
-		actions.forEach(a -> {
-			this.actionsInProgress.put(Objects.requireNonNull(a), 0);
-		});
+		actions.forEach(a -> this.actionsInProgress.put(Objects.requireNonNull(a), 0));
 		this.actionsInProgress.put(Action.EMPTY(), 0);
 		this.fitness = Objects.requireNonNull(fitness);
 	}
@@ -133,10 +131,10 @@ public class Model {
 		requireNonNull(currentEnvironment);
 		Integer action = actionsInProgress.get(a);
 		if (action == null) {
-			throw new IllegalArgumentException("The Action given don't exist in this model");
+			throw new IllegalArgumentException("The given Action doesn't exist in this model");
 		}
 		if (action == 0) {
-			throw new IllegalArgumentException("The Action given was not launched");
+			throw new IllegalArgumentException("The given Action was not launched");
 		}
 		for (Input input : a.getInputs()) {
 			String inputEntityName = input.getName();
@@ -171,7 +169,7 @@ public class Model {
 	}
 
 	public Environment getStartEnvironment() {
-		return startEnvironment;
+		return startEnvironment.copy();
 	}
 
 	public Model copy() {

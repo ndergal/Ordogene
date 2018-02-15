@@ -7,6 +7,7 @@ import org.ordogene.algorithme.models.Environment;
 import org.ordogene.file.models.Type;
 
 import io.jenetics.Genotype;
+import io.jenetics.Optimize;
 import io.jenetics.Phenotype;
 import io.jenetics.engine.Engine;
 import io.jenetics.engine.EvolutionResult;
@@ -24,7 +25,7 @@ public class ScheduleBuilder {
 		this.model = model;
 	}
 	
-	public Action createAction(Environment currentEnvironment) {
+	public Action createAction(Model model, Environment currentEnvironment) {
 		Action action = model.getWorkableAction(currentEnvironment);
 		model.startAnAction(currentEnvironment, action);
 		return action;
@@ -33,6 +34,7 @@ public class ScheduleBuilder {
 	public void run() {
 		Engine<ActionGene, Double> engine = Engine
 			.builder(this::fitness, Genotype.of(Schedule.of(this::createAction, model.getSlots(), () -> model.copy()), 1))
+			.optimize(Type.min.equals(model.getFitness().getType())?Optimize.MINIMUM:Optimize.MAXIMUM)
 			.fitnessScaler(this::fitnessScaler)
 			.populationSize(POPULATION_SIZE)
 //			.selector(new TournamentSelector<>())
@@ -40,6 +42,12 @@ public class ScheduleBuilder {
 			.build();
 		
 		EvolutionStatistics<Double, DoubleMomentStatistics> statistics = EvolutionStatistics.ofNumber();
+		
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		
 		Phenotype<ActionGene, Double> best = engine.stream()
 			.limit(1)

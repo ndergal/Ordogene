@@ -82,7 +82,7 @@ public class CalculationControllerTest {
 		String jsonContent = new String(contentFile);
 		
 		ScheduleBuilder sb = new ScheduleBuilder(new ThreadHandler(), Model.createModel((JSONModel) Parser.parseJsonFile(jsonContent, JSONModel.class)));
-		sb.run();;
+		sb.run();
 	}
 
 	// @Test
