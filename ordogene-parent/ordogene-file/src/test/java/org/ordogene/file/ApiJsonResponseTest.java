@@ -28,7 +28,7 @@ public class ApiJsonResponseTest {
 		Const.loadConfig("./src/test/resources/ordogene.conf.json");
 		ajr.setCid(000);
 		ajr.setError("test error ?");
-		ajr.setImg("Random");
+		ajr.setBase64img("Random");
 		ajr.setUserId("tester");
 		ajr.setList(new ArrayList<Calculation>());
 	}

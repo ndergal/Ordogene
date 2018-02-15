@@ -12,6 +12,7 @@ import java.util.Scanner;
 
 import javax.annotation.PostConstruct;
 
+import org.ordogene.file.FileService;
 import org.ordogene.file.utils.ApiJsonResponse;
 import org.ordogene.file.utils.Calculation;
 import org.slf4j.Logger;
@@ -41,8 +42,10 @@ public class Commands {
 	private final SimpleDateFormat formater = new SimpleDateFormat("dd/MM/yyyy-hh:mm");
 	private String id;
 	private static final Logger log = LoggerFactory.getLogger(Commands.class);
+
 	private final String[] headers = { "Id", "Name", "Date", "Running", "Fitness", "Iteration done",
 			"Last iteration saved", "Max iteration" };
+
 	@Autowired
 	private RestTemplate restTemplate;
 
@@ -53,6 +56,7 @@ public class Commands {
 		@SuppressWarnings("resource") //problem if the scanner is closed
 		Scanner scanner = new Scanner(System.in);
 		String choice = scanner.nextLine();
+
 		switch(choice) {
 			case "":
 			case "n":
@@ -68,18 +72,25 @@ public class Commands {
 			case "yes":
 				createUser();
 				break;
+
 		}
+
 		System.out.println();
 	}
+
 	
 	public boolean getUser(String id) {
 		//Request
+
 		try {
+
 			restTemplate.exchange("/" + id, HttpMethod.GET, null, ApiJsonResponse.class);
 		} catch (HttpClientErrorException e) {
 			log.error(e.getStatusCode() + " -- " + e.getStatusText());
 			return false;
+
 		}
+
 
 		this.id = id;
 		log.info("Welcome back " + id);
@@ -105,6 +116,7 @@ public class Commands {
 
 		id = response.getBody().getUserId();
 		log.info("Your new id is " + id);
+
 	}
 
 	/**
@@ -130,6 +142,7 @@ public class Commands {
 		// Build ascii table
 		List<Calculation> list = response.getBody().getList();
 		if (!(list != null && !list.isEmpty())) {
+
 			log.info("No calculations yet");
 			return null;
 		}
@@ -151,6 +164,7 @@ public class Commands {
 			data[i + 1][5] = String.valueOf(c.getIterationNumber());
 			data[i + 1][6] = String.valueOf(c.getLastIterationSaved());
 			data[i + 1][7] = String.valueOf(c.getMaxIteration());
+
 		}
 		return builder.addFullBorder(BorderStyle.oldschool).build();
 	}
@@ -166,9 +180,11 @@ public class Commands {
 		// Parameter validation
 		Path jsonPath = model.toPath();
 		if (Files.notExists(jsonPath)) {
+
 			log.error("The path does not exist. Try again.");
 			return;
 		}
+
 		if (Files.isDirectory(jsonPath)) {
 			log.error(jsonPath + " is a directory. Try again.");
 		}
@@ -184,6 +200,7 @@ public class Commands {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		HttpEntity<String> request = new HttpEntity<String>(jsonContentRead, headers);
+
 		ResponseEntity<ApiJsonResponse> response = null;
 		try {
 			response = restTemplate.exchange("/" + id + "/calculations/", HttpMethod.PUT, request,
@@ -202,7 +219,7 @@ public class Commands {
 		int cid = response.getBody().getCid();
 		log.info("Calculation '" + cid + "' launched");
 	}
-	
+
 	/**
 	 * Stop the calculation
 	 * 
@@ -228,6 +245,7 @@ public class Commands {
 		}
 
 		log.info("Calculation '" + cid + "' stopped");
+
 	}
 
 	/**
@@ -255,6 +273,7 @@ public class Commands {
 		}
 
 		log.info("Calculation '" + cid + "' deleted");
+
 	}
 
 	/**
@@ -332,6 +351,7 @@ public class Commands {
 		}
 
 		log.info("Snapshot '" + sid + "' launched");
+
 	}
 
 	/**
@@ -360,6 +380,7 @@ public class Commands {
 				System.out.println("|" + response.getBody().toString() + "|");
 				log.error("%d : %s", code, response.getBody().getError());
 				return false;
+
 		}
 	}
 
