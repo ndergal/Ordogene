@@ -73,7 +73,6 @@ public class Commands {
 	
 	public boolean getUser(String id) {
 		//Request
-
 		try {
 			restTemplate.exchange("/" + id, HttpMethod.GET, null, ApiJsonResponse.class);
 		} catch (HttpClientErrorException e) {
@@ -93,6 +92,7 @@ public class Commands {
 			response = restTemplate.exchange("/", HttpMethod.PUT, null, ApiJsonResponse.class);
 		} catch (RestClientException e) {
 			log.error(e.getMessage());
+			log.error("here");
 			return;
 		}
 
@@ -128,7 +128,7 @@ public class Commands {
 
 		// Build ascii table
 		List<Calculation> list = response.getBody().getList();
-		if (list == null) {
+		if (!(list != null && !list.isEmpty())) {
 			log.info("No calculations yet");
 			return null;
 		}
@@ -293,13 +293,16 @@ public class Commands {
 		}
 
 		// Writing the image
-		BufferedImage img = response.getBody().getImg();
+		String imgb64 = response.getBody().getImg();
+		
+		 //TODO ; transform imgb64 to Png
+		/*
 		try {
-			ImageIO.write(img, "PNG", new File(dst));
+			ImageIO.write(imgb64, "PNG", new File(dst));
 		} catch (IOException e) {
 			log.error("A error has occured while writing the image");
 		}
-
+*/
 		log.info("The image of the result is downloaded at " + dst);
 	}
 
