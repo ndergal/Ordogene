@@ -33,6 +33,7 @@ import org.springframework.shell.table.Table;
 import org.springframework.shell.table.TableBuilder;
 import org.springframework.shell.table.TableModel;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -57,66 +58,59 @@ public class Commands {
 		Scanner scanner = new Scanner(System.in);
 		String choice = scanner.nextLine();
 
-		switch(choice) {
-			case "":
-			case "n":
-			case "N":
-			case "no":
-				do {
-					System.out.print("Enter your id : ");
-					id = scanner.nextLine();
-				} while (id.isEmpty() || !getUser(id));
-				break;
-			case "y":
-			case "Y":
-			case "yes":
-				createUser();
-				break;
+		switch (choice) {
+		case "":
+		case "n":
+		case "N":
+		case "no":
+			do {
+				System.out.print("Enter your id : ");
+				id = scanner.nextLine();
+			} while (id.isEmpty() || !getUser(id));
+			break;
+		case "y":
+		case "Y":
+		case "yes":
+			createUser();
+			break;
 
 		}
 
 		System.out.println();
 	}
 
-	
 	public boolean getUser(String id) {
-		//Request
+		// Request
 
 		try {
-
 			restTemplate.exchange("/" + id, HttpMethod.GET, null, ApiJsonResponse.class);
-		} catch (HttpClientErrorException e) {
+		} catch (HttpClientErrorException | HttpServerErrorException e) {
 			log.error(e.getStatusCode() + " -- " + e.getStatusText());
 			return false;
-
+		} catch (RestClientException e) {
+			log.error(e.getMessage());
+			return false;
 		}
-
 
 		this.id = id;
 		log.info("Welcome back " + id);
 		return true;
 	}
 
-	public void createUser() {
+	public boolean createUser() {
 		// Request
-		ResponseEntity<ApiJsonResponse> response = null;
 		try {
-			response = restTemplate.exchange("/", HttpMethod.PUT, null, ApiJsonResponse.class);
+			ResponseEntity<ApiJsonResponse> response = restTemplate.exchange("/", HttpMethod.PUT, null, ApiJsonResponse.class);
+			id = response.getBody().getUserId();
+			log.info("Your new id is " + id);
+		} catch (HttpClientErrorException | HttpServerErrorException e) {
+			log.error(e.getStatusCode() + " -- " + e.getStatusText());
+			return false;
 		} catch (RestClientException e) {
 			log.error(e.getMessage());
-			log.error("here");
-			return;
+			return false;
 		}
-
-		// Check status code
-		int code = response.getStatusCodeValue();
-		if (!isHttpCodeValid(code, response)) {
-			return;
-		}
-
-		id = response.getBody().getUserId();
-		log.info("Your new id is " + id);
-
+		return true;
 	}
 
 	/**
@@ -290,11 +284,9 @@ public class Commands {
 	public void resultCalculation(int cid, String dst, @ShellOption(arity = 0, defaultValue = "false") boolean force) {
 		// Parameter validation
 		Path path = Paths.get(dst);
-		if (Files.exists(path)/* && Files.isRegularFile(path) && Files.isWritable(path) */) {
-			if (!force) {
-				log.error("A file already exists, use --force to overwrite.");
-				return;
-			}
+		if (Files.exists(path) && !force/* && Files.isRegularFile(path) && Files.isWritable(path) */) {
+			log.error("A file already exists, use --force to overwrite.");
+			return;
 		}
 
 		// Request
@@ -373,13 +365,13 @@ public class Commands {
 	 * @param code
 	 */
 	public boolean isHttpCodeValid(int code, ResponseEntity<ApiJsonResponse> response) {
-		switch(code) {
-			case 200:
-				return true;
-			default:
-				System.out.println("|" + response.getBody().toString() + "|");
-				log.error("%d : %s", code, response.getBody().getError());
-				return false;
+		switch (code) {
+		case 200:
+			return true;
+		default:
+			System.out.println("|" + response.getBody().toString() + "|");
+			log.error("%d : %s", code, response.getBody().getError());
+			return false;
 
 		}
 	}
