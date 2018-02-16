@@ -86,6 +86,9 @@ public class Commands {
 		// Request
 		try {
 			restTemplate.exchange("/" + id, HttpMethod.GET, null, ApiJsonResponse.class);
+			this.id = id;
+			log.info("Welcome back " + id);
+			return true;
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
 			log.error(e.getStatusCode() + " -- " + e.getStatusText());
 			return false;
@@ -93,10 +96,6 @@ public class Commands {
 			log.error(e.getMessage());
 			return false;
 		}
-
-		this.id = id;
-		log.info("Welcome back " + id);
-		return true;
 	}
 
 	public boolean createUser() {
@@ -106,6 +105,7 @@ public class Commands {
 					ApiJsonResponse.class);
 			id = response.getBody().getUserId();
 			log.info("Your new id is " + id);
+			return true;
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
 			log.error(e.getStatusCode() + " -- " + e.getStatusText());
 			return false;
@@ -113,7 +113,6 @@ public class Commands {
 			log.debug(e.getMessage());
 			return false;
 		}
-		return true;
 	}
 
 	/**
@@ -152,7 +151,7 @@ public class Commands {
 	 *            path to model to send
 	 */
 	@ShellMethod(value = "Launch a calculation from a model")
-	public void launchCalculation(File model) {
+	public boolean launchCalculation(File model) {
 		// Parameter validation
 		String jsonContentRead = getFileContent(model);
 
@@ -166,13 +165,14 @@ public class Commands {
 					HttpMethod.PUT, request, ApiJsonResponse.class);
 			int cid = response.getBody().getCid();
 			log.info("Calculation '" + cid + "' launched");
+			return true;
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
 			log.error(e.getStatusCode() + " -- " + e.getStatusText());
-			return;
+			return false;
 		} catch (RestClientException e) {
 			log.debug(e.getMessage());
 			log.error("Problem with the communication between client and server");
-			return;
+			return false;
 		}
 
 	}
@@ -184,18 +184,19 @@ public class Commands {
 	 *            id of the calculation
 	 */
 	@ShellMethod(value = "Stop a calculation")
-	public void stopCalculation(int cid) {
+	public boolean stopCalculation(int cid) {
 		// Request
 		try {
 			restTemplate.exchange("/" + id + "/calculations/" + cid, HttpMethod.POST, null, ApiJsonResponse.class);
 			log.info("Calculation '" + cid + "' stopped");
+			return true;
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
 			log.error(e.getStatusCode() + " -- " + e.getStatusText());
-			return;
+			return false;
 		} catch (RestClientException e) {
 			log.debug(e.getMessage());
 			log.error("Problem with the communication between client and server");
-			return;
+			return false;
 		}
 	}
 
@@ -206,10 +207,10 @@ public class Commands {
 	 *            id of the calculation
 	 */
 	@ShellMethod(value = "Remove a calculation")
-	public void removeCalculation(int cid) {
+	public boolean removeCalculation(int cid) {
 		// Request
 		log.info("Not implemented (block on CLI side)");
-		return;
+		return false;
 		// try {
 		// restTemplate.exchange("/" + id + "/calculations/" + cid, HttpMethod.DELETE,
 		// null,
@@ -236,12 +237,12 @@ public class Commands {
 	 *            if set, overwrite if dst already exists
 	 */
 	@ShellMethod(value = "Get the result of a calculation")
-	public void resultCalculation(int cid, String dst, @ShellOption(arity = 0, defaultValue = "false") boolean force) {
+	public boolean resultCalculation(int cid, String dst, @ShellOption(arity = 0, defaultValue = "false") boolean force) {
 		// Parameter validation
 		Path path = Paths.get(dst);
 		if (Files.exists(path) && !force/* && Files.isRegularFile(path) && Files.isWritable(path) */) {
 			log.error("A file already exists, use --force to overwrite.");
-			return;
+			return false;
 		}
 
 		// Request
@@ -254,18 +255,18 @@ public class Commands {
 
 			String base64img = response.getBody().getBase64img();
 			if (!FileService.decodeAndSaveImage(base64img, dst)) {
-				return;
+				return false;
 			}
 
 			log.info("The image of the result is downloaded at " + dst);
-
+			return true;
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
 			log.error(e.getStatusCode() + " -- " + e.getStatusText());
-			return;
+			return false;
 		} catch (RestClientException e) {
 			log.debug(e.getMessage());
 			log.error("Problem with the communication between client and server");
-			return;
+			return false;
 		}
 	}
 
@@ -280,9 +281,9 @@ public class Commands {
 	 *            number of loops to calculate
 	 */
 	@ShellMethod(value = "Launch a snapshot of a calculation")
-	public void launchSnapshot(int cid, int sid, int loops) {
+	public boolean launchSnapshot(int cid, int sid, int loops) {
 		log.info("Not implemented (block on CLI side)");
-		return;
+		return false;
 		// Request
 //		HttpEntity<Integer> request = new HttpEntity<>(loops);
 //		try {
@@ -306,9 +307,9 @@ public class Commands {
 	 * @param iter
 	 */
 	@ShellMethod(value = "Remove a calculation")
-	public void removeSnapshot(int id, int iter) {
+	public boolean removeSnapshot(int id, int iter) {
 		log.info("Not implemented (block on CLI side)");
-		return;
+		return false;
 	}
 
 	/* UTILS */
@@ -337,7 +338,7 @@ public class Commands {
 		return builder;
 	}
 
-	public static CellMatcher at(final int theRow, final int col) {
+	private static CellMatcher at(final int theRow, final int col) {
 		return new CellMatcher() {
 			@Override
 			public boolean matches(int row, int column, TableModel model) {
