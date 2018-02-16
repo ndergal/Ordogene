@@ -1,11 +1,10 @@
 package org.ordogene.algorithme.jenetics;
 
-import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.ordogene.algorithme.Model;
 import org.ordogene.algorithme.models.Action;
-import org.ordogene.algorithme.models.Environment;
 
 import io.jenetics.AbstractChromosome;
 import io.jenetics.Chromosome;
@@ -15,13 +14,13 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private BiFunction<Model, Environment, ? extends Action> factory;
+	private Function<ActionFactoryObjectValue, ? extends Action> factory;
 	private int length;
 	private Supplier<Model> modelSupplier;
 	
 	public Schedule(
 			ISeq<ActionGene> seq, 
-			BiFunction<Model, Environment, ? extends Action> factory,
+			Function<ActionFactoryObjectValue, ? extends Action> factory,
 			Supplier<Model> modelSupplier,
 			int length) {
 		super(seq);
@@ -42,7 +41,7 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 		return new Schedule(genes, factory, modelSupplier, length);
 	}
 	
-	public static Schedule of(BiFunction<Model, Environment, ? extends Action> factory, int length, Supplier<Model> modelSupplier) {
+	public static Schedule of(Function<ActionFactoryObjectValue, ? extends Action> factory, int length, Supplier<Model> modelSupplier) {
 		Model modelCopy = modelSupplier.get();
 		return new Schedule(ActionGene.seq(length, factory, /*modelCopy.getCurrentEnvironment(),*/ modelCopy)
 				, factory, modelSupplier, length);

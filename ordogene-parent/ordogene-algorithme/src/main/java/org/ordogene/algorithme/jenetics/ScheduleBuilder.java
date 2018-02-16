@@ -3,7 +3,6 @@ package org.ordogene.algorithme.jenetics;
 import org.ordogene.algorithme.Model;
 import org.ordogene.algorithme.master.ThreadHandler;
 import org.ordogene.algorithme.models.Action;
-import org.ordogene.algorithme.models.Environment;
 import org.ordogene.file.models.Type;
 
 import io.jenetics.Genotype;
@@ -25,17 +24,17 @@ public class ScheduleBuilder {
 		this.model = model;
 	}
 	
-	public Action createAction(Model model, Environment currentEnvironment) {
-		Action action = model.getWorkableAction(currentEnvironment);
-		model.startAnAction(currentEnvironment, action);
+	public Action createAction(ActionFactoryObjectValue bundle) {
+		Action action = model.getWorkableAction(bundle.getCurrentEnvironment());
+		model.startAnAction(bundle.getCurrentEnvironment(), action);
 		return action;
 	}
 
 	public void run() {
 		Engine<ActionGene, Double> engine = Engine
 			.builder(this::fitness, Genotype.of(Schedule.of(this::createAction, model.getSlots(), () -> model.copy()), 1))
-//			.optimize(Type.min.equals(model.getFitness().getType())?Optimize.MINIMUM:Optimize.MAXIMUM)
-//			.fitnessScaler(this::fitnessScaler)
+			.optimize(Type.min.equals(model.getFitness().getType())?Optimize.MINIMUM:Optimize.MAXIMUM)
+			.fitnessScaler(this::fitnessScaler)
 			.populationSize(POPULATION_SIZE)
 //			.selector(new TournamentSelector<>())
 			.alterers(new ScheduleCrossover(0.2))
@@ -48,10 +47,14 @@ public class ScheduleBuilder {
 			.peek(result -> System.out.println(result.getGeneration() + " : " + result.getBestFitness()))
 			.peek(statistics)
 			.collect(EvolutionResult.toBestPhenotype());
+		try {
+			th.threadFromMaster();
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
 		
 		System.out.println(statistics);
 		best.getGenotype().forEach(c -> c.forEach(a -> System.out.println(a.getAllele())));
-		System.out.println("\\o/");
 	}
 	
 	public Double fitnessScaler(Double value) {

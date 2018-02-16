@@ -17,6 +17,8 @@ public class Action {
 	private final int time;
 	private final Set<Input> inputs = new HashSet<>();
 	private final Set<Entity> outputs = new HashSet<>();
+	
+	private int startTime;
 
 	public Action(String name, int time, Set<Input> inputs, Set<Entity> outputs) {
 		if (time <= 0) {
@@ -48,6 +50,14 @@ public class Action {
 
 	public Set<Entity> getOutputs() {
 		return outputs;
+	}
+	
+	public int getStartTime() {
+		return startTime;
+	}
+	
+	public void setStartTime(int startTime) {
+		this.startTime = startTime;
 	}
 
 	@Override

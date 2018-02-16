@@ -73,17 +73,6 @@ public class CalculationControllerTest {
 		// System.out.println(result.getResponse().getContentAsString());
 
 	}
-	
-	@Test
-	public void testScheduleBuilder() throws Exception {
-		URL urlTestFile = CalculationControllerTest.class.getClassLoader()
-				.getResource("OrdogeneCalculationExamples" + File.separator + "fitness1.json");
-		byte[] contentFile = Files.readAllBytes(Paths.get(urlTestFile.toURI()));
-		String jsonContent = new String(contentFile);
-		
-		ScheduleBuilder sb = new ScheduleBuilder(new ThreadHandler(), Model.createModel((JSONModel) Parser.parseJsonFile(jsonContent, JSONModel.class)));
-		sb.run();
-	}
 
 	// @Test
 	// public void createAndGetRandomUserOk() throws Exception {
