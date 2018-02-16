@@ -49,7 +49,7 @@ public class ActionSelector {
 		}
 		
 		if(total == 0) {
-			throw new IllegalStateException("The ActionSelector have an problem with action's weight.");
+			throw new IllegalStateException("The ActionSelector have a problem with action's weight.");
 		}
 		
 		long value = (Math.abs(random.nextLong())%total) + 1;

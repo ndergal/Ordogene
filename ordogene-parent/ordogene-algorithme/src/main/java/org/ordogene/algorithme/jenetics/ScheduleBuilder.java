@@ -8,10 +8,12 @@ import org.ordogene.file.models.Type;
 import io.jenetics.Genotype;
 import io.jenetics.Optimize;
 import io.jenetics.Phenotype;
+import io.jenetics.engine.Codec;
 import io.jenetics.engine.Engine;
 import io.jenetics.engine.EvolutionResult;
 import io.jenetics.engine.EvolutionStatistics;
 import io.jenetics.stat.DoubleMomentStatistics;
+import io.jenetics.util.ISeq;
 
 public class ScheduleBuilder {
 	
@@ -25,14 +27,24 @@ public class ScheduleBuilder {
 	}
 	
 	public Action createAction(ActionFactoryObjectValue bundle) {
+		bundle.getCurSeq().forEach(g -> {
+			Action a = g.getAllele();
+			if (a.getStartTime() + a.getTime() == bundle.getCurrentAction().getStartTime()) {
+				bundle.getModel().endAnAction(bundle.getCurrentEnvironment(), a);
+			}
+		});
 		Action action = model.getWorkableAction(bundle.getCurrentEnvironment());
 		model.startAnAction(bundle.getCurrentEnvironment(), action);
 		return action;
 	}
 
 	public void run() {
+		Codec<ISeq<ActionGene>, ActionGene> codec = Codec.of(
+				Genotype.of(Schedule.of(this::createAction, model.getSlots(), () -> model.copy())), 
+				gt -> gt.getChromosome().toSeq());
+		
 		Engine<ActionGene, Double> engine = Engine
-			.builder(this::fitness, Genotype.of(Schedule.of(this::createAction, model.getSlots(), () -> model.copy()), 1))
+			.builder(this::fitness, codec)
 			.optimize(Type.min.equals(model.getFitness().getType())?Optimize.MINIMUM:Optimize.MAXIMUM)
 			.fitnessScaler(this::fitnessScaler)
 			.populationSize(POPULATION_SIZE)
@@ -47,6 +59,7 @@ public class ScheduleBuilder {
 			.peek(result -> System.out.println(result.getGeneration() + " : " + result.getBestFitness()))
 			.peek(statistics)
 			.collect(EvolutionResult.toBestPhenotype());
+		
 		try {
 			th.threadFromMaster();
 		} catch (InterruptedException e) {
@@ -67,10 +80,9 @@ public class ScheduleBuilder {
 		return value;
 	}
 	
-	public Double fitness(Genotype<ActionGene> genotype) {
-		return genotype.toSeq().stream()
-				.flatMapToDouble(schedule -> schedule.toSeq().stream()
-						.mapToDouble(action -> model.getFitness().eval(action.getAllele())))
+	public Double fitness(ISeq<ActionGene> ind) {
+		return ind.stream()
+				.mapToDouble(action -> model.getFitness().eval(action.getAllele()))
 				.sum();
 	}
 
