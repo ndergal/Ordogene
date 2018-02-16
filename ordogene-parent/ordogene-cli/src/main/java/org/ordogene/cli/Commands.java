@@ -54,7 +54,7 @@ public class Commands {
 	public void login() {
 		System.out.println();
 		System.out.print("Do you want to create a new id ? [y/N] : ");
-		@SuppressWarnings("resource") //problem if the scanner is closed
+		@SuppressWarnings("resource") // problem if the scanner is closed
 		Scanner scanner = new Scanner(System.in);
 		String choice = scanner.nextLine();
 
