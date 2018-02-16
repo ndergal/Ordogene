@@ -66,7 +66,7 @@ public class Commands {
 			do {
 				System.out.print("Enter your id : ");
 				id = scanner.nextLine();
-			} while (id.isEmpty() || !getUser(id));
+			} while (id.isEmpty() ? true : !getUser(id));
 			break;
 		case "y":
 		case "Y":
@@ -90,7 +90,8 @@ public class Commands {
 			log.error(e.getStatusCode() + " -- " + e.getStatusText());
 			return false;
 		} catch (RestClientException e) {
-			log.error(e.getMessage());
+			log.debug(e.getMessage());
+			log.info("Problem with the communication between client and server");
 			return false;
 		}
 
@@ -323,7 +324,7 @@ public class Commands {
 		}
 		for (int i = 0; i < list.size(); i++) {
 			Calculation c = list.get(i);
-			log.info(c.toString());
+			log.debug(c.toString());
 			data[i + 1][0] = String.valueOf(c.getId());
 			data[i + 1][1] = c.getName();
 			data[i + 1][2] = formater.format(new Date(c.getStartTimestamp()));
