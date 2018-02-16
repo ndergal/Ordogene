@@ -66,14 +66,17 @@ public class FileService {
 		return Base64.getEncoder().encodeToString(imageData);
 	}
 
-	public static void decodeAndSaveImage(String base64Img, String pathImg) {
+	public static boolean decodeAndSaveImage(String base64Img, String pathImg) {
 		byte[] imageData = Base64.getDecoder().decode(base64Img);
 		try (FileOutputStream imageFile = new FileOutputStream(pathImg)) {
 			imageFile.write(imageData);
+			return true;
 		} catch (FileNotFoundException e) {
 			System.err.println("Image not found: " + e);
+			return false;
 		} catch (IOException e) {
 			System.err.println("cannot read : " + e);
+			return false;
 		}
 	}
 

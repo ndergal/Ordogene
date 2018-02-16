@@ -33,6 +33,7 @@ import org.springframework.shell.table.Table;
 import org.springframework.shell.table.TableBuilder;
 import org.springframework.shell.table.TableModel;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -70,7 +71,10 @@ public class Commands {
 		case "y":
 		case "Y":
 		case "yes":
-			createUser();
+			if (!createUser()) {
+				log.error("Problem with the server: user creation failed");
+				System.exit(1);
+			}
 			break;
 
 		}
@@ -80,14 +84,14 @@ public class Commands {
 
 	public boolean getUser(String id) {
 		// Request
-
 		try {
-
 			restTemplate.exchange("/" + id, HttpMethod.GET, null, ApiJsonResponse.class);
-		} catch (HttpClientErrorException e) {
+		} catch (HttpClientErrorException | HttpServerErrorException e) {
 			log.error(e.getStatusCode() + " -- " + e.getStatusText());
 			return false;
-
+		} catch (RestClientException e) {
+			log.error(e.getMessage());
+			return false;
 		}
 
 		this.id = id;
@@ -95,26 +99,21 @@ public class Commands {
 		return true;
 	}
 
-	public void createUser() {
+	public boolean createUser() {
 		// Request
-		ResponseEntity<ApiJsonResponse> response = null;
 		try {
-			response = restTemplate.exchange("/", HttpMethod.PUT, null, ApiJsonResponse.class);
+			ResponseEntity<ApiJsonResponse> response = restTemplate.exchange("/", HttpMethod.PUT, null,
+					ApiJsonResponse.class);
+			id = response.getBody().getUserId();
+			log.info("Your new id is " + id);
+		} catch (HttpClientErrorException | HttpServerErrorException e) {
+			log.error(e.getStatusCode() + " -- " + e.getStatusText());
+			return false;
 		} catch (RestClientException e) {
-			log.error(e.getMessage());
-			log.error("here");
-			return;
+			log.debug(e.getMessage());
+			return false;
 		}
-
-		// Check status code
-		int code = response.getStatusCodeValue();
-		if (!isHttpCodeValid(code, response)) {
-			return;
-		}
-
-		id = response.getBody().getUserId();
-		log.info("Your new id is " + id);
-
+		return true;
 	}
 
 	/**
@@ -126,44 +125,23 @@ public class Commands {
 		ResponseEntity<ApiJsonResponse> response = null;
 		try {
 			response = restTemplate.exchange("/" + id + "/calculations", HttpMethod.GET, null, ApiJsonResponse.class);
-		} catch (RestClientException e) {
-			log.error(e.getMessage());
+		} catch (HttpClientErrorException | HttpServerErrorException e) {
+			log.error(e.getStatusCode() + " -- " + e.getStatusText());
 			return null;
-		}
-
-		// Check status code
-		int code = response.getStatusCodeValue();
-		if (!isHttpCodeValid(code, response)) {
+		} catch (RestClientException e) {
+			log.debug(e.getMessage());
+			log.error("Problem with the communication between client and server");
 			return null;
 		}
 
 		// Build ascii table
 		List<Calculation> list = response.getBody().getList();
 		if (!(list != null && !list.isEmpty())) {
-
 			log.info("No calculations yet");
 			return null;
 		}
-		String[][] data = new String[list.size() + 1][headers.length];
-		TableModel model = new ArrayTableModel(data);
-		TableBuilder builder = new TableBuilder(model);
-		for (int i = 0; i < headers.length; i++) {
-			data[0][i] = headers[i];
-			// builder.on(at(0, i)).
-		}
-		for (int i = 0; i < list.size(); i++) {
-			Calculation c = list.get(i);
-			log.info(c.toString());
-			data[i + 1][0] = String.valueOf(c.getId());
-			data[i + 1][1] = c.getName();
-			data[i + 1][2] = formater.format(new Date(c.getStartTimestamp()));
-			data[i + 1][3] = String.valueOf(c.isRunning());
-			data[i + 1][4] = String.valueOf(c.getFitnessSaved());
-			data[i + 1][5] = String.valueOf(c.getIterationNumber());
-			data[i + 1][6] = String.valueOf(c.getLastIterationSaved());
-			data[i + 1][7] = String.valueOf(c.getMaxIteration());
 
-		}
+		TableBuilder builder = fillTable(list);
 		return builder.addFullBorder(BorderStyle.oldschool).build();
 	}
 
@@ -176,46 +154,27 @@ public class Commands {
 	@ShellMethod(value = "Launch a calculation from a model")
 	public void launchCalculation(File model) {
 		// Parameter validation
-		Path jsonPath = model.toPath();
-		if (Files.notExists(jsonPath)) {
-
-			log.error("The path does not exist. Try again.");
-			return;
-		}
-
-		if (Files.isDirectory(jsonPath)) {
-			log.error(jsonPath + " is a directory. Try again.");
-		}
-		String jsonContentRead = null;
-		try {
-			jsonContentRead = new String(Files.readAllBytes(jsonPath));
-		} catch (IOException e1) {
-			log.error("Error while reading " + model);
-			return;
-		}
+		String jsonContentRead = getFileContent(model);
 
 		// Request
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		HttpEntity<String> request = new HttpEntity<String>(jsonContentRead, headers);
 
-		ResponseEntity<ApiJsonResponse> response = null;
 		try {
-			response = restTemplate.exchange("/" + id + "/calculations/", HttpMethod.PUT, request,
-					ApiJsonResponse.class);
+			ResponseEntity<ApiJsonResponse> response = restTemplate.exchange("/" + id + "/calculations/",
+					HttpMethod.PUT, request, ApiJsonResponse.class);
+			int cid = response.getBody().getCid();
+			log.info("Calculation '" + cid + "' launched");
+		} catch (HttpClientErrorException | HttpServerErrorException e) {
+			log.error(e.getStatusCode() + " -- " + e.getStatusText());
+			return;
 		} catch (RestClientException e) {
-			log.error(e.getMessage());
+			log.debug(e.getMessage());
+			log.error("Problem with the communication between client and server");
 			return;
 		}
 
-		// Check status code
-		int code = response.getStatusCodeValue();
-		if (!isHttpCodeValid(code, response)) {
-			return;
-		}
-
-		int cid = response.getBody().getCid();
-		log.info("Calculation '" + cid + "' launched");
 	}
 
 	/**
@@ -227,23 +186,17 @@ public class Commands {
 	@ShellMethod(value = "Stop a calculation")
 	public void stopCalculation(int cid) {
 		// Request
-		ResponseEntity<ApiJsonResponse> response = null;
 		try {
-			response = restTemplate.exchange("/" + id + "/calculations/" + cid, HttpMethod.POST, null,
-					ApiJsonResponse.class);
+			restTemplate.exchange("/" + id + "/calculations/" + cid, HttpMethod.POST, null, ApiJsonResponse.class);
+			log.info("Calculation '" + cid + "' stopped");
+		} catch (HttpClientErrorException | HttpServerErrorException e) {
+			log.error(e.getStatusCode() + " -- " + e.getStatusText());
+			return;
 		} catch (RestClientException e) {
-			log.error(e.getMessage());
+			log.debug(e.getMessage());
+			log.error("Problem with the communication between client and server");
 			return;
 		}
-
-		// Check status code
-		int code = response.getStatusCodeValue();
-		if (!isHttpCodeValid(code, response)) {
-			return;
-		}
-
-		log.info("Calculation '" + cid + "' stopped");
-
 	}
 
 	/**
@@ -255,23 +208,21 @@ public class Commands {
 	@ShellMethod(value = "Remove a calculation")
 	public void removeCalculation(int cid) {
 		// Request
-		ResponseEntity<ApiJsonResponse> response = null;
-		try {
-			response = restTemplate.exchange("/" + id + "/calculations/" + cid, HttpMethod.DELETE, null,
-					ApiJsonResponse.class);
-		} catch (RestClientException e) {
-			log.error(e.getMessage());
-			return;
-		}
-
-		// Check status code
-		int code = response.getStatusCodeValue();
-		if (!isHttpCodeValid(code, response)) {
-			return;
-		}
-
-		log.info("Calculation '" + cid + "' deleted");
-
+		log.info("Not implemented (block on CLI side)");
+		return;
+		// try {
+		// restTemplate.exchange("/" + id + "/calculations/" + cid, HttpMethod.DELETE,
+		// null,
+		// ApiJsonResponse.class);
+		// log.info("Calculation '" + cid + "' deleted");
+		// } catch (HttpClientErrorException | HttpServerErrorException e) {
+		// log.error(e.getStatusCode() + " -- " + e.getStatusText());
+		// return;
+		// } catch (RestClientException e) {
+		// log.debug(e.getMessage());
+		// log.error("Problem with the communication between client and server");
+		// return;
+		// }
 	}
 
 	/**
@@ -298,23 +249,24 @@ public class Commands {
 		try {
 			response = restTemplate.exchange("/" + id + "/calculations/" + cid, HttpMethod.GET, null,
 					ApiJsonResponse.class);
+
+			// Writing the image
+
+			String base64img = response.getBody().getBase64img();
+			if (!FileService.decodeAndSaveImage(base64img, dst)) {
+				return;
+			}
+
+			log.info("The image of the result is downloaded at " + dst);
+
+		} catch (HttpClientErrorException | HttpServerErrorException e) {
+			log.error(e.getStatusCode() + " -- " + e.getStatusText());
+			return;
 		} catch (RestClientException e) {
-			log.error(e.getMessage());
+			log.debug(e.getMessage());
+			log.error("Problem with the communication between client and server");
 			return;
 		}
-
-		// Check status code
-		int code = response.getStatusCodeValue();
-		if (!isHttpCodeValid(code, response)) {
-			return;
-		}
-
-		// Writing the image
-
-		String base64img = response.getBody().getBase64img();
-		FileService.decodeAndSaveImage(base64img, dst);
-
-		log.info("The image of the result is downloaded at " + dst);
 	}
 
 	/**
@@ -329,25 +281,22 @@ public class Commands {
 	 */
 	@ShellMethod(value = "Launch a snapshot of a calculation")
 	public void launchSnapshot(int cid, int sid, int loops) {
+		log.info("Not implemented (block on CLI side)");
+		return;
 		// Request
-		HttpEntity<Integer> request = new HttpEntity<>(loops);
-		ResponseEntity<ApiJsonResponse> response = null;
-		try {
-			response = restTemplate.exchange("/" + id + "/calculations/" + cid + "/snapshots/" + sid, HttpMethod.POST,
-					request, ApiJsonResponse.class);
-		} catch (RestClientException e) {
-			log.error(e.getMessage());
-			return;
-		}
-
-		// Check status code
-		int code = response.getStatusCodeValue();
-		if (!isHttpCodeValid(code, response)) {
-			return;
-		}
-
-		log.info("Snapshot '" + sid + "' launched");
-
+//		HttpEntity<Integer> request = new HttpEntity<>(loops);
+//		try {
+//			restTemplate.exchange("/" + id + "/calculations/" + cid + "/snapshots/" + sid, HttpMethod.POST, request,
+//					ApiJsonResponse.class);
+//			log.info("Snapshot '" + sid + "' launched");
+//		} catch (HttpClientErrorException | HttpServerErrorException e) {
+//			log.error(e.getStatusCode() + " -- " + e.getStatusText());
+//			return;
+//		} catch (RestClientException e) {
+//			log.debug(e.getMessage());
+//			log.error("Problem with the communication between client and server");
+//			return;
+//		}
 	}
 
 	/**
@@ -358,26 +307,34 @@ public class Commands {
 	 */
 	@ShellMethod(value = "Remove a calculation")
 	public void removeSnapshot(int id, int iter) {
-		// HTTPRequest
-		log.info("snapshot removed");
+		log.info("Not implemented (block on CLI side)");
+		return;
 	}
 
 	/* UTILS */
 
-	/**
-	 * @param response
-	 * @param code
-	 */
-	public boolean isHttpCodeValid(int code, ResponseEntity<ApiJsonResponse> response) {
-		switch (code) {
-		case 200:
-			return true;
-		default:
-			System.out.println("|" + response.getBody().toString() + "|");
-			log.error("%d : %s", code, response.getBody().getError());
-			return false;
+	private TableBuilder fillTable(List<Calculation> list) {
+		String[][] data = new String[list.size() + 1][headers.length];
+		TableModel model = new ArrayTableModel(data);
+		TableBuilder builder = new TableBuilder(model);
+		for (int i = 0; i < headers.length; i++) {
+			data[0][i] = headers[i];
+			// builder.on(at(0, i)).
+		}
+		for (int i = 0; i < list.size(); i++) {
+			Calculation c = list.get(i);
+			log.info(c.toString());
+			data[i + 1][0] = String.valueOf(c.getId());
+			data[i + 1][1] = c.getName();
+			data[i + 1][2] = formater.format(new Date(c.getStartTimestamp()));
+			data[i + 1][3] = String.valueOf(c.isRunning());
+			data[i + 1][4] = String.valueOf(c.getFitnessSaved());
+			data[i + 1][5] = String.valueOf(c.getIterationNumber());
+			data[i + 1][6] = String.valueOf(c.getLastIterationSaved());
+			data[i + 1][7] = String.valueOf(c.getMaxIteration());
 
 		}
+		return builder;
 	}
 
 	public static CellMatcher at(final int theRow, final int col) {
@@ -387,5 +344,24 @@ public class Commands {
 				return row == theRow && column == col;
 			}
 		};
+	}
+
+	private String getFileContent(File model) {
+		Path jsonPath = model.toPath();
+		if (Files.notExists(jsonPath)) {
+			log.error("The path does not exist. Try again.");
+			return null;
+		}
+		if (Files.isDirectory(jsonPath)) {
+			log.error(jsonPath + " is a directory. Try again.");
+			return null;
+		}
+
+		try {
+			return new String(Files.readAllBytes(jsonPath));
+		} catch (IOException e) {
+			log.error("Error while reading " + model);
+			return null;
+		}
 	}
 }
