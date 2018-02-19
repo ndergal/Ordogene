@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ordogene.file.utils.Const;
+import org.springframework.boot.context.embedded.tomcat.ConnectorStartFailedException;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -43,19 +44,33 @@ public class ApplicationTest {
 	 * assertEquals("hello again", errContent.toString()); }
 	 */
 	@Test
-	public void mainWithConfigArgAndWithoutTest() throws Exception {
-		//System.out.println("All is in one test to save Spring launch time...");
+	public void mainMultipleFails() throws Exception {
+		// System.out.println("All is in one test to save Spring launch time...");
 
-		String[] args = {};
-		Application.main(args);
-		assertTrue(outContent.toString().startsWith("Missing required option: conf"));
-
-		String[] args2 = { "-conf", "./src/test/resources/ordogene.conf.json" };
+		String[] args2 = { "-conf", "./src/test/resources/ordogene.conf.json", "-port", "49155" };
 		Application.main(args2);
 		assertTrue(Const.getConst() != null);
 		assertTrue(Const.getConst().size() > 0);
+
+		String[] args3 = { "-conf", "./src/test/resources/ordogene.conf.json", "-port", "655356" };
+
+		String[] args4 = { "-conf", "./src/test/resources/ordogene.conf.json", "-port", "-6743" };
+
+		Application.main(args4);
+
+		assertTrue(errContent.toString()
+				.startsWith("Ordogene Server : The port parameter must be a positive number below 65535."));
+ 
+		Application.main(args3);
+		assertTrue(errContent.toString()
+				.startsWith("Ordogene Server : The port parameter must be a positive number below 65535."));
+
+		String[] args = {};
+		System.out.println(outContent.toString());
+		Application.main(args);
+		assertTrue(outContent.toString().contains("Missing required option: conf"));
 		
-		
+
 	}
 
 }
