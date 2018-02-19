@@ -238,9 +238,14 @@ public class Commands {
 	 *            if set, overwrite if dst already exists
 	 */
 	@ShellMethod(value = "Get the result of a calculation")
-	public boolean resultCalculation(int cid, String dst, @ShellOption(arity = 0, defaultValue = "false") boolean force) {
+	public boolean resultCalculation(int cid, File dst, @ShellOption(arity = 0, defaultValue = "false") boolean force) {
+
 		// Parameter validation
-		Path path = Paths.get(dst);
+		//Path path = Paths.get(dst);
+		Path path = dst.toPath();
+		if(dst.isDirectory()) {
+			path = Paths.get(dst.toPath().toString()+File.separator+this.id+"_"+cid);
+		}
 		if (Files.exists(path) && !force/* && Files.isRegularFile(path) && Files.isWritable(path) */) {
 			log.error("A file already exists, use --force to overwrite.");
 			return false;
@@ -255,7 +260,7 @@ public class Commands {
 			// Writing the image
 
 			String base64img = response.getBody().getBase64img();
-			if (!FileService.decodeAndSaveImage(base64img, dst)) {
+			if (!FileService.decodeAndSaveImage(base64img, path.toAbsolutePath().toString())) {
 				return false;
 			}
 

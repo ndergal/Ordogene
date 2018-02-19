@@ -189,4 +189,9 @@ public class CalculationController {
 					HttpStatus.NOT_FOUND);
 		}
 	}
+<<<<<<< HEAD
+=======
+
+	
+>>>>>>> branch 'dev' of https://ThibaultGIRARD@bitbucket.org/darwinners/ordogene.git
 }
