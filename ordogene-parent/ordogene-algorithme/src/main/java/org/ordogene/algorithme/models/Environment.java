@@ -57,7 +57,7 @@ public class Environment {
 	
 	public Environment copy() {
 		Set<Entity> entitiesSet = new HashSet<>();
-		entities.forEach((k, v) -> entitiesSet.add(v));
+		entities.forEach((k, v) -> entitiesSet.add(v.copy()));
 		return new Environment(entitiesSet);
 	}
 }

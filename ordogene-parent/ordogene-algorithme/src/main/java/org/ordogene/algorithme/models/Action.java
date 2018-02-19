@@ -18,7 +18,7 @@ public class Action {
 	private final Set<Input> inputs = new HashSet<>();
 	private final Set<Entity> outputs = new HashSet<>();
 	
-	private int startTime;
+	private int startTime = -1;
 
 	public Action(String name, int time, Set<Input> inputs, Set<Entity> outputs) {
 		if (time <= 0) {
@@ -66,6 +66,7 @@ public class Action {
 		int result = prime * inputs.hashCode();
 		result = prime * result + name.hashCode();
 		result = prime * result + outputs.hashCode();
+//		result = prime * result + startTime;
 		result = prime * result + time;
 		return result;
 	}
@@ -85,6 +86,8 @@ public class Action {
 			return false;
 		if (!outputs.equals(action.outputs))
 			return false;
+//		if (startTime != action.startTime)
+//			return false;
 		if (time != action.time)
 			return false;
 		return true;
@@ -92,6 +95,6 @@ public class Action {
 
 	@Override
 	public String toString() {
-		return "Action [name=" + name + ", time=" + time + ", inputs=" + inputs + ", outputs=" + outputs + "]";
+		return "Action [name=" + name + ", startTime= " + startTime + ", time=" + time + ", inputs=" + inputs + ", outputs=" + outputs + "]";
 	}
 }

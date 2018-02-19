@@ -42,6 +42,10 @@ public class Entity {
 	public String getName() {
 		return name;
 	}
+	
+	public Entity copy() {
+		return new Entity(name, quantity);
+	}
 
 	@Override
 	public int hashCode() {

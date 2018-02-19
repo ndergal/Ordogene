@@ -32,7 +32,7 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 	@Override
 	public Chromosome<ActionGene> newInstance() {
 		Model modelCopy = modelSupplier.get();
-		return new Schedule(ActionGene.seq(length, factory, /*modelCopy.getStartEnvironment(),*/ modelCopy)
+		return new Schedule(ActionGene.seq(length, factory, modelCopy)
 				, factory, modelSupplier, length);
 	}
 
@@ -43,7 +43,7 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 	
 	public static Schedule of(Function<ActionFactoryObjectValue, ? extends Action> factory, int length, Supplier<Model> modelSupplier) {
 		Model modelCopy = modelSupplier.get();
-		return new Schedule(ActionGene.seq(length, factory, /*modelCopy.getCurrentEnvironment(),*/ modelCopy)
+		return new Schedule(ActionGene.seq(length, factory, modelCopy)
 				, factory, modelSupplier, length);
 	}
 

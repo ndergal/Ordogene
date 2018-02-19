@@ -834,5 +834,36 @@ public class ModelTest {
 		
 		m.endAnAction(env, null);
 	}
+	
+//	@Test
+//	public void test_empty() {
+//		RandomRegistry.setRandom(new Random(0));
+//		
+//		Environment env = mock(Environment.class);
+//		Entity e1 = mock(Entity.class);
+//		Fitness f = mock(Fitness.class);
+//		Input i = mock(Input.class);
+//		Action a1 = Action.EMPTY();
+//		Action a2 = Action.EMPTY();
+//		
+//		Set<Entity> entityEnv = new HashSet<>();
+//		entityEnv.add(e1);
+//		
+//		Set<Action> actions = new HashSet<>();
+//		actions.add(a1);
+//		
+//		Set<Input> inputs = new HashSet<>();
+//		inputs.add(i);
+//		Set<Entity> outputs = new HashSet<>();
+//		outputs.add(e1);
+//		
+//		when(env.containsEntity(anyString())).thenReturn(true);
+//		when(env.getEntity("e1")).thenReturn(e1);
+//		when(env.getEntities()).thenReturn(entityEnv);
+//		
+//		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
+//		
+//		m.startAnAction(env, a2);
+//	}
 
 }

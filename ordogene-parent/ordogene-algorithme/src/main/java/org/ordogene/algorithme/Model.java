@@ -105,7 +105,7 @@ public class Model {
 		requireNonNull(a);
 		requireNonNull(currentEnvironment);
 		if (actionsInProgress.get(a) == null) {
-			throw new IllegalArgumentException("The Action given don't exist in this model");
+			throw new IllegalArgumentException("The Action given doesn't exist in this model");
 		}
 		if (!workable(a, currentEnvironment)) {
 			throw new IllegalArgumentException("The Action given cannot be started");
@@ -119,9 +119,7 @@ public class Model {
 				environmentEntity.addQuantity(-quantityToRemoved);
 			}
 		}
-		actionsInProgress.compute(a, (k, i) -> {
-			return i + 1;
-		});
+		actionsInProgress.compute(a, (k, i) -> i + 1);
 		actionSelector.reset();
 	}
 

@@ -1,6 +1,8 @@
 package org.ordogene.algorithme.jenetics;
 
+import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.ordogene.algorithme.Model;
 import org.ordogene.algorithme.models.Action;
@@ -32,7 +34,7 @@ public class ActionGene implements Gene<Action, ActionGene> {
 
 	@Override
 	public boolean isValid() {
-		return false;
+		return model.workable(action, currentEnvironment);
 	}
 
 	@Override
@@ -43,7 +45,7 @@ public class ActionGene implements Gene<Action, ActionGene> {
 	@Override
 	public ActionGene newInstance() {
 		model.startAnAction(currentEnvironment, action);
-		return new ActionGene(supplier.apply(new ActionFactoryObjectValue(model, currentEnvironment, action, curSeq.toISeq())), 
+		return new ActionGene(supplier.apply(new ActionFactoryObjectValue(model, currentEnvironment.copy(), action, curSeq.toISeq())), 
 				supplier, 
 				currentEnvironment, 
 				model,
@@ -53,15 +55,20 @@ public class ActionGene implements Gene<Action, ActionGene> {
 	@Override
 	public ActionGene newInstance(Action action) {
 		model.startAnAction(currentEnvironment, action);
-		return new ActionGene(action, supplier, currentEnvironment, model, curSeq);
+		return new ActionGene(action, supplier, currentEnvironment.copy(), model, curSeq);
 	}
 	
 	public static ActionGene of(Function<ActionFactoryObjectValue, ? extends Action> factory, 
 			Environment currentEnvironment, 
 			Model model,
 			MSeq<ActionGene> curSeq) {
-		return new ActionGene(factory.apply(new ActionFactoryObjectValue(model, currentEnvironment, null, curSeq.toISeq()))
-				, factory, currentEnvironment, model, curSeq);
+		Action curAction = null;
+		List<ActionGene> genes = curSeq.toISeq().stream().filter(g -> g != null).collect(Collectors.toList());
+		if (genes.size() > 0) {
+			curAction = genes.get(genes.size() - 1).getAllele();
+		}
+		return new ActionGene(factory.apply(new ActionFactoryObjectValue(model, currentEnvironment.copy(), curAction, curSeq.toISeq()))
+				, factory, currentEnvironment.copy(), model, curSeq);
 	}
 	
 	static ISeq<ActionGene> seq(
