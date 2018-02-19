@@ -72,12 +72,16 @@ public class Application {
 		}
 		if (Const.loadConfig(configFilePath)) {
 			if (!hasPort) {
+				System.out.println("Launch Ordogene server on default port.");
 				SpringApplication.run(Application.class, args);
+				// --server.port=8081
 			} else {
-				HashMap<String, Object> props = new HashMap<>();
-				props.put("server.port", portParameterInt);
-				System.out.println("Launching Ordogene Server on port " + optionalPort);
-				new SpringApplicationBuilder().sources(Application.class).properties(props).run(args);
+				String[] newArgs = new String[args.length+1];
+				System.out.println("Launch Ordogene server on port "+portParameterInt+".");
+				System.arraycopy(args, 0, newArgs, 0, args.length);
+				newArgs[args.length] = "--server.port="+portParameterInt;
+				SpringApplication.run(Application.class, newArgs);
+
 			}
 		}
 	}
