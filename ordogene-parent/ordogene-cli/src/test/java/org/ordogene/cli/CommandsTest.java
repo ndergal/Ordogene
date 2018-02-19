@@ -326,7 +326,7 @@ public class CommandsTest {
 				any(HttpEntity.class), 
 				any(Class.class)))
 		.thenThrow(HttpServerErrorException.class);
-		assertFalse(commands.resultCalculation(666, dst, true));
+		assertFalse(commands.resultCalculation(666, new File(dst), true));
 	}
 	
 	@Test
@@ -338,7 +338,7 @@ public class CommandsTest {
 				any(HttpEntity.class), 
 				any(Class.class)))
 		.thenThrow(HttpClientErrorException.class);
-		assertFalse(commands.resultCalculation(666, dst, true));
+		assertFalse(commands.resultCalculation(666, new File(dst), true));
 	}
 	
 	@Test
@@ -350,7 +350,7 @@ public class CommandsTest {
 				any(HttpEntity.class), 
 				any(Class.class)))
 		.thenThrow(RestClientException.class);
-		assertFalse(commands.resultCalculation(666, dst, true));
+		assertFalse(commands.resultCalculation(666, new File(dst), true));
 	}
 	
 	@Test
@@ -367,7 +367,7 @@ public class CommandsTest {
 		.thenReturn(re);
 		when(re.getBody()).thenReturn(ajr);
 		when(ajr.getBase64img()).thenReturn(base64img);
-		assertTrue(commands.resultCalculation(666, dst, true));
+		assertTrue(commands.resultCalculation(666, new File(dst), true));
 	}
 
 	@Ignore
