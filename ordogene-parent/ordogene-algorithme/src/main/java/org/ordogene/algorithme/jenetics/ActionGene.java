@@ -1,5 +1,6 @@
 package org.ordogene.algorithme.jenetics;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -16,20 +17,20 @@ public class ActionGene implements Gene<Action, ActionGene> {
 
 	private final Action action;
 	private Function<ActionFactoryObjectValue, ? extends Action> supplier;
-	private Environment currentEnvironment;
 	private Model model;
-	private MSeq<ActionGene> curSeq;
+	private Environment currentEnvironment;
+	private int startTime;
 	
 	public ActionGene(Action action, 
-			Function<ActionFactoryObjectValue, ? extends Action> supplier, 
-			Environment currentEnvironment, 
+			Function<ActionFactoryObjectValue, ? extends Action> supplier,
 			Model model,
-			MSeq<ActionGene> curSeq) {
+			Environment currentEnvironment,
+			int startTime) {
 		this.action = action;
 		this.supplier = supplier;
-		this.currentEnvironment = currentEnvironment;
 		this.model = model;
-		this.curSeq = curSeq;
+		this.currentEnvironment = currentEnvironment;
+		this.startTime = startTime;
 	}
 
 	@Override
@@ -41,34 +42,52 @@ public class ActionGene implements Gene<Action, ActionGene> {
 	public Action getAllele() {
 		return action;
 	}
+	
+	public int getStartTime() {
+		return startTime;
+	}
+	
+	public Environment getCurrentEnvironment() {
+		return currentEnvironment.copy();
+	}
 
 	@Override
 	public ActionGene newInstance() {
-		model.startAnAction(currentEnvironment, action);
-		return new ActionGene(supplier.apply(new ActionFactoryObjectValue(model, currentEnvironment.copy(), action, curSeq.toISeq())), 
-				supplier, 
-				currentEnvironment, 
-				model,
-				curSeq);
+		return new ActionGene(action, supplier, model, currentEnvironment, startTime);
 	}
 
 	@Override
 	public ActionGene newInstance(Action action) {
-		model.startAnAction(currentEnvironment, action);
-		return new ActionGene(action, supplier, currentEnvironment.copy(), model, curSeq);
+		return new ActionGene(action, supplier, model, currentEnvironment, startTime);
 	}
 	
 	public static ActionGene of(Function<ActionFactoryObjectValue, ? extends Action> factory, 
-			Environment currentEnvironment, 
 			Model model,
+			Timeline timeline,
+			List<ActionGene> runningActions,
 			MSeq<ActionGene> curSeq) {
-		Action curAction = null;
-		List<ActionGene> genes = curSeq.toISeq().stream().filter(g -> g != null).collect(Collectors.toList());
-		if (genes.size() > 0) {
-			curAction = genes.get(genes.size() - 1).getAllele();
+		
+		ActionGene currentAction = null;
+		Environment currentEnvironment = model.getStartEnvironment().copy();
+		List<ActionGene> currentActions = curSeq.toISeq().stream().filter(a -> a != null).collect(Collectors.toList());
+		if (currentActions.size() > 0) {
+			currentAction = currentActions.get(currentActions.size() - 1);
+			currentEnvironment = currentActions.get(currentActions.size() - 1).getCurrentEnvironment();
 		}
-		return new ActionGene(factory.apply(new ActionFactoryObjectValue(model, currentEnvironment.copy(), curAction, curSeq.toISeq()))
-				, factory, currentEnvironment.copy(), model, curSeq);
+		
+		ActionGene newAction = new ActionGene(
+				factory.apply(
+						new ActionFactoryObjectValue(
+								model, 
+								currentEnvironment, 
+								timeline, 
+								runningActions,
+								currentAction)), 
+				factory, model, currentEnvironment, timeline.getTime());
+		
+		runningActions.add(newAction);
+		
+		return newAction;
 	}
 	
 	static ISeq<ActionGene> seq(
@@ -77,7 +96,9 @@ public class ActionGene implements Gene<Action, ActionGene> {
 			Model model
 		) {
 			MSeq<ActionGene> curSeq = MSeq.ofLength(length);
-			return curSeq.fill(() -> of(factory, model.getStartEnvironment(), model, curSeq))
+			Timeline timeline = new Timeline();
+			List<ActionGene> runningActions = new LinkedList<>();
+			return curSeq.fill(() -> of(factory, model, timeline, runningActions, curSeq))
 				.toISeq();
 		}
 

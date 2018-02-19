@@ -1,5 +1,8 @@
 package org.ordogene.algorithme.jenetics;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.ordogene.algorithme.Model;
 import org.ordogene.algorithme.master.ThreadHandler;
 import org.ordogene.algorithme.models.Action;
@@ -31,28 +34,19 @@ public class ScheduleBuilder {
 	 * @return
 	 */
 	public Action createAction(ActionFactoryObjectValue bundle) {
-		Model model = bundle.getModel();
-		bundle.getCurSeq().stream().filter(g -> g != null).forEach(g -> {
-			Action a = g.getAllele();
-			if (bundle.getCurrentAction() != null && 
-					a.getStartTime() + a.getTime() == bundle.getCurrentAction().getStartTime()) {
-				model.endAnAction(bundle.getCurrentEnvironment(), a);
-			}
-		});
+		List<ActionGene> toEnd = bundle.getRunningActions().stream().filter(g -> g.getStartTime() == bundle.getTimeline().getTime()).collect(Collectors.toList());
+		toEnd.forEach(ag -> bundle.getModel().endAnAction(bundle.getCurrentEnvironment(), ag.getAllele()));
+		bundle.getRunningActions().removeAll(toEnd);
 		
-		Action action = model.getWorkableAction(bundle.getCurrentEnvironment());
+		Action action = bundle.getModel().getWorkableAction(bundle.getCurrentEnvironment());
 		
-		if (bundle.getCurrentAction() != null) {
-			if ("EMPTY".equals(bundle.getCurrentAction().getName()) && 
-					bundle.getCurrentAction().getName().equals(action.getName())) {
-				action.setStartTime(bundle.getCurrentAction().getStartTime() + 1);
-			} else {
-				action.setStartTime(bundle.getCurrentAction().getStartTime());
-			}
-		} else {
-			action.setStartTime(0);
+		if ("EMPTY".equals(action.getName()) && bundle.getCurrentAction() != null) {
+			if (action.getName().equals(bundle.getCurrentAction().getAllele().getName())) {
+				bundle.getTimeline().step();
+			} 
 		}
-		model.startAnAction(bundle.getCurrentEnvironment(), action);
+		
+		bundle.getModel().startAnAction(bundle.getCurrentEnvironment(), action);
 		return action;
 	}
 
@@ -79,18 +73,12 @@ public class ScheduleBuilder {
 				result.getPopulation().forEach(pheno -> {
 					int i = 0;
 					for (ActionGene g : pheno.getGenotype().getChromosome()) {
-						System.out.println((i++) + " " + g.getAllele());
+						System.out.println((i++) + " " + g.getAllele() + " start time : " + g.getStartTime());
 					}
 				});
 			})
 			.peek(statistics)
 			.collect(EvolutionResult.toBestPhenotype());
-		
-		try {
-			th.threadFromMaster();
-		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-		}
 		
 		System.out.println(statistics);
 //		best.getGenotype().getChromosome().forEach(g -> System.out.println(g.getAllele()));

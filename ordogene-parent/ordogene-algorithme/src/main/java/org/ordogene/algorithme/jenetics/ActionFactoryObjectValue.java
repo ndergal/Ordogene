@@ -1,24 +1,27 @@
 package org.ordogene.algorithme.jenetics;
 
-import org.ordogene.algorithme.Model;
-import org.ordogene.algorithme.models.Action;
-import org.ordogene.algorithme.models.Environment;
+import java.util.List;
 
-import io.jenetics.util.ISeq;
+import org.ordogene.algorithme.Model;
+import org.ordogene.algorithme.models.Environment;
 
 public class ActionFactoryObjectValue {
 	private Model model;
 	private Environment currentEnvironment;
-	private Action currentAction;
-	private ISeq<ActionGene> curSeq;
+	private Timeline timeline;
+	private List<ActionGene> runningActions;
+	private ActionGene currentAction;
 	
-	public ActionFactoryObjectValue(org.ordogene.algorithme.Model model, Environment currentEnvironment,
-			Action currentAction, ISeq<ActionGene> curSeq) {
-		super();
+	public ActionFactoryObjectValue(Model model, 
+			Environment currentEnvironment,
+			Timeline timeline,
+			List<ActionGene> runningActions,
+			ActionGene currentAction) {
 		this.model = model;
 		this.currentEnvironment = currentEnvironment;
+		this.timeline = timeline;
+		this.runningActions = runningActions;
 		this.currentAction = currentAction;
-		this.curSeq = curSeq;
 	}
 
 	public Model getModel() {
@@ -28,13 +31,16 @@ public class ActionFactoryObjectValue {
 	public Environment getCurrentEnvironment() {
 		return currentEnvironment;
 	}
-
-	public Action getCurrentAction() {
-		return currentAction;
-	}
-
-	public ISeq<ActionGene> getCurSeq() {
-		return curSeq;
+	
+	public Timeline getTimeline() {
+		return timeline;
 	}
 	
+	public List<ActionGene> getRunningActions() {
+		return runningActions;
+	}
+	
+	public ActionGene getCurrentAction() {
+		return currentAction;
+	}
 }
