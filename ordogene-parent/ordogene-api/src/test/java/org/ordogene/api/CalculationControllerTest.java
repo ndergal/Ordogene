@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -254,6 +255,81 @@ public class CalculationControllerTest {
  		String jsonResponseWaited = mapper.writeValueAsString(ajrWaited);
 		assertEquals(jsonResponseWaited, errorResponse);
  	}
+	
+	@Test
+	public void stopCalculationTest_null_UserId() {
+		ResponseEntity<ApiJsonResponse> expected = new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
+		
+		assertEquals(expected, cc.stopCalculation(null, 0));
+	}
+	
+	@Test
+	public void stopCalculationTest_empty_UserId() {
+		ResponseEntity<ApiJsonResponse> expected = new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
+		
+		assertEquals(expected, cc.stopCalculation("", 0));
+	}
+	
+	@Test
+	public void stopCalculationTest_UserId_notExist() {
+		when(fs.userExist(usertest)).thenReturn(false);
+		
+		ResponseEntity<ApiJsonResponse> expected = new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNotExist(usertest), HttpStatus.NOT_FOUND);
+		
+		assertEquals(expected, cc.stopCalculation(usertest, 0));
+	}
+	
+	@Test
+	public void stopCalculationTest_userId_isNot_launcherId() {
+		List<Calculation> cals = new ArrayList<>();
+		Calculation c = mock(Calculation.class);
+		cals.add(c);
+		
+		when(c.getId()).thenReturn(30);
+		
+		when(fs.userExist(usertest)).thenReturn(true);
+		when(fs.getUserCalculations(usertest)).thenReturn(cals);
+		
+		ResponseEntity<ApiJsonResponse> expected = new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(usertest, 20, "The calculationId is wrong", null, null), HttpStatus.FORBIDDEN);
+		
+		assertEquals(expected, cc.stopCalculation(usertest, 20));
+	}
+	
+	@Test
+	public void stopCalculationTest_calculation_isNotRunning() {
+		List<Calculation> cals = new ArrayList<>();
+		Calculation c = mock(Calculation.class);
+		cals.add(c);
+		
+		when(c.getId()).thenReturn(20);
+		
+		when(fs.userExist(usertest)).thenReturn(true);
+		when(fs.getUserCalculations(usertest)).thenReturn(cals);
+		
+		when(master.interruptCalculation(20)).thenReturn(false);
+		
+		ResponseEntity<ApiJsonResponse> expected = new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(usertest, 20, "The calcul is not running.", null, null), HttpStatus.NOT_FOUND);
+		
+		assertEquals(expected, cc.stopCalculation(usertest, 20));
+	}
+	
+	@Test
+	public void stopCalculationTest_OK() {
+		List<Calculation> cals = new ArrayList<>();
+		Calculation c = mock(Calculation.class);
+		cals.add(c);
+		
+		when(c.getId()).thenReturn(20);
+		
+		when(fs.userExist(usertest)).thenReturn(true);
+		when(fs.getUserCalculations(usertest)).thenReturn(cals);
+		
+		when(master.interruptCalculation(20)).thenReturn(true);
+		
+		ResponseEntity<ApiJsonResponse> expected = new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(usertest, 20, null, null, null), HttpStatus.OK);
+		
+		assertEquals(expected, cc.stopCalculation(usertest, 20));
+	}
 
 	// @Test
 	// public void createAndGetRandomUserOk() throws Exception {

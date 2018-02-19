@@ -24,6 +24,9 @@ public class Calculation implements Validable {
 	}
 
 	public void setStartTimestamp(long startTime) {
+		if(startTime < 0) {
+			throw new IllegalArgumentException("The number of iteration cannot be negative");
+		}
 		this.startTimestamp = startTime;
 	}
 
@@ -59,6 +62,9 @@ public class Calculation implements Validable {
 	}
 
 	public void setIterationNumber(int iterationNumber) {
+		if(iterationNumber < 0) {
+			throw new IllegalArgumentException("The number of iteration cannot be negative");
+		}
 		this.iterationNumber = iterationNumber;
 	}
 
@@ -67,6 +73,9 @@ public class Calculation implements Validable {
 	}
 
 	public void setMaxIteration(int maxIteration) {
+		if(maxIteration < 0) {
+			throw new IllegalArgumentException("The maximum of iteration cannot be negative");
+		}
 		this.maxIteration = maxIteration;
 	}
 
@@ -75,6 +84,9 @@ public class Calculation implements Validable {
 	}
 
 	public void setLastIterationSaved(int lastIterationSaved) {
+		if(lastIterationSaved < 0) {
+			throw new IllegalArgumentException("The last iteration saved cannot be negative");
+		}
 		this.lastIterationSaved = lastIterationSaved;
 	}
 
