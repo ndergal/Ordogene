@@ -1,6 +1,5 @@
 package org.ordogene.api;
 
-import org.ordogene.algorithme.master.Master;
 import java.util.Arrays;
 
 import org.apache.commons.cli.CommandLine;
@@ -22,13 +21,16 @@ import org.springframework.context.annotation.Bean;
 
 public class Application {
 	
-	private final Master masterAlgorithme = new Master();
 
 	private final static Master algoMaster;
 	static {
 		algoMaster = new Master();
 	}
 
+	
+	
+	
+	
 	public static void main(String[] args) {
 
 		Options options = new Options();
@@ -47,7 +49,6 @@ public class Application {
 			String jarName = new java.io.File(
 					Application.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
 			formatter.printHelp("java -jar " + jarName, options);
-			System.exit(1);
 			return;
 		}
 

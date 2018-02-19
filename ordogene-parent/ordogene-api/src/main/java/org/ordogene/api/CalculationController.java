@@ -40,8 +40,6 @@ public class CalculationController {
 
 	@Autowired
 	private Master masterAlgorithme;
-	private static final Map<Integer, String> currentCalculation = new HashMap<>();
-	private final Object token = new Object();
 
 	/**
 	 * 
@@ -125,7 +123,7 @@ public class CalculationController {
 		if (userId == null || "".equals(userId)) {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
 		}
-		if (jsonBody == null) {
+		if (jsonBody == null|| "".equals(jsonBody)) {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.jsonBodyNull(), HttpStatus.BAD_REQUEST);
 		}
 		if (!fs.userExist(userId)) {
@@ -194,31 +192,5 @@ public class CalculationController {
 		}
 	}
 
-	private void asynchronousDeletePid(Process proc, int pid, String id) {
-
-		Runnable waitAndDeletePid = new Runnable() {
-
-			@Override
-			public void run() {
-				try {
-					// int exitVal = proc.waitFor();
-					int exitVal = proc.waitFor();
-					synchronized (token) {
-						if (currentCalculation.containsKey(pid)) {
-							currentCalculation.remove(pid);
-							System.out.println("remove " + pid + " from the map");
-						}
-					}
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-
-		};
-
-		Thread t = new Thread(waitAndDeletePid);
-		t.setDaemon(true);
-		t.start();
-	}
+	
 }
