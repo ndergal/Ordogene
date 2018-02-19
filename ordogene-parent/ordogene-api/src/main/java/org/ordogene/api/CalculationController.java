@@ -87,7 +87,6 @@ public class CalculationController {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNotExist(userId),
 					HttpStatus.NOT_FOUND);
 		} else {
-			// TODO check if userId = launcherUserId
 			if (fs.getUserCalculations(userId).stream().anyMatch(c -> c.getId() == calculationId)) {
 				if (masterAlgorithme.interruptCalculation(calculationId)) {
 					return new ResponseEntity<ApiJsonResponse>(
@@ -189,9 +188,4 @@ public class CalculationController {
 					HttpStatus.NOT_FOUND);
 		}
 	}
-<<<<<<< HEAD
-=======
-
-	
->>>>>>> branch 'dev' of https://ThibaultGIRARD@bitbucket.org/darwinners/ordogene.git
 }
