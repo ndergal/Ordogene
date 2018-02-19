@@ -47,7 +47,7 @@ public class ApplicationTest {
 	public void mainMultipleFails() throws Exception {
 		// System.out.println("All is in one test to save Spring launch time...");
 
-		String[] args2 = { "-conf", "./src/test/resources/ordogene.conf.json", "-port", "6743" };
+		String[] args2 = { "-conf", "./src/test/resources/ordogene.conf.json", "-port", "49155" };
 		Application.main(args2);
 		assertTrue(Const.getConst() != null);
 		assertTrue(Const.getConst().size() > 0);
