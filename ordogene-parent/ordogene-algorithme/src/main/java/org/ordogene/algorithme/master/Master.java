@@ -101,7 +101,6 @@ public class Master {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			cal.setRunning(true);
 		} else {
 			try {
 				String pathName = Const.getConst().get("ApplicationPath") + File.separator + userId + File.separator
@@ -120,20 +119,20 @@ public class Master {
 	}
 
 	// TODO connection with Thread
-	public boolean interruptCalculation(Calculation cal) {
-		ThreadHandler th = threadMap.get(cal.getId());
+	public boolean interruptCalculation(int calculationId) {
+		ThreadHandler th = threadMap.get(calculationId);
 		if (th != null) {
 			// IsRunning
 			try {
 				th.masterToThread("interrupt");
-				return (true);
+				return true;
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				return (false);
+				return false;
 			}
 		} else {
-			return (false);
+			return false;
 		}
 	}
 }

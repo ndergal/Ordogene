@@ -239,6 +239,7 @@ public class Commands {
 	 */
 	@ShellMethod(value = "Get the result of a calculation")
 	public boolean resultCalculation(int cid, File dst, @ShellOption(arity = 0, defaultValue = "false") boolean force) {
+
 		// Parameter validation
 		//Path path = Paths.get(dst);
 		Path path = dst.toPath();

@@ -1,11 +1,5 @@
 package org.ordogene.file.utils;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Objects;
 
 import org.ordogene.file.parser.Validable;
@@ -16,10 +10,8 @@ public class Calculation implements Validable{
 	/**
 	 * 
 	 */
-	private static final DateFormat dateFormater = new SimpleDateFormat("dd/MM/yyyy-hh:mm");
 	private int id;
 	private String name;
-	@JsonIgnore
 	private boolean running;
 	private int iterationNumber;
 	private int maxIteration;
@@ -78,11 +70,6 @@ public class Calculation implements Validable{
 		this.maxIteration = maxIteration;
 	}
 
-	public String getDate() {
-		Date date = new Date(this.startTimestamp);
-		return dateFormater.format(date);
-	}
-
 	public int getLastIterationSaved() {
 		return lastIterationSaved;
 	}
@@ -102,8 +89,8 @@ public class Calculation implements Validable{
 	@Override
 	public String toString() {
 		return "Calculation {" + " id='" + id + "'" + " name='" + name + "'" + " running='" + running + "'"
-				+ " iterationNumber='" + iterationNumber + "'" + " maxIteration='" + maxIteration + "'" + " startDate='"
-				+ dateFormater.format(new Date(startTimestamp)) + "'" + " lastIterationSaved='" + lastIterationSaved
+				+ " iterationNumber='" + iterationNumber + "'" + " maxIteration='" + maxIteration + "'" + " startTimestramp='"
+				+ startTimestamp + "'" + " lastIterationSaved='" + lastIterationSaved
 				+ "'" + "}";
 	}
 
