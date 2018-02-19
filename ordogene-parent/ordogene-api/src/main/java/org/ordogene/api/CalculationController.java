@@ -4,9 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import javax.xml.bind.UnmarshalException;
@@ -191,6 +189,9 @@ public class CalculationController {
 					HttpStatus.NOT_FOUND);
 		}
 	}
+<<<<<<< HEAD
+=======
 
 	
+>>>>>>> branch 'dev' of https://ThibaultGIRARD@bitbucket.org/darwinners/ordogene.git
 }
