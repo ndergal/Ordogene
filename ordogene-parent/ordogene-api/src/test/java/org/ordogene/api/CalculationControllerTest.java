@@ -205,7 +205,7 @@ public class CalculationControllerTest {
 		ApiJsonResponse ajrWaited = new ApiJsonResponse("tester", 0, "Invalid JSON (JsonParseException) ", null,
 				null);
 		String errorResponse = result.getResponse().getContentAsString();
-		System.out.println("launchCalcJsonParseExceptionTest "+errorResponse);
+		//System.out.println("launchCalcJsonParseExceptionTest "+errorResponse);
 		String jsonResponseWaited = mapper.writeValueAsString(ajrWaited);
 		assertEquals(jsonResponseWaited, errorResponse);
  	}
@@ -224,7 +224,7 @@ public class CalculationControllerTest {
 		ApiJsonResponse ajrWaited = new ApiJsonResponse("tester", 0, "Invalid JSON (Missing fields in the JSON) ", null,
 				null);
 		String errorResponse = result.getResponse().getContentAsString();
-		System.out.println("launchCalcJsonParseExceptionTest "+errorResponse);
+		//System.out.println("launchCalcJsonParseExceptionTest "+errorResponse);
 		String jsonResponseWaited = mapper.writeValueAsString(ajrWaited);
 		assertEquals(jsonResponseWaited, errorResponse);
  	}
