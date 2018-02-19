@@ -24,46 +24,12 @@ public class ScheduleBuilder {
 		this.th = th;
 		this.model = model;
 	}
-	
-	/**
-	 * Factory d'action utilisé par l'engine de jenetics
-	 * @param bundle
-	 * @return
-	 */
-	public Action createAction(ActionFactoryObjectValue bundle) {
-		Model model = bundle.getModel();
-		bundle.getCurSeq().stream().filter(g -> g != null).forEach(g -> {
-			Action a = g.getAllele();
-			if (bundle.getCurrentAction() != null && 
-					a.getStartTime() + a.getTime() == bundle.getCurrentAction().getStartTime()) {
-				model.endAnAction(bundle.getCurrentEnvironment(), a);
-			}
-		});
-		
-		Action action = model.getWorkableAction(bundle.getCurrentEnvironment());
-		
-		if (bundle.getCurrentAction() != null) {
-			if ("EMPTY".equals(bundle.getCurrentAction().getName()) && 
-					bundle.getCurrentAction().getName().equals(action.getName())) {
-				action.setStartTime(bundle.getCurrentAction().getStartTime() + 1);
-			} else {
-				action.setStartTime(bundle.getCurrentAction().getStartTime());
-			}
-		} else {
-			action.setStartTime(0);
-		}
-		model.startAnAction(bundle.getCurrentEnvironment(), action);
-		return action;
-	}
 
 	public void run() {
-//		Codec<ISeq<ActionGene>, ActionGene> codec = Codec.of(
-//				Genotype.of(Schedule.of(this::createAction, model.getSlots(), () -> model.copy())), 
-//				gt -> gt.getChromosome().toSeq());
 		
 		Engine<ActionGene, Double> engine = Engine
-			.builder(this::fitness, Genotype.of(Schedule.of(this::createAction, model.getSlots(), () -> model.copy()), 1))
-			.optimize(Type.min.equals(model.getFitness().getType())?Optimize.MINIMUM:Optimize.MAXIMUM)
+			.builder(this::fitness, Genotype.of(Schedule.of(model), 1))
+			.optimize(Type.min.equals(model.getFitness().getType()) ? Optimize.MINIMUM : Optimize.MAXIMUM)
 			.fitnessScaler(this::fitnessScaler)
 			.populationSize(POPULATION_SIZE)
 			.selector(new TournamentSelector<>())

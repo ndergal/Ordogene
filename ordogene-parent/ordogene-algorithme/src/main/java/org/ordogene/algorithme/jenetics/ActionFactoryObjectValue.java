@@ -12,7 +12,7 @@ public class ActionFactoryObjectValue {
 	private Action currentAction;
 	private ISeq<ActionGene> curSeq;
 	
-	public ActionFactoryObjectValue(org.ordogene.algorithme.Model model, Environment currentEnvironment,
+	public ActionFactoryObjectValue(Model model, Environment currentEnvironment,
 			Action currentAction, ISeq<ActionGene> curSeq) {
 		super();
 		this.model = model;

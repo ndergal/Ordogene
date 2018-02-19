@@ -15,21 +15,13 @@ import io.jenetics.util.MSeq;
 public class ActionGene implements Gene<Action, ActionGene> {
 
 	private final Action action;
-	private Function<ActionFactoryObjectValue, ? extends Action> supplier;
 	private Environment currentEnvironment;
 	private Model model;
-	private MSeq<ActionGene> curSeq;
 	
-	public ActionGene(Action action, 
-			Function<ActionFactoryObjectValue, ? extends Action> supplier, 
-			Environment currentEnvironment, 
-			Model model,
-			MSeq<ActionGene> curSeq) {
+	public ActionGene(Action action, Environment currentEnvironment, Model model, MSeq<ActionGene> curSeq) {
 		this.action = action;
-		this.supplier = supplier;
 		this.currentEnvironment = currentEnvironment;
 		this.model = model;
-		this.curSeq = curSeq;
 	}
 
 	@Override
@@ -45,17 +37,13 @@ public class ActionGene implements Gene<Action, ActionGene> {
 	@Override
 	public ActionGene newInstance() {
 		model.startAnAction(currentEnvironment, action);
-		return new ActionGene(supplier.apply(new ActionFactoryObjectValue(model, currentEnvironment.copy(), action, curSeq.toISeq())), 
-				supplier, 
-				currentEnvironment, 
-				model,
-				curSeq);
+		return new ActionGene(action, currentEnvironment, model, curSeq);
 	}
 
 	@Override
 	public ActionGene newInstance(Action action) {
 		model.startAnAction(currentEnvironment, action);
-		return new ActionGene(action, supplier, currentEnvironment.copy(), model, curSeq);
+		return new ActionGene(action, currentEnvironment.copy(), model, curSeq);
 	}
 	
 	public static ActionGene of(Function<ActionFactoryObjectValue, ? extends Action> factory, 
@@ -67,18 +55,12 @@ public class ActionGene implements Gene<Action, ActionGene> {
 		if (genes.size() > 0) {
 			curAction = genes.get(genes.size() - 1).getAllele();
 		}
-		return new ActionGene(factory.apply(new ActionFactoryObjectValue(model, currentEnvironment.copy(), curAction, curSeq.toISeq()))
-				, factory, currentEnvironment.copy(), model, curSeq);
+		return new ActionGene(curAction, currentEnvironment.copy(), model, curSeq);
 	}
 	
-	static ISeq<ActionGene> seq(
-			final int length,
-			final Function<ActionFactoryObjectValue, ? extends Action> factory,
-			Model model
-		) {
-			MSeq<ActionGene> curSeq = MSeq.ofLength(length);
-			return curSeq.fill(() -> of(factory, model.getStartEnvironment(), model, curSeq))
-				.toISeq();
+	static ISeq<ActionGene> seq(Function<ActionFactoryObjectValue, ? extends Action> factory, Model model) {
+			MSeq<ActionGene> curSeq = MSeq.ofLength(model.getSlots()); //TODO to change with correct value
+			return curSeq.fill(() -> of(factory, model.getStartEnvironment(), model, curSeq)).toISeq();
 		}
 
 }

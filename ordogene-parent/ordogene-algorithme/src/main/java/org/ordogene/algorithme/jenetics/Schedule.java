@@ -14,37 +14,56 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private Function<ActionFactoryObjectValue, ? extends Action> factory;
-	private int length;
-	private Supplier<Model> modelSupplier;
+	private Model model;
 	
-	public Schedule(
-			ISeq<ActionGene> seq, 
-			Function<ActionFactoryObjectValue, ? extends Action> factory,
-			Supplier<Model> modelSupplier,
-			int length) {
+	public Schedule(ISeq<ActionGene> seq, Model model) {
 		super(seq);
-		this.modelSupplier = modelSupplier;
-		this.factory = factory;
-		this.length = length;
+		this.model = model;
+	}
+	
+	/**
+	 * Factory d'action utilisé par l'engine de jenetics
+	 * @param bundle
+	 * @return
+	 */
+	public static Action createAction(ActionFactoryObjectValue bundle) {
+		Model model = bundle.getModel();
+		bundle.getCurSeq().stream().filter(g -> g != null).forEach(g -> {
+			Action a = g.getAllele();
+			if (bundle.getCurrentAction() != null && 
+					a.getStartTime() + a.getTime() == bundle.getCurrentAction().getStartTime()) {
+				model.endAnAction(bundle.getCurrentEnvironment(), a);
+			}
+		});
+		
+		Action action = model.getWorkableAction(bundle.getCurrentEnvironment());
+		
+		if (bundle.getCurrentAction() != null) {
+			if ("EMPTY".equals(bundle.getCurrentAction().getName()) && 
+					bundle.getCurrentAction().getName().equals(action.getName())) {
+				action.setStartTime(bundle.getCurrentAction().getStartTime() + 1);
+			} else {
+				action.setStartTime(bundle.getCurrentAction().getStartTime());
+			}
+		} else {
+			action.setStartTime(0);
+		}
+		model.startAnAction(bundle.getCurrentEnvironment(), action);
+		return action;
 	}
 
 	@Override
 	public Chromosome<ActionGene> newInstance() {
-		Model modelCopy = modelSupplier.get();
-		return new Schedule(ActionGene.seq(length, factory, modelCopy)
-				, factory, modelSupplier, length);
+		return new Schedule(ActionGene.seq(Schedule::createAction, model), model);
 	}
 
 	@Override
 	public Chromosome<ActionGene> newInstance(ISeq<ActionGene> genes) {
-		return new Schedule(genes, factory, modelSupplier, length);
+		return new Schedule(genes, model);
 	}
 	
-	public static Schedule of(Function<ActionFactoryObjectValue, ? extends Action> factory, int length, Supplier<Model> modelSupplier) {
-		Model modelCopy = modelSupplier.get();
-		return new Schedule(ActionGene.seq(length, factory, modelCopy)
-				, factory, modelSupplier, length);
+	public static Schedule of(Model model) {
+		return new Schedule(ActionGene.seq(Schedule::createAction, model), model);
 	}
 
 
