@@ -39,16 +39,17 @@ public class CommandsTest {
 	@InjectMocks
 	private Commands commands;
 
+	@Ignore
 	@Test
 	public void testLogin() {
 		/*InputStream is = Mockito.mock(InputStream.class);
 		commands.login();
-		System.setIn(in);
-		fail("Not yet implemented");*/
+		System.setIn(in);*/
+		fail("Not yet implemented");
 	}
 
 	@Test
-	public void testGetUserFalseClient() {
+	public void testGetUserClientException() {
 		when(restTemplate.exchange(
 				anyString(),
 				any(HttpMethod.class), 
@@ -59,7 +60,7 @@ public class CommandsTest {
 	}
 	
 	@Test
-	public void testGetUserFalseServer() {
+	public void testGetUserServerException() {
 		when(restTemplate.exchange(
 				anyString(),
 				any(HttpMethod.class), 
@@ -70,7 +71,7 @@ public class CommandsTest {
 	}
 	
 	@Test
-	public void testGetUserFalseRest() {
+	public void testGetUserRestException() {
 		when(restTemplate.exchange(
 				anyString(),
 				any(HttpMethod.class), 
@@ -81,7 +82,7 @@ public class CommandsTest {
 	}
 	
 	@Test
-	public void testGetUserTrue() {
+	public void testGetUser() {
 		when(restTemplate.exchange(
 				anyString(),
 				any(HttpMethod.class), 
@@ -223,55 +224,39 @@ public class CommandsTest {
 		assertNotNull(commands.listCalculations());
 	}
 	
-	@Ignore
 	@Test
 	public void testLaunchCalculationServerException() {
-		ResponseEntity<ApiJsonResponse> re = mock(ResponseEntity.class);
-		ApiJsonResponse ajr = mock(ApiJsonResponse.class);
 		when(restTemplate.exchange(
 				anyString(),
 				any(HttpMethod.class), 
 				any(HttpEntity.class), 
 				any(Class.class)))
 		.thenThrow(HttpServerErrorException.class);
-		commands.launchCalculation(new File("../ordogene-api/src/test/resources/OrdogeneCalculationExamples/fitness1.json"));
+		assertFalse(commands.launchCalculation(new File("../ordogene-api/src/test/resources/OrdogeneCalculationExamples/fitness1.json")));
 	}
 	
-	@Ignore
 	@Test
 	public void testLaunchCalculationClientException() {
-		ResponseEntity<ApiJsonResponse> re = mock(ResponseEntity.class);
-		ApiJsonResponse ajr = mock(ApiJsonResponse.class);
 		when(restTemplate.exchange(
 				anyString(),
 				any(HttpMethod.class), 
 				any(HttpEntity.class), 
 				any(Class.class)))
 		.thenThrow(HttpClientErrorException.class);		
-		commands.launchCalculation(new File("../ordogene-api/src/test/resources/OrdogeneCalculationExamples/fitness1.json"));
-		/*verify(restTemplate.exchange(
-				anyString(),
-				any(HttpMethod.class), 
-				any(HttpEntity.class), 
-				any(Class.class)), times(1));*/
-		//pas terrible comme test mais pas le choix
+		assertFalse(commands.launchCalculation(new File("../ordogene-api/src/test/resources/OrdogeneCalculationExamples/fitness1.json")));
 	}
 	
-	@Ignore
 	@Test
 	public void testLaunchCalculationRestException() {
-		ResponseEntity<ApiJsonResponse> re = mock(ResponseEntity.class);
-		ApiJsonResponse ajr = mock(ApiJsonResponse.class);
 		when(restTemplate.exchange(
 				anyString(),
 				any(HttpMethod.class), 
 				any(HttpEntity.class), 
 				any(Class.class)))
 		.thenThrow(RestClientException.class);		
-		commands.launchCalculation(new File("../ordogene-api/src/test/resources/OrdogeneCalculationExamples/fitness1.json"));
+		assertFalse(commands.launchCalculation(new File("../ordogene-api/src/test/resources/OrdogeneCalculationExamples/fitness1.json")));
 	}
 	
-	@Ignore
 	@Test
 	public void testLaunchCalculation() {
 		ResponseEntity<ApiJsonResponse> re = mock(ResponseEntity.class);
@@ -284,23 +269,110 @@ public class CommandsTest {
 		.thenReturn(re);
 		when(re.getBody()).thenReturn(ajr);
 		when(ajr.getCid()).thenReturn(666);
+		assertTrue(commands.launchCalculation(new File("../ordogene-api/src/test/resources/OrdogeneCalculationExamples/fitness1.json")));
 	}
 
-	@Ignore
+	@Test
+	public void testStopCalculationServerException() {
+		when(restTemplate.exchange(
+				anyString(),
+				any(HttpMethod.class), 
+				any(HttpEntity.class), 
+				any(Class.class)))
+		.thenThrow(HttpServerErrorException.class);
+		assertFalse(commands.stopCalculation(666));
+	}
+	
+	@Test
+	public void testStopCalculationClientException() {
+		when(restTemplate.exchange(
+				anyString(),
+				any(HttpMethod.class), 
+				any(HttpEntity.class), 
+				any(Class.class)))
+		.thenThrow(HttpClientErrorException.class);
+		assertFalse(commands.stopCalculation(666));
+	}
+	
+	@Test
+	public void testStopCalculationRestException() {
+		when(restTemplate.exchange(
+				anyString(),
+				any(HttpMethod.class), 
+				any(HttpEntity.class), 
+				any(Class.class)))
+		.thenThrow(RestClientException.class);
+		assertFalse(commands.stopCalculation(666));
+	}
+	
 	@Test
 	public void testStopCalculation() {
-		fail("Not yet implemented");
+		ResponseEntity<ApiJsonResponse> re = mock(ResponseEntity.class);
+		when(restTemplate.exchange(
+				anyString(),
+				any(HttpMethod.class), 
+				any(HttpEntity.class), 
+				any(Class.class)))
+		.thenReturn(re);
+		assertTrue(commands.stopCalculation(666));
+	}
+
+	@Test
+	public void testResultCalculationServerException() {
+		String dst = "/tmp/result.png";
+		when(restTemplate.exchange(
+				anyString(),
+				any(HttpMethod.class), 
+				any(HttpEntity.class), 
+				any(Class.class)))
+		.thenThrow(HttpServerErrorException.class);
+		assertFalse(commands.resultCalculation(666, dst, true));
+	}
+	
+	@Test
+	public void testResultCalculationClientException() {
+		String dst = "/tmp/result.png";
+		when(restTemplate.exchange(
+				anyString(),
+				any(HttpMethod.class), 
+				any(HttpEntity.class), 
+				any(Class.class)))
+		.thenThrow(HttpClientErrorException.class);
+		assertFalse(commands.resultCalculation(666, dst, true));
+	}
+	
+	@Test
+	public void testResultCalculationRestException() {
+		String dst = "/tmp/result.png";
+		when(restTemplate.exchange(
+				anyString(),
+				any(HttpMethod.class), 
+				any(HttpEntity.class), 
+				any(Class.class)))
+		.thenThrow(RestClientException.class);
+		assertFalse(commands.resultCalculation(666, dst, true));
+	}
+	
+	@Test
+	public void testResultCalculation() {
+		String dst = "/tmp/result.png";
+		ResponseEntity<ApiJsonResponse> re = mock(ResponseEntity.class);
+		ApiJsonResponse ajr = mock(ApiJsonResponse.class);
+		String base64img = "tartampion";
+		when(restTemplate.exchange(
+				anyString(),
+				any(HttpMethod.class), 
+				any(HttpEntity.class), 
+				any(Class.class)))
+		.thenReturn(re);
+		when(re.getBody()).thenReturn(ajr);
+		when(ajr.getBase64img()).thenReturn(base64img);
+		assertTrue(commands.resultCalculation(666, dst, true));
 	}
 
 	@Ignore
 	@Test
 	public void testRemoveCalculation() {
-		fail("Not yet implemented");
-	}
-
-	@Ignore
-	@Test
-	public void testResultCalculation() {
 		fail("Not yet implemented");
 	}
 
