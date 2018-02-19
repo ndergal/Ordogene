@@ -34,6 +34,9 @@ public class ApiJsonResponseCreator {
 	public static ApiJsonResponse calculationIDNull() {
 		return new ApiJsonResponse(null, 0, "The calculationId can't be null or empty", null, null);
 	}
+	public static ApiJsonResponse serverFull() {
+		return new ApiJsonResponse(null, 0, "The server can not run your calculation (the server is full)", null, null);
+	}
 	
 	
 	

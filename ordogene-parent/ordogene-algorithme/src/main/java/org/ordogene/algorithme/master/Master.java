@@ -32,14 +32,12 @@ public class Master {
 		this.maxThread = maxThread;
 	}
 
-	public int compute(String idUser, String jsonString)
+	public Integer compute(String idUser, String jsonString)
 			throws JsonParseException, JsonMappingException, UnmarshalException, IOException {
 
 		synchronized (threadMap) {
 			if (currentThread == maxThread) {
-				// TODO to fix we can send -2
-				// timeout -2 complet ~5sec -1 error random
-				return -2;
+				return null;
 			}
 			currentThread++;
 		}
@@ -98,8 +96,8 @@ public class Master {
 				}
 				cal.setRunning(true);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				// Master will be closed
+				Thread.currentThread().interrupt();
 			}
 		} else {
 			try {
@@ -127,8 +125,8 @@ public class Master {
 				th.masterToThread("interrupt");
 				return true;
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				// Master will be closed
+				Thread.currentThread().interrupt();
 				return false;
 			}
 		} else {

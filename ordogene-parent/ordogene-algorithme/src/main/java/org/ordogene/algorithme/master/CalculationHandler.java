@@ -61,8 +61,8 @@ public class CalculationHandler {
 
 				}
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				interupted = true;
+				Thread.currentThread().interrupt();
 			}
 		}
 		Random rand = RandomRegistry.getRandom(); // TODO change RANDOM

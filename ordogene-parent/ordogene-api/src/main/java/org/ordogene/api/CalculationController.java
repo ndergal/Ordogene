@@ -128,7 +128,11 @@ public class CalculationController {
 					HttpStatus.NOT_FOUND);
 		}
 		try {
-			int calculationId = this.masterAlgorithme.compute(userId, jsonBody);
+			Integer calculationId = this.masterAlgorithme.compute(userId, jsonBody);
+			if(calculationId == null) {
+				return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.serverFull(),
+						HttpStatus.SERVICE_UNAVAILABLE);
+			}
 			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(userId, calculationId, null, null, null),
 					HttpStatus.OK);
 		} catch (JsonParseException e) {
