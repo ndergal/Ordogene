@@ -76,6 +76,40 @@ public class CalculationController {
 	/**
 	 * 
 	 * @param userId
+	 * @return
+	 */
+	@RequestMapping(method = RequestMethod.POST, value = "/{userId}/calculations/{calculationId}"/*, produces = "application/json"*/)
+	@ResponseBody
+	public ResponseEntity<ApiJsonResponse> stopCalculation(@PathVariable String userId,
+			@PathVariable int calculationId) {
+		if (userId == null || "".equals(userId)) {
+			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
+		}
+		if (!fs.userExist(userId)) {
+			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNotExist(userId),
+					HttpStatus.NOT_FOUND);
+		} else {
+			// TODO check if userId = launcherUserId
+			if (fs.getUserCalculations(userId).stream().anyMatch(c -> c.getId() == calculationId)) {
+				if (masterAlgorithme.interruptCalculation(calculationId)) {
+					return new ResponseEntity<ApiJsonResponse>(
+							new ApiJsonResponse(userId, calculationId, null, null, null), HttpStatus.OK);
+				} else {
+					return new ResponseEntity<ApiJsonResponse>(
+							new ApiJsonResponse(userId, calculationId, "The calcul is not running.", null, null),
+							HttpStatus.NOT_FOUND);
+				}
+			} else {
+				return new ResponseEntity<ApiJsonResponse>(
+						new ApiJsonResponse(userId, calculationId, "The calculationId is wrong", null, null),
+						HttpStatus.FORBIDDEN);
+			}
+		}
+	}
+
+	/**
+	 * 
+	 * @param userId
 	 * @param jsonBody
 	 * @return
 	 */
