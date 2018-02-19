@@ -11,8 +11,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 import org.junit.Ignore;
@@ -21,7 +19,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.ordogene.file.FileService;
 import org.ordogene.file.utils.ApiJsonResponse;
 import org.ordogene.file.utils.Calculation;
 import org.springframework.http.HttpEntity;
@@ -323,8 +320,6 @@ public class CommandsTest {
 	@Test
 	public void testResultCalculationServerException() {
 		String dst = "/tmp/result.png";
-		Path path = mock(Path.class);
-		when(Paths.get(dst)).thenReturn(path);
 		when(restTemplate.exchange(
 				anyString(),
 				any(HttpMethod.class), 
@@ -337,8 +332,6 @@ public class CommandsTest {
 	@Test
 	public void testResultCalculationClientException() {
 		String dst = "/tmp/result.png";
-		Path path = mock(Path.class);
-		when(Paths.get(dst)).thenReturn(path);
 		when(restTemplate.exchange(
 				anyString(),
 				any(HttpMethod.class), 
@@ -351,8 +344,6 @@ public class CommandsTest {
 	@Test
 	public void testResultCalculationRestException() {
 		String dst = "/tmp/result.png";
-		Path path = mock(Path.class);
-		when(Paths.get(dst)).thenReturn(path);
 		when(restTemplate.exchange(
 				anyString(),
 				any(HttpMethod.class), 
@@ -365,11 +356,9 @@ public class CommandsTest {
 	@Test
 	public void testResultCalculation() {
 		String dst = "/tmp/result.png";
-		Path path = mock(Path.class);
 		ResponseEntity<ApiJsonResponse> re = mock(ResponseEntity.class);
 		ApiJsonResponse ajr = mock(ApiJsonResponse.class);
-		String base64img = mock(String.class);
-		when(Paths.get(dst)).thenReturn(path);
+		String base64img = "tartampion";
 		when(restTemplate.exchange(
 				anyString(),
 				any(HttpMethod.class), 
@@ -378,7 +367,6 @@ public class CommandsTest {
 		.thenReturn(re);
 		when(re.getBody()).thenReturn(ajr);
 		when(ajr.getBase64img()).thenReturn(base64img);
-		when(FileService.decodeAndSaveImage(base64img, dst)).thenReturn(true);
 		assertTrue(commands.resultCalculation(666, dst, true));
 	}
 
