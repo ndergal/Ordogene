@@ -209,11 +209,24 @@ public class Commands {
 	 * @param cid
 	 *            id of the calculation
 	 */
-	@ShellMethod(value = "Remove a calculation")
-	public boolean removeCalculation(int cid) {
+	@ShellMethod(value = "Remove a calculation") //TODO : TU
+	public boolean removeCalculation(int calculationID) {
 		// Request
-		log.info(NOT_IMPLEMENTED_BLOCK_ON_CLI_SIDE);
-		return false;
+
+		ResponseEntity<ApiJsonResponse> response = null;
+		try {
+			response = restTemplate.exchange("/" + id + "/calculations/"+calculationID, HttpMethod.DELETE, null,
+					ApiJsonResponse.class);
+		} catch (HttpClientErrorException | HttpServerErrorException e) {
+			log.error(e.getStatusCode() + " -- " + e.getStatusText());
+			return false;
+		} catch (RestClientException e) {
+			log.debug(e.getMessage());
+			log.error(PROBLEM_WITH_THE_COMMUNICATION_BETWEEN_CLIENT_AND_SERVER);
+			return false;
+		}
+		log.info("Calculation "+calculationID+" has been deleted.");
+		return true;
 	}
 
 	/**
