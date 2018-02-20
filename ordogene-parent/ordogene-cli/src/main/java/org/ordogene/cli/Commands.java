@@ -325,7 +325,7 @@ public class Commands {
 		};
 	}
 
-	private String getFileContent(File model) {
+	String getFileContent(File model) {
 		Path jsonPath = model.toPath();
 		if (Files.notExists(jsonPath)) {
 			log.error("The path does not exist. Try again.");
