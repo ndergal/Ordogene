@@ -37,6 +37,11 @@ public class Environment {
 	}
 
 	@Override
+	public String toString() {
+		return "Environment [entities=" + entities + "]";
+	}
+
+	@Override
 	public int hashCode() {
 		return 31 * entities.hashCode();
 	}

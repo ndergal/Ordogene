@@ -45,7 +45,7 @@ public class Fitness {
 	 */
 	public long eval(Action a) {
 		Objects.requireNonNull(a);
-		int score = 0;
+		long score = 0;
 		for(Input i : a.getInputs()) {
 			Objects.requireNonNull(i);
 			String entityName = i.getName();
@@ -57,6 +57,17 @@ public class Fitness {
 			Objects.requireNonNull(e);
 			String entityName = e.getName();
 			long coef = operands.getOrDefault(entityName, Long.valueOf(0));
+			long quantity = e.getQuantity();
+			score += coef * quantity;
+		}
+		return score;
+	}
+	
+	public long evalEnv(Environment env) {
+		Objects.requireNonNull(env);
+		long score = 0;
+		for(Entity e : env.getEntities()) {
+			long coef = operands.getOrDefault(e.getName(), Long.valueOf(0));
 			long quantity = e.getQuantity();
 			score += coef * quantity;
 		}

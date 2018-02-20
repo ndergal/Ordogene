@@ -18,7 +18,7 @@ public class ScheduleBuilder {
 	
 	private final ThreadHandler th;
 	private final Model model;
-	private final int POPULATION_SIZE = 2;
+	private final int POPULATION_SIZE = 10;
 	
 	public ScheduleBuilder(ThreadHandler th, Model model) {
 		this.th = th;
@@ -27,25 +27,25 @@ public class ScheduleBuilder {
 
 	public void run() {
 		
-		Engine<ActionGene, Double> engine = Engine
+		Engine<ActionGene, Long> engine = Engine
 			.builder(this::fitness, Genotype.of(Schedule.of(model), 1))
 			.optimize(Type.min.equals(model.getFitness().getType()) ? Optimize.MINIMUM : Optimize.MAXIMUM)
-			.fitnessScaler(this::fitnessScaler)
+			//.fitnessScaler(this::fitnessScaler)
 			.populationSize(POPULATION_SIZE)
 			.selector(new TournamentSelector<>())
 			.alterers(new ScheduleCrossover(0.2))
 			.build();
 		
-		EvolutionStatistics<Double, DoubleMomentStatistics> statistics = EvolutionStatistics.ofNumber();
+		EvolutionStatistics<Long, DoubleMomentStatistics> statistics = EvolutionStatistics.ofNumber();
 		
-		Phenotype<ActionGene, Double> best = engine.stream()
+		Phenotype<ActionGene, Long> best = engine.stream()
 			.limit(1)
 			.peek(result -> {
-				System.out.println(result.getGeneration() + " : " + result.getBestFitness());
+				//System.out.println(result.getGeneration() + " : " + result.getBestFitness());
 				result.getPopulation().forEach(pheno -> {
 					int i = 0;
 					for (ActionGene g : pheno.getGenotype().getChromosome()) {
-						System.out.println((i++) + " " + g.getAllele());
+						//System.out.println((i++) + " " + g.getAllele());
 					}
 				});
 			})
@@ -82,11 +82,13 @@ public class ScheduleBuilder {
 	 * @param ind
 	 * @return
 	 */
-	public Double fitness(Genotype<ActionGene> ind) {
-		return ind.stream()
-				.flatMapToDouble(c -> c.stream()
-						.mapToDouble(action -> model.getFitness().eval(action.getAllele())))
-				.sum();
+	public Long fitness(Genotype<ActionGene> ind) {
+		long startFitness = model.getFitness().evalEnv(model.getStartEnvironment());
+		long transformationFitness = ind	.stream()
+											.flatMap(c -> c.stream())
+											.mapToLong(ag -> model.getFitness().eval(ag.getAllele()))
+											.sum();
+		return startFitness + transformationFitness;
 	}
 
 }

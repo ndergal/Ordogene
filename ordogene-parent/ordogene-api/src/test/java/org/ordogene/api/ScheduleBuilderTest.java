@@ -15,13 +15,13 @@ import org.ordogene.file.JSONModel;
 import org.ordogene.file.parser.Parser;
 
 @RunWith(MockitoJUnitRunner.class)
-public class SheduleBuilderTest {
+public class ScheduleBuilderTest {
 	
 //	@Ignore
 	@Test
 	public void testScheduleBuilder() throws Exception {
-		URL urlTestFile = SheduleBuilderTest.class.getClassLoader()
-				.getResource("OrdogeneCalculationExamples" + File.separator + "fitness1.json");
+		URL urlTestFile = ScheduleBuilderTest.class.getClassLoader()
+				.getResource("OrdogeneCalculationExamples" + File.separator + "short_path_10.json");
 		byte[] contentFile = Files.readAllBytes(Paths.get(urlTestFile.toURI()));
 		String jsonContent = new String(contentFile);
 		

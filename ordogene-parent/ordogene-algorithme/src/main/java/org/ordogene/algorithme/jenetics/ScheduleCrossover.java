@@ -3,7 +3,7 @@ package org.ordogene.algorithme.jenetics;
 import io.jenetics.Crossover;
 import io.jenetics.util.MSeq;
 
-public class ScheduleCrossover extends Crossover<ActionGene, Double> {
+public class ScheduleCrossover extends Crossover<ActionGene, Long> {
 
 	public ScheduleCrossover(double probability) {
 		super(probability);

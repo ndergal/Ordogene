@@ -143,7 +143,7 @@ public class FitnessTest {
 		
 		Fitness f = new Fitness(Type.max, op);
 		
-		assertEquals(9, f.eval(null));
+		f.eval(null);
 	}
 
 	@Test(expected=NullPointerException.class)
@@ -168,7 +168,7 @@ public class FitnessTest {
 		
 		Fitness f = new Fitness(Type.max, op);
 		
-		assertEquals(9, f.eval(a));
+		f.eval(a);
 	}
 
 	@Test(expected=NullPointerException.class)
@@ -193,7 +193,7 @@ public class FitnessTest {
 		
 		Fitness f = new Fitness(Type.max, op);
 		
-		assertEquals(9, f.eval(a));
+		f.eval(a);
 	}
 
 	@Test

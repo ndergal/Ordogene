@@ -2,7 +2,6 @@ package org.ordogene.algorithme;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -24,7 +23,7 @@ public class Model {
 	private final int slots;
 	private final int execTime;
 	private final Environment startEnvironment;
-	private final HashMap<Action, Integer> actionsInProgress = new HashMap<>();
+	private final Set<Action> actions = new HashSet<>();
 	private final Fitness fitness;
 	private ActionSelector actionSelector = new ActionSelector();
 
@@ -44,8 +43,8 @@ public class Model {
 		this.slots = slots;
 		this.execTime = execTime;
 		this.startEnvironment = Objects.requireNonNull(environment);
-		actions.forEach(a -> this.actionsInProgress.put(Objects.requireNonNull(a), 0));
-		this.actionsInProgress.put(Action.EMPTY(), 0);
+		actions.forEach(a -> this.actions.add(Objects.requireNonNull(a)));
+		this.actions.add(Action.EMPTY());
 		this.fitness = Objects.requireNonNull(fitness);
 	}
 
@@ -67,18 +66,9 @@ public class Model {
 	 * @return True if the action can be done, else False
 	 */
 	public boolean workable(Action a, Environment currentEnvironment) {
-		if (actionsInProgress.get(a) == null) {
+		if (!isInModel(a)) {
 			throw new IllegalArgumentException("The Action given don't exist in this model");
 		}
-//		Iterator<Input> it = a.getInputs().iterator();
-//		while (it.hasNext()) {
-//			Input input = it.next();
-//			Entity entityToChecked = currentEnvironment.getEntity(input.getName());
-//			if (entityToChecked.getQuantity() < input.getQuantity()) {
-//				return false;
-//			}
-//		}
-//		return true;
 		return a.getInputs().stream().allMatch(input -> input.getQuantity() <= currentEnvironment.getEntity(input.getName()).getQuantity());
 	}
 
@@ -93,7 +83,7 @@ public class Model {
 			// Select one action here
 			return actionSelector.select();
 		}
-		for (Action a : actionsInProgress.keySet()) {
+		for (Action a : actions) {
 			if (workable(a, currentEnvironment)) {
 				actionSelector.add(a, fitness.eval(a));
 			}
@@ -104,7 +94,7 @@ public class Model {
 	public void startAnAction(Environment currentEnvironment, Action a) {
 		requireNonNull(a);
 		requireNonNull(currentEnvironment);
-		if (actionsInProgress.get(a) == null) {
+		if (!isInModel(a)) {
 			throw new IllegalArgumentException("The Action given doesn't exist in this model");
 		}
 		if (!workable(a, currentEnvironment)) {
@@ -119,19 +109,14 @@ public class Model {
 				environmentEntity.addQuantity(-quantityToRemoved);
 			}
 		}
-		actionsInProgress.compute(a, (k, i) -> i + 1);
 		actionSelector.reset();
 	}
 
 	public void endAnAction(Environment currentEnvironment, Action a) {
 		requireNonNull(a);
 		requireNonNull(currentEnvironment);
-		Integer action = actionsInProgress.get(a);
-		if (action == null) {
+		if (!isInModel(a)) {
 			throw new IllegalArgumentException("The given Action doesn't exist in this model");
-		}
-		if (action == 0) {
-			throw new IllegalArgumentException("The given Action was not launched");
 		}
 		for (Input input : a.getInputs()) {
 			String inputEntityName = input.getName();
@@ -149,8 +134,6 @@ public class Model {
 			int quantityToAdd = outputEntity.getQuantity();
 			environmentEntity.addQuantity(quantityToAdd);
 		}
-
-		actionsInProgress.put(a, action - 1);
 	}
 	
 	public Fitness getFitness() {
@@ -166,12 +149,16 @@ public class Model {
 	}
 
 	public Environment getStartEnvironment() {
-		return startEnvironment.copy();
+		return startEnvironment;
 	}
 
 	public Model copy() {
 		Set<Action> actions = new HashSet<>();
-		actionsInProgress.forEach((a, i) -> actions.add(a));
+		actions.forEach(a -> actions.add(a));
 		return new Model(snaps, name, slots, execTime, startEnvironment.copy(), actions, fitness);
+	}
+
+	public boolean isInModel(Action action) {
+		return actions.contains(action);
 	}
 }
