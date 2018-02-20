@@ -28,7 +28,6 @@ import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 import org.springframework.shell.table.ArrayTableModel;
 import org.springframework.shell.table.BorderStyle;
-import org.springframework.shell.table.CellMatcher;
 import org.springframework.shell.table.Table;
 import org.springframework.shell.table.TableBuilder;
 import org.springframework.shell.table.TableModel;
@@ -40,11 +39,14 @@ import org.springframework.web.client.RestTemplate;
 @ShellComponent
 public class Commands {
 
+	private static final String NOT_IMPLEMENTED_BLOCK_ON_CLI_SIDE = "Not implemented (block on CLI side)";
+	private static final String CALCULATIONS = "/calculations/";
+	private static final String PROBLEM_WITH_THE_COMMUNICATION_BETWEEN_CLIENT_AND_SERVER = "Problem with the communication between client and server";
 	private final SimpleDateFormat formater = new SimpleDateFormat("dd/MM/yyyy-hh:mm");
 	private String id;
 	private static final Logger log = LoggerFactory.getLogger(Commands.class);
 
-	private final String[] headers = { "Id", "Name", "Date", "Running", "Fitness", "Iteration done",
+	private final String[] headerFields = { "Id", "Name", "Date", "Running", "Fitness", "Iteration done",
 			"Last iteration saved", "Max iteration" };
 
 	@Autowired
@@ -52,34 +54,34 @@ public class Commands {
 
 	@PostConstruct
 	public void login() {
-		System.out.println();
-		System.out.print("Do you want to create a new group id ? [y/N] : ");
+		log.info("\nDo you want to create a new group id ? [y/N] : ");
 		@SuppressWarnings("resource") // problem if the scanner is closed
 		Scanner scanner = new Scanner(System.in);
 		String choice = scanner.nextLine();
-
-		switch (choice) {
-		case "":
-		case "n":
-		case "N":
-		case "no":
-			do {
-				System.out.print("Enter your group id : ");
-				id = scanner.nextLine();
-			} while (id.isEmpty() ? true : !getUser(id));
-			break;
-		case "y":
-		case "Y":
-		case "yes":
-			if (!createUser()) {
-				log.error("Problem with the server: user creation failed");
-				System.exit(1);
+		loop: for (;;) {
+			switch (choice) {
+			case "":
+			case "n":
+			case "N":
+			case "no":
+				do {
+					log.info("Enter your group id : ");
+					id = scanner.nextLine();
+				} while (id.isEmpty() ? true : !getUser(id));
+				break loop;
+			case "y":
+			case "Y":
+			case "yes":
+				if (!createUser()) {
+					log.error("Problem with the server: user creation failed");
+					System.exit(1);
+				}
+				break loop;
+			default:
+				break;
 			}
-			break;
-
 		}
-
-		System.out.println();
+		log.info("\n");
 	}
 
 	public boolean getUser(String id) {
@@ -94,7 +96,7 @@ public class Commands {
 			return false;
 		} catch (RestClientException e) {
 			log.debug(e.getMessage());
-			log.info("Problem with the communication between client and server");
+			log.info(PROBLEM_WITH_THE_COMMUNICATION_BETWEEN_CLIENT_AND_SERVER);
 			return false;
 		}
 	}
@@ -130,7 +132,7 @@ public class Commands {
 			return null;
 		} catch (RestClientException e) {
 			log.debug(e.getMessage());
-			log.error("Problem with the communication between client and server");
+			log.error(PROBLEM_WITH_THE_COMMUNICATION_BETWEEN_CLIENT_AND_SERVER);
 			return null;
 		}
 
@@ -162,8 +164,8 @@ public class Commands {
 		HttpEntity<String> request = new HttpEntity<String>(jsonContentRead, headers);
 
 		try {
-			ResponseEntity<ApiJsonResponse> response = restTemplate.exchange("/" + id + "/calculations/",
-					HttpMethod.PUT, request, ApiJsonResponse.class);
+			ResponseEntity<ApiJsonResponse> response = restTemplate.exchange("/" + id + CALCULATIONS, HttpMethod.PUT,
+					request, ApiJsonResponse.class);
 			int cid = response.getBody().getCid();
 			log.info("Calculation '" + cid + "' launched");
 			return true;
@@ -172,7 +174,7 @@ public class Commands {
 			return false;
 		} catch (RestClientException e) {
 			log.debug(e.getMessage());
-			log.error("Problem with the communication between client and server");
+			log.error(PROBLEM_WITH_THE_COMMUNICATION_BETWEEN_CLIENT_AND_SERVER);
 			return false;
 		}
 
@@ -188,7 +190,7 @@ public class Commands {
 	public boolean stopCalculation(int cid) {
 		// Request
 		try {
-			restTemplate.exchange("/" + id + "/calculations/" + cid, HttpMethod.POST, null, ApiJsonResponse.class);
+			restTemplate.exchange("/" + id + CALCULATIONS + cid, HttpMethod.POST, null, ApiJsonResponse.class);
 			log.info("Calculation '" + cid + "' stopped");
 			return true;
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
@@ -196,7 +198,7 @@ public class Commands {
 			return false;
 		} catch (RestClientException e) {
 			log.debug(e.getMessage());
-			log.error("Problem with the communication between client and server");
+			log.error(PROBLEM_WITH_THE_COMMUNICATION_BETWEEN_CLIENT_AND_SERVER);
 			return false;
 		}
 	}
@@ -210,7 +212,7 @@ public class Commands {
 	@ShellMethod(value = "Remove a calculation")
 	public boolean removeCalculation(int cid) {
 		// Request
-		log.info("Not implemented (block on CLI side)");
+		log.info(NOT_IMPLEMENTED_BLOCK_ON_CLI_SIDE);
 		return false;
 	}
 
@@ -228,12 +230,11 @@ public class Commands {
 	public boolean resultCalculation(int cid, File dst, @ShellOption(arity = 0, defaultValue = "false") boolean force) {
 
 		// Parameter validation
-		//Path path = Paths.get(dst);
 		Path path = dst.toPath();
-		if(dst.isDirectory()) {
-			path = Paths.get(dst.toPath().toString()+File.separator+this.id+"_"+cid);
+		if (dst.isDirectory()) {
+			path = Paths.get(dst.toPath().toString() + File.separator + this.id + "_" + cid);
 		}
-		if (Files.exists(path) && !force/* && Files.isRegularFile(path) && Files.isWritable(path) */) {
+		if (path.toFile().exists() && !force) {
 			log.error("A file already exists, use --force to overwrite.");
 			return false;
 		}
@@ -241,7 +242,7 @@ public class Commands {
 		// Request
 		ResponseEntity<ApiJsonResponse> response = null;
 		try {
-			response = restTemplate.exchange("/" + id + "/calculations/" + cid, HttpMethod.GET, null,
+			response = restTemplate.exchange("/" + id + CALCULATIONS + cid, HttpMethod.GET, null,
 					ApiJsonResponse.class);
 
 			// Writing the image
@@ -258,7 +259,7 @@ public class Commands {
 			return false;
 		} catch (RestClientException e) {
 			log.debug(e.getMessage());
-			log.error("Problem with the communication between client and server");
+			log.error(PROBLEM_WITH_THE_COMMUNICATION_BETWEEN_CLIENT_AND_SERVER);
 			return false;
 		}
 	}
@@ -275,7 +276,7 @@ public class Commands {
 	 */
 	@ShellMethod(value = "Launch a snapshot of a calculation")
 	public boolean launchSnapshot(int cid, int sid, int loops) {
-		log.info("Not implemented (block on CLI side)");
+		log.info(NOT_IMPLEMENTED_BLOCK_ON_CLI_SIDE);
 		return false;
 	}
 
@@ -287,18 +288,18 @@ public class Commands {
 	 */
 	@ShellMethod(value = "Remove a calculation")
 	public boolean removeSnapshot(int id, int iter) {
-		log.info("Not implemented (block on CLI side)");
+		log.info(NOT_IMPLEMENTED_BLOCK_ON_CLI_SIDE);
 		return false;
 	}
 
 	/* UTILS */
 
 	private TableBuilder fillTable(List<Calculation> list) {
-		String[][] data = new String[list.size() + 1][headers.length];
+		String[][] data = new String[list.size() + 1][headerFields.length];
 		TableModel model = new ArrayTableModel(data);
 		TableBuilder builder = new TableBuilder(model);
-		for (int i = 0; i < headers.length; i++) {
-			data[0][i] = headers[i];
+		for (int i = 0; i < headerFields.length; i++) {
+			data[0][i] = headerFields[i];
 		}
 		for (int i = 0; i < list.size(); i++) {
 			Calculation c = list.get(i);
@@ -316,22 +317,13 @@ public class Commands {
 		return builder;
 	}
 
-	private static CellMatcher at(final int theRow, final int col) {
-		return new CellMatcher() {
-			@Override
-			public boolean matches(int row, int column, TableModel model) {
-				return row == theRow && column == col;
-			}
-		};
-	}
-
 	private String getFileContent(File model) {
 		Path jsonPath = model.toPath();
-		if (Files.notExists(jsonPath)) {
+		if (!jsonPath.toFile().exists()) {
 			log.error("The path does not exist. Try again.");
 			return null;
 		}
-		if (Files.isDirectory(jsonPath)) {
+		if (jsonPath.toFile().isDirectory()) {
 			log.error(jsonPath + " is a directory. Try again.");
 			return null;
 		}
