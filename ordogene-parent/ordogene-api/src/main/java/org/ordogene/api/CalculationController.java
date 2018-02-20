@@ -158,14 +158,14 @@ public class CalculationController {
 	@ResponseBody
 	public ResponseEntity<ApiJsonResponse> getCalculation(@PathVariable String id, @PathVariable int calculationid) {
 
-		if (id == null) {
-			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(null, 0, "id can't be null", null, null),
-					HttpStatus.BAD_REQUEST);
+		if (id == null || "".equals(id)) {
+			return new ResponseEntity<ApiJsonResponse>(
+					ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
 		}
 
 		if (!fs.userExist(id)) {
-			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(null, 0, id + " does not exist", null, null),
-					HttpStatus.NOT_FOUND);
+			return new ResponseEntity<ApiJsonResponse>(
+					ApiJsonResponseCreator.userIdNotExist(id), HttpStatus.NOT_FOUND);
 		} else {
 			List<Calculation> calculations = fs.getUserCalculations(id);
 			Optional<Calculation> calcul = calculations.stream().filter(x -> x.getId() == calculationid).findFirst();

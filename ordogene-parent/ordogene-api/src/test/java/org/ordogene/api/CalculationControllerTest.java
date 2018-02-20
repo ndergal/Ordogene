@@ -1,6 +1,7 @@
 package org.ordogene.api;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doNothing;
@@ -9,8 +10,10 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -19,7 +22,10 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
+import org.codehaus.plexus.util.FileUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,6 +34,8 @@ import org.mockito.Mock;
 import org.ordogene.algorithme.master.Master;
 import org.ordogene.api.utils.ApiJsonResponseCreator;
 import org.ordogene.file.FileService;
+import org.ordogene.file.ModelTest;
+import org.ordogene.file.CalculationHandlerTest.CopyFileVisitor;
 import org.ordogene.file.utils.ApiJsonResponse;
 import org.ordogene.file.utils.Calculation;
 import org.ordogene.file.utils.Const;
@@ -52,7 +60,7 @@ public class CalculationControllerTest {
 	private MockMvc mvc;
 
 	private static final ObjectMapper mapper = new ObjectMapper();
-	
+
 	@Mock
 	private FileService fs;
 	@Mock
@@ -77,6 +85,26 @@ public class CalculationControllerTest {
 		} catch (IOException e) {
 			System.err.println("Error while creating the directory " + Const.getConst().get("ApplicationPath")
 					+ File.separator + "tester");
+			e.printStackTrace();
+		}
+
+		Path sourcePath = (Paths.get(
+				CalculationControllerTest.class.getClassLoader().getResource("-624472280_dummy-calc-test").toURI()));
+		Path destinationPath = Paths.get(Const.getConst().get("ApplicationPath") + File.separator + usertest
+				+ File.separator + "-624472280_dummy-calc-test");
+
+		System.out.println("Move " + sourcePath.toAbsolutePath().toString() + " in "
+				+ destinationPath.toAbsolutePath().toString());
+		try {
+			if (Files.exists(destinationPath)) {
+				FileUtils.deleteDirectory(destinationPath.toFile());
+				Files.deleteIfExists(destinationPath);
+			}
+			Files.createDirectories(destinationPath);
+
+			FileUtils.copyDirectory(sourcePath.toFile(), destinationPath.toFile());
+		} catch (IOException e) {
+			// problem !?
 			e.printStackTrace();
 		}
 
@@ -168,10 +196,10 @@ public class CalculationControllerTest {
 
 		result.add(cf1);
 		result.add(cf2);
-		
+
 		cm1.setCalculation(0, 2, 1, 3, 1, "c1", 42);
 		cm1.setRunning(true);
-		
+
 		cm2.setCalculation(10, 12, 11, 13, 2, "c2", 142);
 		cm2.setRunning(false);
 
@@ -201,16 +229,16 @@ public class CalculationControllerTest {
 		String jsonContentPost = new String(contentFileTest);
 		jsonContentPost = jsonContentPost.replace("[", "@");
 
-		MvcResult result = mvc.perform(put("/" + usertest + "/calculations").content(jsonContentPost)).andExpect(status().isBadRequest()).andReturn();
- 
-		ApiJsonResponse ajrWaited = new ApiJsonResponse("tester", 0, "Invalid JSON (JsonParseException) ", null,
-				null);
+		MvcResult result = mvc.perform(put("/" + usertest + "/calculations").content(jsonContentPost))
+				.andExpect(status().isBadRequest()).andReturn();
+
+		ApiJsonResponse ajrWaited = new ApiJsonResponse("tester", 0, "Invalid JSON (JsonParseException) ", null, null);
 		String errorResponse = result.getResponse().getContentAsString();
-		//System.out.println("launchCalcJsonParseExceptionTest "+errorResponse);
+		// System.out.println("launchCalcJsonParseExceptionTest "+errorResponse);
 		String jsonResponseWaited = mapper.writeValueAsString(ajrWaited);
 		assertEquals(jsonResponseWaited, errorResponse);
- 	}
-	
+	}
+
 	@Test
 	public void launchCalcUnmarshalExceptionTest() throws Exception {
 		URL urlTestFile = CalculationControllerTest.class.getClassLoader()
@@ -220,114 +248,229 @@ public class CalculationControllerTest {
 		String jsonContentPost = new String(contentFileTest);
 		jsonContentPost = jsonContentPost.replace("\"exec_time\" : 10000,", "");
 
-		MvcResult result = mvc.perform(put("/" + usertest + "/calculations").content(jsonContentPost)).andExpect(status().isBadRequest()).andReturn();
- 
+		MvcResult result = mvc.perform(put("/" + usertest + "/calculations").content(jsonContentPost))
+				.andExpect(status().isBadRequest()).andReturn();
+
 		ApiJsonResponse ajrWaited = new ApiJsonResponse("tester", 0, "Invalid JSON (Missing fields in the JSON) ", null,
 				null);
 		String errorResponse = result.getResponse().getContentAsString();
-		//System.out.println("launchCalcJsonParseExceptionTest "+errorResponse);
+		// System.out.println("launchCalcJsonParseExceptionTest "+errorResponse);
 		String jsonResponseWaited = mapper.writeValueAsString(ajrWaited);
 		assertEquals(jsonResponseWaited, errorResponse);
- 	}
+	}
 
-	
 	@Test
 	public void launchUnknowUserCalcTest() throws Exception {
- 
+
 		String unknowUserId = "ZESFD";
 		Path usrTestPath = Paths.get((Const.getConst().get("ApplicationPath") + File.separator + unknowUserId));
 
 		if (Files.exists(usrTestPath)) {
 			FileSystemUtils.deleteRecursively(usrTestPath.toFile());
 		}
-		
+
 		URL urlTestFile = CalculationControllerTest.class.getClassLoader()
 				.getResource("OrdogeneCalculationExamples" + File.separator + "short_path_100.json");
 
 		byte[] contentFileTest = Files.readAllBytes(Paths.get(urlTestFile.toURI()));
 		String jsonContentPost = new String(contentFileTest);
- 
-		MvcResult result = mvc.perform(put("/" + unknowUserId + "/calculations").content(jsonContentPost)).andExpect(status().isNotFound()).andReturn();
- 
-		ApiJsonResponse ajrWaited = new ApiJsonResponse(null, 0, "'" + unknowUserId + "' does not exist", null,
-				null);
+
+		MvcResult result = mvc.perform(put("/" + unknowUserId + "/calculations").content(jsonContentPost))
+				.andExpect(status().isNotFound()).andReturn();
+
+		ApiJsonResponse ajrWaited = new ApiJsonResponse(null, 0, "'" + unknowUserId + "' does not exist", null, null);
 		String errorResponse = result.getResponse().getContentAsString();
- 		String jsonResponseWaited = mapper.writeValueAsString(ajrWaited);
+		String jsonResponseWaited = mapper.writeValueAsString(ajrWaited);
 		assertEquals(jsonResponseWaited, errorResponse);
- 	}
+	}
+
+	@Test
+	public void launchNoRouteCalcBodyNullTest() throws Exception {
+		CalculationController cc = new CalculationController();
+		ResponseEntity<ApiJsonResponse> responseAjr = cc.launchCalculation("tester", null);
+		ResponseEntity<ApiJsonResponse> resWaited = new ResponseEntity<ApiJsonResponse>(
+				ApiJsonResponseCreator.jsonBodyNull(), HttpStatus.BAD_REQUEST);
+		assertEquals(resWaited, responseAjr);
+
+		responseAjr = cc.launchCalculation("tester", "");
+		assertEquals(resWaited, responseAjr);
+	}
+
+	@Test
+	public void launchNoRouteCalcUserNullTest() throws Exception {
+		CalculationController cc = new CalculationController();
+		ResponseEntity<ApiJsonResponse> responseAjr = cc.launchCalculation(null, null);
+		ResponseEntity<ApiJsonResponse> resWaited = new ResponseEntity<ApiJsonResponse>(
+				ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
+		assertEquals(resWaited, responseAjr);
+
+		responseAjr = cc.launchCalculation("", null);
+		assertEquals(resWaited, responseAjr);
+	}
+
+	@Test
+	public void getCalculationUserNull() throws Exception {
+		CalculationController cc = new CalculationController();
+		ResponseEntity<ApiJsonResponse> responseAjr = cc.getCalculation(null, 0);
+		ResponseEntity<ApiJsonResponse> resWaited = new ResponseEntity<ApiJsonResponse>(
+				ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
+		assertEquals(resWaited, responseAjr);
+
+		responseAjr = cc.getCalculation("", 0);
+		assertEquals(resWaited, responseAjr);
+	}
+
+	@Test
+	public void getCalculationSuccess() throws Exception {
+		final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+		// to don't print it in the shell
+		System.setOut(new PrintStream(outContent));
+
+		CalculationController cc = new CalculationController();
+		MvcResult result = mvc.perform(put("/" + usertest + "/calculations/-624472280")).andExpect(status().isOk())
+				.andReturn();
+
+		String calculationGotStr = result.getResponse().getContentAsString();
+		System.setOut(System.out);
+
+		ApiJsonResponse ajrGot = mapper.readValue(calculationGotStr, ApiJsonResponse.class);
+		ApiJsonResponse ajrWaited = new ApiJsonResponse(usertest, -624472280, null, null, null);
+		assertEquals(ajrWaited.getCid(), ajrGot.getCid());
+		assertEquals(ajrWaited.getUserId(), ajrGot.getUserId());
+		assertNotEquals(null, ajrGot.getBase64img());
+
+	}
+
+	@Test
+	public void getCalculationNotFoundTest() throws Exception {
+		String userTest2 = "rsijgivbusiuddbgvzauzefv";
+		int cid = ThreadLocalRandom.current().nextInt(-923549, 67175772);
+		Path newUserPath = Paths.get(Const.getConst().get("ApplicationPath") + File.separator + userTest2);
+		try {
+			if (Files.exists(newUserPath)) {
+				FileUtils.deleteDirectory(newUserPath.toFile());
+				Files.deleteIfExists(newUserPath);
+			}
+			Files.createDirectories(newUserPath);
+		} catch (IOException e) {
+			// problem !?
+			e.printStackTrace();
+		}
+
+		CalculationController cc = new CalculationController();
+		MvcResult result = mvc.perform(put("/" + userTest2 + "/calculations/" + cid)).andExpect(status().isNotFound())
+				.andReturn();
+		String responseJson = result.getResponse().getContentAsString();
+		ApiJsonResponse ajrGot = mapper.readValue(responseJson, ApiJsonResponse.class);
+		ApiJsonResponse ajrEexpected = new ApiJsonResponse(userTest2, 0,
+				"calculation " + cid + " does not exist for user " + userTest2, null, null);
+		assertEquals(ajrEexpected, ajrGot);
+
+	}
 	
+	@Test
+	public void getCalculationNotExistTest() throws Exception {
+		String userTest2 = "rsijgiffuzefv";
+		int cid = ThreadLocalRandom.current().nextInt(-923599, 87175772);
+		Path newUserPath = Paths.get(Const.getConst().get("ApplicationPath") + File.separator + userTest2);
+		try {
+			if (Files.exists(newUserPath)) {
+				FileUtils.deleteDirectory(newUserPath.toFile());
+				Files.deleteIfExists(newUserPath);
+			}
+		} catch (IOException e) {
+			// problem !?
+			e.printStackTrace();
+		}
+
+		CalculationController cc = new CalculationController();
+		MvcResult result = mvc.perform(put("/" + userTest2 + "/calculations/" + cid)).andExpect(status().isNotFound())
+				.andReturn();
+		String responseJson = result.getResponse().getContentAsString();
+		ApiJsonResponse ajrGot = mapper.readValue(responseJson, ApiJsonResponse.class);
+		ApiJsonResponse ajrEexpected =ApiJsonResponseCreator.userIdNotExist(userTest2);
+		assertEquals(ajrEexpected, ajrGot);
+
+	}
+
 	@Test
 	public void stopCalculationTest_null_UserId() {
-		ResponseEntity<ApiJsonResponse> expected = new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
-		
+		ResponseEntity<ApiJsonResponse> expected = new ResponseEntity<ApiJsonResponse>(
+				ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
+
 		assertEquals(expected, cc.stopCalculation(null, 0));
 	}
-	
+
 	@Test
 	public void stopCalculationTest_empty_UserId() {
-		ResponseEntity<ApiJsonResponse> expected = new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
-		
+		ResponseEntity<ApiJsonResponse> expected = new ResponseEntity<ApiJsonResponse>(
+				ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
+
 		assertEquals(expected, cc.stopCalculation("", 0));
 	}
-	
+
 	@Test
 	public void stopCalculationTest_UserId_notExist() {
 		when(fs.userExist(usertest)).thenReturn(false);
-		
-		ResponseEntity<ApiJsonResponse> expected = new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNotExist(usertest), HttpStatus.NOT_FOUND);
-		
+
+		ResponseEntity<ApiJsonResponse> expected = new ResponseEntity<ApiJsonResponse>(
+				ApiJsonResponseCreator.userIdNotExist(usertest), HttpStatus.NOT_FOUND);
+
 		assertEquals(expected, cc.stopCalculation(usertest, 0));
 	}
-	
+
 	@Test
 	public void stopCalculationTest_userId_isNot_launcherId() {
 		List<Calculation> cals = new ArrayList<>();
 		Calculation c = mock(Calculation.class);
 		cals.add(c);
-		
+
 		when(c.getId()).thenReturn(30);
-		
+
 		when(fs.userExist(usertest)).thenReturn(true);
 		when(fs.getUserCalculations(usertest)).thenReturn(cals);
-		
-		ResponseEntity<ApiJsonResponse> expected = new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(usertest, 20, "The calculationId is wrong", null, null), HttpStatus.FORBIDDEN);
-		
+
+		ResponseEntity<ApiJsonResponse> expected = new ResponseEntity<ApiJsonResponse>(
+				new ApiJsonResponse(usertest, 20, "The calculationId is wrong", null, null), HttpStatus.FORBIDDEN);
+
 		assertEquals(expected, cc.stopCalculation(usertest, 20));
 	}
-	
+
 	@Test
 	public void stopCalculationTest_calculation_isNotRunning() {
 		List<Calculation> cals = new ArrayList<>();
 		Calculation c = mock(Calculation.class);
 		cals.add(c);
-		
+
 		when(c.getId()).thenReturn(20);
-		
+
 		when(fs.userExist(usertest)).thenReturn(true);
 		when(fs.getUserCalculations(usertest)).thenReturn(cals);
-		
+
 		when(master.interruptCalculation(20)).thenReturn(false);
-		
-		ResponseEntity<ApiJsonResponse> expected = new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(usertest, 20, "The calcul is not running.", null, null), HttpStatus.NOT_FOUND);
-		
+
+		ResponseEntity<ApiJsonResponse> expected = new ResponseEntity<ApiJsonResponse>(
+				new ApiJsonResponse(usertest, 20, "The calcul is not running.", null, null), HttpStatus.NOT_FOUND);
+
 		assertEquals(expected, cc.stopCalculation(usertest, 20));
 	}
-	
+
 	@Test
 	public void stopCalculationTest_OK() {
 		List<Calculation> cals = new ArrayList<>();
 		Calculation c = mock(Calculation.class);
 		cals.add(c);
-		
+
 		when(c.getId()).thenReturn(20);
-		
+
 		when(fs.userExist(usertest)).thenReturn(true);
 		when(fs.getUserCalculations(usertest)).thenReturn(cals);
-		
+
 		when(master.interruptCalculation(20)).thenReturn(true);
-		
-		ResponseEntity<ApiJsonResponse> expected = new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(usertest, 20, null, null, null), HttpStatus.OK);
-		
+
+		ResponseEntity<ApiJsonResponse> expected = new ResponseEntity<ApiJsonResponse>(
+				new ApiJsonResponse(usertest, 20, null, null, null), HttpStatus.OK);
+
 		assertEquals(expected, cc.stopCalculation(usertest, 20));
 	}
 
