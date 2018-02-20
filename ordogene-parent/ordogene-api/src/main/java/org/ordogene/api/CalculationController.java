@@ -4,9 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import javax.xml.bind.UnmarshalException;
@@ -40,8 +38,6 @@ public class CalculationController {
 
 	@Autowired
 	private Master masterAlgorithme;
-	private static final Map<Integer, String> currentCalculation = new HashMap<>();
-	private final Object token = new Object();
 
 	/**
 	 * 
@@ -91,7 +87,6 @@ public class CalculationController {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNotExist(userId),
 					HttpStatus.NOT_FOUND);
 		} else {
-			// TODO check if userId = launcherUserId
 			if (fs.getUserCalculations(userId).stream().anyMatch(c -> c.getId() == calculationId)) {
 				if (masterAlgorithme.interruptCalculation(calculationId)) {
 					return new ResponseEntity<ApiJsonResponse>(
@@ -125,7 +120,7 @@ public class CalculationController {
 		if (userId == null || "".equals(userId)) {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
 		}
-		if (jsonBody == null) {
+		if (jsonBody == null|| "".equals(jsonBody)) {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.jsonBodyNull(), HttpStatus.BAD_REQUEST);
 		}
 		if (!fs.userExist(userId)) {
@@ -133,7 +128,11 @@ public class CalculationController {
 					HttpStatus.NOT_FOUND);
 		}
 		try {
-			int calculationId = this.masterAlgorithme.compute(userId, jsonBody);
+			Integer calculationId = this.masterAlgorithme.compute(userId, jsonBody);
+			if(calculationId == null) {
+				return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.serverFull(),
+						HttpStatus.SERVICE_UNAVAILABLE);
+			}
 			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(userId, calculationId, null, null, null),
 					HttpStatus.OK);
 		} catch (JsonParseException e) {
@@ -194,31 +193,4 @@ public class CalculationController {
 		}
 	}
 
-	private void asynchronousDeletePid(Process proc, int pid, String id) {
-
-		Runnable waitAndDeletePid = new Runnable() {
-
-			@Override
-			public void run() {
-				try {
-					// int exitVal = proc.waitFor();
-					int exitVal = proc.waitFor();
-					synchronized (token) {
-						if (currentCalculation.containsKey(pid)) {
-							currentCalculation.remove(pid);
-							System.out.println("remove " + pid + " from the map");
-						}
-					}
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-
-		};
-
-		Thread t = new Thread(waitAndDeletePid);
-		t.setDaemon(true);
-		t.start();
-	}
 }
