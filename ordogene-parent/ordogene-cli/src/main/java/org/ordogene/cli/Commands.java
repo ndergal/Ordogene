@@ -317,7 +317,20 @@ public class Commands {
 		return builder;
 	}
 
+<<<<<<< HEAD
 	private String getFileContent(File model) {
+=======
+	private static CellMatcher at(final int theRow, final int col) {
+		return new CellMatcher() {
+			@Override
+			public boolean matches(int row, int column, TableModel model) {
+				return row == theRow && column == col;
+			}
+		};
+	}
+
+	String getFileContent(File model) {
+>>>>>>> branch 'dev' of https://ndergal@bitbucket.org/darwinners/ordogene.git
 		Path jsonPath = model.toPath();
 		if (!jsonPath.toFile().exists()) {
 			log.error("The path does not exist. Try again.");
