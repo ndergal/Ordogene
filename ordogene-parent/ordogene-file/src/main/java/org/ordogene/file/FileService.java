@@ -46,7 +46,11 @@ public class FileService {
 	public List<Calculation> getUserCalculations(String username) {
 		return ch.getCalculations(username);
 	}
-
+	
+	public boolean removeUserCalculation(String username, Calculation c) {
+		return ch.removeCalculation(username, c.getId(), c.getName());
+	}
+	
 	public static void writeInFile(Object content, Path dest) throws IOException {
 
 		if (Files.exists(dest)) {

@@ -7,6 +7,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -25,7 +26,6 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.codehaus.plexus.util.FileUtils;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -365,7 +365,7 @@ public class CalculationControllerTest {
 		assertEquals(ajrEexpected, ajrGot);
 
 	}
-	
+
 	@Test
 	public void getCalculationNotExistTest() throws Exception {
 		String userTest2 = "rsijgiffuzefv";
@@ -386,8 +386,60 @@ public class CalculationControllerTest {
 				.andReturn();
 		String responseJson = result.getResponse().getContentAsString();
 		ApiJsonResponse ajrGot = mapper.readValue(responseJson, ApiJsonResponse.class);
-		ApiJsonResponse ajrEexpected =ApiJsonResponseCreator.userIdNotExist(userTest2);
+		ApiJsonResponse ajrEexpected = ApiJsonResponseCreator.userIdNotExist(userTest2);
 		assertEquals(ajrEexpected, ajrGot);
+
+	}
+
+	@Test
+	public void removeCalculationTest() throws Exception {
+
+		CalculationController cc = new CalculationController();
+		int cid = -624472280;
+		String cname = "dummy-calc-test";
+		MvcResult result = mvc.perform(delete("/" + usertest + "/calculations/" + cid)).andExpect(status().isOk())
+				.andReturn();
+
+	}
+
+	@Test
+	public void removeCalculationUserNullTest() throws Exception {
+
+		CalculationController cc = new CalculationController();
+		ResponseEntity<ApiJsonResponse> responseAjr = cc.removeCalculation(null, 0);
+		ResponseEntity<ApiJsonResponse> resWaited = new ResponseEntity<ApiJsonResponse>(
+				ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
+		assertEquals(resWaited, responseAjr);
+
+		responseAjr = cc.removeCalculation("", 0);
+		assertEquals(resWaited, responseAjr);
+	}
+
+	@Test
+	public void removeCalculationUserNotExistTest() throws Exception {
+
+		Path sourcePath = (Paths.get(
+				CalculationControllerTest.class.getClassLoader().getResource("-624472280_dummy-calc-test").toURI()));
+		Path destinationPath = Paths.get(Const.getConst().get("ApplicationPath") + File.separator + usertest
+				+ File.separator + "-624472280_dummy-calc-test");
+
+		if (Files.exists(destinationPath)) {
+			FileUtils.deleteDirectory(destinationPath.getParent().toFile());
+			Files.deleteIfExists(destinationPath);
+		}
+		MvcResult result = mvc.perform(delete("/" + usertest + "/calculations/" + 2354)).andExpect(status().isNotFound())
+				.andReturn();
+
+	}
+
+	@Test
+	public void removeCalculationDontExistTest() throws Exception {
+
+		CalculationController cc = new CalculationController();
+		int cid = -62447220;
+		String cname = "dummy-calc-test";
+		MvcResult result = mvc.perform(delete("/" + usertest + "/calculations/" + cid))
+				.andExpect(status().isBadRequest()).andReturn();
 
 	}
 

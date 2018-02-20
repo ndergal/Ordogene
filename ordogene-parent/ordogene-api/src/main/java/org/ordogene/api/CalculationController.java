@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import javax.xml.bind.UnmarshalException;
@@ -71,12 +72,53 @@ public class CalculationController {
 		}
 	}
 
+	@RequestMapping(method = RequestMethod.DELETE, value = "/{userId}/calculations/{calculationId}"/*
+																									 * , produces =
+																									 * "application/json"
+																									 */)
+	@ResponseBody
+	public ResponseEntity<ApiJsonResponse> removeCalculation(@PathVariable String userId,
+			@PathVariable int calculationId) {
+		if (userId == null || "".equals(userId))
+			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
+
+		if (!fs.userExist(userId))
+			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNotExist(userId),
+					HttpStatus.NOT_FOUND);
+
+		Optional<Calculation> optCalc = fs.getUserCalculations(userId).stream().filter(c -> c.getId() == calculationId)
+				.findFirst();
+
+		if (!optCalc.isPresent()) {
+			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.calculationIDNotExist(calculationId),
+					HttpStatus.BAD_REQUEST);
+		} else {
+			try {
+				Calculation calcToDelete = optCalc.get();
+				if (fs.removeUserCalculation(userId, calcToDelete)) {
+					return new ResponseEntity<ApiJsonResponse>(
+							new ApiJsonResponse(userId, calculationId, null, null, null), HttpStatus.OK);
+				} else {
+					return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.InternalServerError(),
+							HttpStatus.INTERNAL_SERVER_ERROR);
+				}
+			} catch (NoSuchElementException e) {
+				return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.calculationIDNotExist(calculationId),
+						HttpStatus.BAD_REQUEST);
+			}
+		}
+
+	}
+
 	/**
 	 * 
 	 * @param userId
 	 * @return
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/{userId}/calculations/{calculationId}"/*, produces = "application/json"*/)
+	@RequestMapping(method = RequestMethod.POST, value = "/{userId}/calculations/{calculationId}"/*
+																									 * , produces =
+																									 * "application/json"
+																									 */)
 	@ResponseBody
 	public ResponseEntity<ApiJsonResponse> stopCalculation(@PathVariable String userId,
 			@PathVariable int calculationId) {
@@ -120,7 +162,7 @@ public class CalculationController {
 		if (userId == null || "".equals(userId)) {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
 		}
-		if (jsonBody == null|| "".equals(jsonBody)) {
+		if (jsonBody == null || "".equals(jsonBody)) {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.jsonBodyNull(), HttpStatus.BAD_REQUEST);
 		}
 		if (!fs.userExist(userId)) {
@@ -129,7 +171,7 @@ public class CalculationController {
 		}
 		try {
 			Integer calculationId = this.masterAlgorithme.compute(userId, jsonBody);
-			if(calculationId == null) {
+			if (calculationId == null) {
 				return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.serverFull(),
 						HttpStatus.SERVICE_UNAVAILABLE);
 			}
@@ -159,13 +201,11 @@ public class CalculationController {
 	public ResponseEntity<ApiJsonResponse> getCalculation(@PathVariable String id, @PathVariable int calculationid) {
 
 		if (id == null || "".equals(id)) {
-			return new ResponseEntity<ApiJsonResponse>(
-					ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
 		}
 
 		if (!fs.userExist(id)) {
-			return new ResponseEntity<ApiJsonResponse>(
-					ApiJsonResponseCreator.userIdNotExist(id), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNotExist(id), HttpStatus.NOT_FOUND);
 		} else {
 			List<Calculation> calculations = fs.getUserCalculations(id);
 			Optional<Calculation> calcul = calculations.stream().filter(x -> x.getId() == calculationid).findFirst();

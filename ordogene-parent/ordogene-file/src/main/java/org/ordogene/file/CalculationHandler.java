@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.codehaus.plexus.util.FileUtils;
 import org.ordogene.file.utils.Calculation;
 import org.ordogene.file.utils.Const;
 
@@ -21,12 +22,12 @@ public class CalculationHandler {
 		}
 		Path userPath = Paths.get(Const.getConst().get("ApplicationPath") + File.separatorChar + username);
 		try (DirectoryStream<Path> userPathStream = Files.newDirectoryStream(userPath, p -> Files.isDirectory(p))) {
-			
+
 			userPathStream.forEach(p -> {
 				Calculation currenCalculation = new Calculation();
 				String directoryName = p.getFileName().toString();
 				String[] idAndName = directoryName.split("_", 2);
-				if(idAndName.length < 2) {
+				if (idAndName.length < 2) {
 					return;
 				}
 				try {
@@ -35,7 +36,7 @@ public class CalculationHandler {
 					return;
 				}
 				currenCalculation.setName(idAndName[1]);
-				//currenCalculation.set
+				// currenCalculation.set
 				res.add(currenCalculation);
 			});
 
@@ -47,22 +48,23 @@ public class CalculationHandler {
 		return res;
 	}
 
-	boolean startCalculation(String username, String calculationName) {
+	boolean removeCalculation(String username, int calculationID, String calculationName) {
 		if (username == null || username.equals("")) {
 			return false;
 		}
 
+		File todelete = new File(Const.getConst().get("ApplicationPath") + File.separatorChar + username
+				+ File.separatorChar + calculationID + "_" + calculationName);
+		if(!todelete.exists()) {
+			return false;
+		}
 		try {
-			Files.createDirectories(Paths.get(Const.getConst().get("ApplicationPath") + File.separatorChar + username
-					+ File.separatorChar + calculationName));
+			FileUtils.deleteDirectory(todelete);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
 		}
-
-		// do stuff
 		return true;
 	}
 
-	 
 }
