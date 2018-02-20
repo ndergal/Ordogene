@@ -53,7 +53,7 @@ public class Commands {
 	@PostConstruct
 	public void login() {
 		System.out.println();
-		System.out.print("Do you want to create a new id ? [y/N] : ");
+		System.out.print("Do you want to create a new group id ? [y/N] : ");
 		@SuppressWarnings("resource") // problem if the scanner is closed
 		Scanner scanner = new Scanner(System.in);
 		String choice = scanner.nextLine();
@@ -64,7 +64,7 @@ public class Commands {
 		case "N":
 		case "no":
 			do {
-				System.out.print("Enter your id : ");
+				System.out.print("Enter your group id : ");
 				id = scanner.nextLine();
 			} while (id.isEmpty() ? true : !getUser(id));
 			break;
@@ -105,7 +105,7 @@ public class Commands {
 			ResponseEntity<ApiJsonResponse> response = restTemplate.exchange("/", HttpMethod.PUT, null,
 					ApiJsonResponse.class);
 			id = response.getBody().getUserId();
-			log.info("Your new id is " + id);
+			log.info("Your new group id is " + id);
 			return true;
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
 			log.error(e.getStatusCode() + " -- " + e.getStatusText());
@@ -212,19 +212,6 @@ public class Commands {
 		// Request
 		log.info("Not implemented (block on CLI side)");
 		return false;
-		// try {
-		// restTemplate.exchange("/" + id + "/calculations/" + cid, HttpMethod.DELETE,
-		// null,
-		// ApiJsonResponse.class);
-		// log.info("Calculation '" + cid + "' deleted");
-		// } catch (HttpClientErrorException | HttpServerErrorException e) {
-		// log.error(e.getStatusCode() + " -- " + e.getStatusText());
-		// return;
-		// } catch (RestClientException e) {
-		// log.debug(e.getMessage());
-		// log.error("Problem with the communication between client and server");
-		// return;
-		// }
 	}
 
 	/**
@@ -290,20 +277,6 @@ public class Commands {
 	public boolean launchSnapshot(int cid, int sid, int loops) {
 		log.info("Not implemented (block on CLI side)");
 		return false;
-		// Request
-//		HttpEntity<Integer> request = new HttpEntity<>(loops);
-//		try {
-//			restTemplate.exchange("/" + id + "/calculations/" + cid + "/snapshots/" + sid, HttpMethod.POST, request,
-//					ApiJsonResponse.class);
-//			log.info("Snapshot '" + sid + "' launched");
-//		} catch (HttpClientErrorException | HttpServerErrorException e) {
-//			log.error(e.getStatusCode() + " -- " + e.getStatusText());
-//			return;
-//		} catch (RestClientException e) {
-//			log.debug(e.getMessage());
-//			log.error("Problem with the communication between client and server");
-//			return;
-//		}
 	}
 
 	/**
@@ -326,7 +299,6 @@ public class Commands {
 		TableBuilder builder = new TableBuilder(model);
 		for (int i = 0; i < headers.length; i++) {
 			data[0][i] = headers[i];
-			// builder.on(at(0, i)).
 		}
 		for (int i = 0; i < list.size(); i++) {
 			Calculation c = list.get(i);
