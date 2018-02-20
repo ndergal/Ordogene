@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Date;
 import java.util.Objects;
-import java.util.Random;
 
 import org.ordogene.algorithme.Model;
 import org.ordogene.file.FileService;
@@ -51,9 +50,8 @@ public class CalculationHandler {
 				String str = th.threadFromMaster();
 				if (str != null && str.equals("state")) {
 					
-					Random rand = RandomRegistry.getRandom();
-					int lastIterationSaved = rand.nextInt(occur); // TODO change RANDOM
-					String msg = constructStateString(occur, maxIter, rand, lastIterationSaved,fitness);
+					// TODO change 1 by real value
+					String msg = constructStateString(occur, maxIter, 1,fitness);
 					
 					th.threadToMaster(msg.toString());
 				} else if (str != null && str.equals("interrupt")) {
@@ -61,14 +59,13 @@ public class CalculationHandler {
 
 				}
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				interupted = true;
+				Thread.currentThread().interrupt();
 			}
 		}
-		Random rand = RandomRegistry.getRandom(); // TODO change RANDOM
-		int lastIterationSaved = rand.nextInt(occur);
+		// TODO change 1 by real value
 		Calculation tmpCalc = new Calculation();
-		tmpCalc.setCalculation(currentDate.getTime(), occur, lastIterationSaved, maxIter, calculationId,
+		tmpCalc.setCalculation(currentDate.getTime(), occur, 1, maxIter, calculationId,
 				model.getName(), fitness);
 		try {
 			String calculationSaveDest = Const.getConst().get("ApplicationPath") + File.separator + userId
@@ -81,7 +78,7 @@ public class CalculationHandler {
 		}
 	}
 
-	private String constructStateString(int occur, int maxIter, Random rand, int lastIterationSaved, int fitness) {
+	private String constructStateString(int occur, int maxIter, int lastIterationSaved, int fitness) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(currentDate.getTime()).append("_");
 		sb.append(occur).append("_");

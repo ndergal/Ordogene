@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.xml.bind.UnmarshalException;
 
@@ -29,17 +30,21 @@ public class Master {
 	}
 
 	public Master(int maxThread) {
+		if(maxThread <= 0) {
+			throw new IllegalArgumentException("The max Thread can not be zero or negative");
+		}
 		this.maxThread = maxThread;
 	}
 
-	public int compute(String idUser, String jsonString)
+	public Integer compute(String idUser, String jsonString)
 			throws JsonParseException, JsonMappingException, UnmarshalException, IOException {
 
+		Objects.requireNonNull(idUser);
+		Objects.requireNonNull(jsonString);
+		
 		synchronized (threadMap) {
 			if (currentThread == maxThread) {
-				// TODO to fix we can send -2
-				// timeout -2 complet ~5sec -1 error random
-				return -2;
+				return null;
 			}
 			currentThread++;
 		}
@@ -74,13 +79,6 @@ public class Master {
 
 	}
 
-	public String getInfoByNumCalc(int numCalc) throws InterruptedException {
-		ThreadHandler th = threadMap.get(numCalc);
-		th.masterToThread("something");
-		return th.masterFromThread();
-	}
-
-	// TODO connection with Thread
 	public void updateCalculation(Calculation cal, String userId) {
 		ThreadHandler th = threadMap.get(cal.getId());
 		if (th != null) {
@@ -98,8 +96,8 @@ public class Master {
 				}
 				cal.setRunning(true);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				// Master will be closed
+				Thread.currentThread().interrupt();
 			}
 		} else {
 			try {
@@ -111,10 +109,10 @@ public class Master {
 				cal.setLastIterationSaved(tmpCal.getLastIterationSaved());
 				cal.setMaxIteration(tmpCal.getMaxIteration());
 				cal.setFitnessSaved(tmpCal.getFitnessSaved());
+				cal.setRunning(false);
 			} catch (IllegalAccessException | UnmarshalException | IOException e) {
 				System.err.println("Problem to read the calculation ");
 			}
-			cal.setRunning(false);
 		}
 	}
 
@@ -127,8 +125,8 @@ public class Master {
 				th.masterToThread("interrupt");
 				return true;
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				// Master will be closed
+				Thread.currentThread().interrupt();
 				return false;
 			}
 		} else {

@@ -192,5 +192,4 @@ public class CalculationController {
 					HttpStatus.NOT_FOUND);
 		}
 	}
-
 }

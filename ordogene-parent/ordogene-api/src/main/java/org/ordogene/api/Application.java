@@ -1,7 +1,7 @@
 package org.ordogene.api;
 
-import org.ordogene.algorithme.master.Master;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
@@ -12,17 +12,17 @@ import org.ordogene.algorithme.master.Master;
 import org.ordogene.api.utils.CustomArgsParser;
 import org.ordogene.file.FileService;
 import org.ordogene.file.utils.Const;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 
 public class Application {
-	
-	private final Master masterAlgorithme = new Master();
 
 	private final static Master algoMaster;
 	static {
@@ -37,6 +37,10 @@ public class Application {
 		config.setRequired(true);
 		options.addOption(config);
 
+		Option port = new Option("port", "port", true, "port to launch the server");
+		port.setRequired(false);
+		options.addOption(port);
+
 		HelpFormatter formatter = new HelpFormatter();
 		CommandLine cmd;
 		boolean ignoreUnknowArg = true;
@@ -47,15 +51,39 @@ public class Application {
 			String jarName = new java.io.File(
 					Application.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
 			formatter.printHelp("java -jar " + jarName, options);
-			System.exit(1);
 			return;
 		}
 
 		String configFilePath = cmd.getOptionValue("config");
+		String optionalPort = cmd.getOptionValue("port");
+		boolean hasPort = (optionalPort != null);
+		int portParameterInt = -1;
+		if (hasPort) {
+			try {
+				portParameterInt = Integer.parseInt(optionalPort);
+				if (portParameterInt > 65535 || portParameterInt < 1) {
+					System.err.println("Ordogene Server : The port parameter must be a positive number below 65535.");
+					return;
+				}
+			} catch (NumberFormatException e) {
+				System.err.println("Ordogene Server : The port parameter must be a positive number below 65535.");
+				return;
+			}
+		}
+		if (Const.loadConfig(configFilePath)) {
+			if (!hasPort) {
+				System.out.println("Launch Ordogene server on default port.");
+				SpringApplication.run(Application.class, args);
+				// --server.port=8081
+			} else {
+				String[] newArgs = new String[args.length+1];
+				System.out.println("Launch Ordogene server on port "+portParameterInt+".");
+				System.arraycopy(args, 0, newArgs, 0, args.length);
+				newArgs[args.length] = "--server.port="+portParameterInt;
+				SpringApplication.run(Application.class, newArgs);
 
-		System.out.println(configFilePath);
-		if (Const.loadConfig(configFilePath))
-			SpringApplication.run(Application.class, args);
+			}
+		}
 	}
 
 	@Bean
@@ -77,7 +105,7 @@ public class Application {
 	public FileService buildFileService() {
 		return new FileService();
 	}
-	
+
 	@Bean
 	public Master buildMasterAlgo() {
 		return algoMaster;
