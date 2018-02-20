@@ -34,8 +34,6 @@ import org.mockito.Mock;
 import org.ordogene.algorithme.master.Master;
 import org.ordogene.api.utils.ApiJsonResponseCreator;
 import org.ordogene.file.FileService;
-import org.ordogene.file.ModelTest;
-import org.ordogene.file.CalculationHandlerTest.CopyFileVisitor;
 import org.ordogene.file.utils.ApiJsonResponse;
 import org.ordogene.file.utils.Calculation;
 import org.ordogene.file.utils.Const;
