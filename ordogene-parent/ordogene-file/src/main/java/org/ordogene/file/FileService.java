@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.List;
+import java.util.Objects;
 
 import org.ordogene.file.utils.Calculation;
 import org.ordogene.file.utils.Const;
@@ -61,21 +62,24 @@ public class FileService {
 
 	}
 
-	public static String encodeImage(Path pathImg) throws FileNotFoundException, IOException {
-		byte[] imageData = Files.readAllBytes(pathImg);
+	public static String encodeImage(Path pathSrcImg) throws IOException {
+		Objects.requireNonNull(pathSrcImg);
+		byte[] imageData = Files.readAllBytes(pathSrcImg);
 		return Base64.getEncoder().encodeToString(imageData);
 	}
 
-	public static boolean decodeAndSaveImage(String base64Img, String pathImg) {
+	public static boolean decodeAndSaveImage(String base64Img, String pathDstImg) {
+		Objects.requireNonNull(base64Img);
+		Objects.requireNonNull(pathDstImg);
 		byte[] imageData = Base64.getDecoder().decode(base64Img);
-		try (FileOutputStream imageFile = new FileOutputStream(pathImg)) {
+		try (FileOutputStream imageFile = new FileOutputStream(pathDstImg)) {
 			imageFile.write(imageData);
 			return true;
 		} catch (FileNotFoundException e) {
-			System.err.println("Image not found: " + e);
+			System.err.println("Destination path is not a file : " + e);
 			return false;
 		} catch (IOException e) {
-			System.err.println("cannot read : " + e);
+			System.err.println("cannot write to the path : " + e);
 			return false;
 		}
 	}

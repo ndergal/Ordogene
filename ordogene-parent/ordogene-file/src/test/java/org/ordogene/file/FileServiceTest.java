@@ -4,7 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Paths;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -17,7 +19,8 @@ public class FileServiceTest {
 
 	@Before
 	public void init() throws URISyntaxException {
- 		String configFileLocation = ModelTest.class.getClassLoader().getResource("ordogene.conf.json").toURI().toString();
+		String configFileLocation = ModelTest.class.getClassLoader().getResource("ordogene.conf.json").toURI()
+				.toString();
 		if (configFileLocation.startsWith("file:")) {
 			configFileLocation = configFileLocation.substring(5);
 
@@ -48,14 +51,38 @@ public class FileServiceTest {
 
 		assertTrue(fs.removeUser("bwana"));
 	}
-	
 
 	@Test
 	public void getRandomUid() {
 		FileService fs = new FileService();
-		int size=89;
+		int size = 89;
 		String ruid = fs.generateRandomUserId(size);
-		assertFalse(ruid==null);
-		assertEquals(size,ruid.length());
+		assertFalse(ruid == null);
+		assertEquals(size, ruid.length());
+	}
+
+	@Test
+	public void testEncodeAndDecode() throws IOException {
+		String ref = FileService.encodeImage(Paths.get("../ordogene-file/test-image/doge_test.png"));
+		FileService.decodeAndSaveImage(ref, "../ordogene-file/test-image/result.png");
+		String end = FileService.encodeImage(Paths.get("../ordogene-file/test-image/result.png"));
+		assertEquals(ref, end);
+	}
+
+	@Test
+	public void testDecodeWithFolder() throws IOException {
+		String ref = FileService.encodeImage(Paths.get("../ordogene-file/test-image/doge_test.png"));
+		assertFalse(FileService.decodeAndSaveImage(ref, "../ordogene-file/test-image/"));
+	}
+
+	@Test
+	public void testDecode() throws IOException {
+		String ref = FileService.encodeImage(Paths.get("../ordogene-file/test-image/doge_test.png"));
+		assertTrue(FileService.decodeAndSaveImage(ref, "../ordogene-file/test-image/result.png"));
+	}
+
+	@Test(expected = IOException.class)
+	public void testEncodeWithFolder() throws IOException {
+		FileService.encodeImage(Paths.get("../ordogene-file/test-image/"));
 	}
 }
