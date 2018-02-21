@@ -13,7 +13,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,8 +26,7 @@ public class FileServiceTest {
 
 	@Before
 	public void init() throws URISyntaxException {
-		String configFileLocation = ModelTest.class.getClassLoader().getResource("ordogene.conf.json").toURI()
-				.toString();
+ 		String configFileLocation = FileServiceTest.class.getClassLoader().getResource("ordogene.conf.json").toURI().toString();
 		if (configFileLocation.startsWith("file:")) {
 			configFileLocation = configFileLocation.substring(5);
 

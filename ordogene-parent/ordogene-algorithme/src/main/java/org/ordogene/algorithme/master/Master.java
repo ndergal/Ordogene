@@ -72,7 +72,6 @@ public class Master {
 
 		synchronized (threadMap) {
 			threadMap.put(calculationId, th);
-			th.setThread(t);
 			t.start();
 			return calculationId;
 		}

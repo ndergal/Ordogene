@@ -264,7 +264,7 @@ public class ModelTest {
 		
 		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
-		assertTrue(m.workable(a));
+		assertTrue(m.workable(a, env, 0));
 	}
 	
 	@Test
@@ -304,7 +304,7 @@ public class ModelTest {
 		
 		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
-		assertFalse(m.workable(a));
+		assertFalse(m.workable(a, env, 0));
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
@@ -350,7 +350,7 @@ public class ModelTest {
 		
 		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
-		assertFalse(m.workable(otherAction));
+		assertFalse(m.workable(otherAction, env, 0));
 	}
 
 	@Test
@@ -394,7 +394,7 @@ public class ModelTest {
 		
 		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
-		assertEquals(a, m.getWorkableAction());
+		assertEquals(a, m.getWorkableAction(env, 0));
 	}
 
 	@Test
@@ -434,13 +434,14 @@ public class ModelTest {
 		when(i.getQuantity()).thenReturn(1);
 		when(i.getRelation()).thenReturn(Relation.c);
 		
-		when(f.eval(a)).thenReturn(Long.valueOf(3));
+		when(f.eval(a)).thenReturn(Long.valueOf(1));
 		
 		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
-		assertEquals(a, m.getWorkableAction());
-		assertEquals(a, m.getWorkableAction());
-		assertEquals(Action.EMPTY(1), m.getWorkableAction());
+		assertEquals(a, m.getWorkableAction(env, 0));
+		assertEquals(Action.EMPTY(), m.getWorkableAction(env, 0));
+		assertEquals(Action.EMPTY(), m.getWorkableAction(env, 0));
+		assertEquals(a, m.getWorkableAction(env, 0));
 	}
 
 	@Test
@@ -497,7 +498,7 @@ public class ModelTest {
 		
 		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
-		m.startAnAction(a);
+		m.startAction(a, env, 0);
 	}
 
 	@Test(expected=NullPointerException.class)
@@ -541,7 +542,7 @@ public class ModelTest {
 		
 		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
-		m.startAnAction(null);
+		m.startAction(null, env, 0);
 	}
 
 	@Test(expected=IllegalArgumentException.class)
@@ -591,7 +592,7 @@ public class ModelTest {
 		
 		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
-		m.startAnAction(otherAction);
+		m.startAction(otherAction, env, 0);
 	}
 
 	@Test(expected=IllegalArgumentException.class)
@@ -635,7 +636,7 @@ public class ModelTest {
 		
 		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
-		m.startAnAction(a);
+		m.startAction(a, env, 0);
 	}
 
 	@Test
@@ -692,8 +693,8 @@ public class ModelTest {
 		
 		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
-		m.startAnAction(a);
-		m.endAnAction(a);
+		m.startAction(a, env, 0);
+		m.endAction(env, a);
 	}
 
 	@Test(expected=IllegalArgumentException.class)
@@ -743,52 +744,8 @@ public class ModelTest {
 		
 		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
-		m.startAnAction(a);
-		m.endAnAction(otherAction);
-	}
-
-	@Test(expected=IllegalArgumentException.class)
-	public void testEndAnAction_action_not_started() {
-		RandomRegistry.setRandom(new Random(0));
-		
-		Environment env = mock(Environment.class);
-		Entity e1 = mock(Entity.class);
-		Fitness f = mock(Fitness.class);
-		Action a = mock(Action.class);
-		Input i = mock(Input.class);
-		
-		Set<Entity> entityEnv = new HashSet<>();
-		entityEnv.add(e1);
-		
-		Set<Action> actions = new HashSet<>();
-		actions.add(a);
-		
-		Set<Input> inputs = new HashSet<>();
-		inputs.add(i);
-		Set<Entity> outputs = new HashSet<>();
-		outputs.add(e1);
-		
-		when(env.containsEntity(anyString())).thenReturn(true);
-		when(env.getEntity("e1")).thenReturn(e1);
-		when(env.getEntities()).thenReturn(entityEnv);
-		
-		when(e1.getName()).thenReturn("e1");
-		when(e1.getQuantity()).thenReturn(10);
-		
-		when(a.getOutputs()).thenReturn(outputs);
-		when(a.getInputs()).thenReturn(inputs);
-		when(a.getName()).thenReturn("action");
-		when(a.getTime()).thenReturn(5);
-		
-		when(i.getName()).thenReturn("e1");
-		when(i.getQuantity()).thenReturn(5);
-		when(i.getRelation()).thenReturn(Relation.c);
-		
-		when(f.eval(a)).thenReturn(Long.valueOf(3));
-		
-		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
-		
-		m.endAnAction(a);
+		m.startAction(a, env, 0);
+		m.endAction(env, otherAction);
 	}
 
 	@Test(expected=NullPointerException.class)
@@ -832,7 +789,7 @@ public class ModelTest {
 		
 		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
-		m.endAnAction(null);
+		m.endAction(env, null);
 	}
 
 }

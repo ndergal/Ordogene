@@ -57,7 +57,7 @@ public class CalculationHandlerTest {
 		Const.loadConfig("./src/test/resources/ordogene.conf.json");
 		// copy fake calculation folder :
 		Path sourcePath = (Paths
-				.get(ModelTest.class.getClassLoader().getResource("-624472280_dummy-calc-test").toURI()));
+				.get(CalculationHandlerTest.class.getClassLoader().getResource("-624472280_dummy-calc-test").toURI()));
 		Path destinationPath = Paths.get(Const.getConst().get("ApplicationPath") + File.separator + testerName
 				+ File.separator + "-624472280_dummy-calc-test");
 

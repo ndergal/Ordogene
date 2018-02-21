@@ -37,6 +37,11 @@ public class Environment {
 	}
 
 	@Override
+	public String toString() {
+		return "Environment [entities=" + entities + "]";
+	}
+
+	@Override
 	public int hashCode() {
 		return 31 * entities.hashCode();
 	}
@@ -53,5 +58,11 @@ public class Environment {
 		if (!entities.equals(env.entities))
 			return false;
 		return true;
+	}
+	
+	public Environment copy() {
+		Set<Entity> entitiesSet = new HashSet<>();
+		entities.forEach((k, v) -> entitiesSet.add(v.copy()));
+		return new Environment(entitiesSet);
 	}
 }

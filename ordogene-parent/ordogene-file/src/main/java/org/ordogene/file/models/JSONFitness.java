@@ -6,12 +6,29 @@ import java.util.Objects;
 import org.ordogene.file.parser.Validable;
 
 public class JSONFitness implements Validable {
+	
 	private Type type;
+	private Integer value;
 	private List<JSONOperand> operands;
 
 	@Override
 	public boolean isValid() {
-		return type != null && operands != null && operands.stream().allMatch(Validable::isValid);
+		if(type != null && operands != null && operands.stream().allMatch(Validable::isValid)) {
+			if(type.equals(Type.value)) {
+				return value != null;
+			} else {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public Integer getValue() {
+		return value;
+	}
+
+	public void setValue(int value) {
+		this.value = value;
 	}
 
 	public Type getType() {
@@ -38,6 +55,8 @@ public class JSONFitness implements Validable {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Fitness [type=");
 		builder.append(type);
+		builder.append(", value=");
+		builder.append(value);
 		builder.append(", operands=");
 		builder.append(operands);
 		builder.append("]");

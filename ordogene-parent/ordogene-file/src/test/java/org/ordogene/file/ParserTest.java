@@ -20,14 +20,14 @@ public class ParserTest {
 	@Test(expected = UnmarshalException.class)
 	public void should_UE_if_Missing_Field_in_file() throws JsonParseException, JsonMappingException,
 			InstantiationException, IllegalAccessException, UnmarshalException, IOException, URISyntaxException {
-		Parser.parseJsonFile(Paths.get(ModelTest.class.getClassLoader().getResource("testJson/missingFieldJson.json").toURI()),
+		Parser.parseJsonFile(Paths.get(ParserTest.class.getClassLoader().getResource("testJson/missingFieldJson.json").toURI()),
 				JSONModel.class);
 	}
 
 	@Test(expected = UnmarshalException.class)
 	public void should_UE_if_Missing_Field_in_string() throws JsonParseException, JsonMappingException,
 			InstantiationException, IllegalAccessException, UnmarshalException, IOException, URISyntaxException {
-		Path path = Paths.get(ModelTest.class.getClassLoader().getResource("testJson/missingFieldJson.json").toURI());
+		Path path = Paths.get(ParserTest.class.getClassLoader().getResource("testJson/missingFieldJson.json").toURI());
 		BufferedReader br = Files.newBufferedReader(path);
 		StringBuilder sb = new StringBuilder();
 		String str;

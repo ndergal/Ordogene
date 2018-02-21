@@ -8,8 +8,11 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
+import javax.xml.bind.UnmarshalException;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
@@ -122,6 +125,18 @@ public class MasterTest {
 	}
 
 	@Test
+	public void execCalculationDummy() throws IOException, URISyntaxException, InstantiationException,
+			IllegalAccessException, InterruptedException, UnmarshalException {
+		URL urlTestFile = MasterTest.class.getClassLoader()
+				.getResource("OrdogeneCalculationExamples" + File.separator + "short_path_10.json");
+		byte[] contentFileTest = Files.readAllBytes(Paths.get(urlTestFile.toURI()));
+		String jsonContentPost = new String(contentFileTest);
+		// System.out.println(jsonContentPost);
+		int res = new Master().compute("tester", jsonContentPost);
+		//System.out.println("compute res = " + res);
+		assertNotEquals(-2, res);
+	}
+	
 	public void MasterTest_defaultConstructor() {
 		new Master();
 	}
