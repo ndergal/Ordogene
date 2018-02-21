@@ -14,6 +14,7 @@ import java.util.List;
 import org.junit.Test;
 import org.ordogene.file.models.JSONFitness;
 import org.ordogene.file.models.JSONOperand;
+import org.ordogene.file.models.Relation;
 import org.ordogene.file.models.Type;
 
 public class FitnessTest {
@@ -120,6 +121,7 @@ public class FitnessTest {
 		
 		when(i1.getName()).thenReturn("i1");
 		when(i1.getQuantity()).thenReturn(1);
+		when(i1.getRelation()).thenReturn(Relation.c);
 		when(o1.getName()).thenReturn("o1");
 		when(o1.getQuantity()).thenReturn(1);
 		

@@ -20,7 +20,7 @@ public class ParserTest {
 	public void should_UE_if_Missing_Field_in_file() throws JsonParseException, JsonMappingException,
 			InstantiationException, IllegalAccessException, UnmarshalException, IOException {
 		Parser.parseJsonFile(Paths.get(
-				"/home/ordogene/git/ordogene/ordogene-parent/ordogene-file/src/test/java/org/ordogene/file/testJson/missingFieldJson.json"),
+				"/home/ordogene/git/ordogene/ordogene-parent/ordogene-file/src/test/resources/testJson/missingFieldJson.json"),
 				JSONModel.class);
 	}
 
@@ -28,7 +28,7 @@ public class ParserTest {
 	public void should_UE_if_Missing_Field_in_string() throws JsonParseException, JsonMappingException,
 			InstantiationException, IllegalAccessException, UnmarshalException, IOException {
 		Path path = Paths.get(
-				"/home/ordogene/git/ordogene/ordogene-parent/ordogene-file/src/test/java/org/ordogene/file/testJson/missingFieldJson.json");
+				"/home/ordogene/git/ordogene/ordogene-parent/ordogene-file/src/test/resources/testJson/missingFieldJson.json");
 		BufferedReader br = Files.newBufferedReader(path);
 		StringBuilder sb = new StringBuilder();
 		String str;

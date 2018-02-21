@@ -16,7 +16,7 @@ public class FileServiceTest {
 
 	@Before
 	public void init() throws URISyntaxException {
- 		String configFileLocation = ModelTest.class.getClassLoader().getResource("ordogene.conf.json").toURI().toString();
+ 		String configFileLocation = FileServiceTest.class.getClassLoader().getResource("ordogene.conf.json").toURI().toString();
 		if (configFileLocation.startsWith("file:")) {
 			configFileLocation = configFileLocation.substring(5);
 

@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.ordogene.algorithme.models.Action;
 import org.ordogene.algorithme.models.Entity;
@@ -398,8 +397,6 @@ public class ModelTest {
 		assertEquals(a, m.getWorkableAction(env, 0));
 	}
 
-	@Ignore
-	// TODO correct it
 	@Test
 	public void testGetWorkableAction_multiple_time() {
 		RandomRegistry.setRandom(new Random(0));
@@ -437,13 +434,14 @@ public class ModelTest {
 		when(i.getQuantity()).thenReturn(1);
 		when(i.getRelation()).thenReturn(Relation.c);
 		
-		when(f.eval(a)).thenReturn(Long.valueOf(3));
+		when(f.eval(a)).thenReturn(Long.valueOf(1));
 		
 		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
 		assertEquals(a, m.getWorkableAction(env, 0));
-		assertEquals(a, m.getWorkableAction(env, 0));
 		assertEquals(Action.EMPTY(), m.getWorkableAction(env, 0));
+		assertEquals(Action.EMPTY(), m.getWorkableAction(env, 0));
+		assertEquals(a, m.getWorkableAction(env, 0));
 	}
 
 	@Test
@@ -750,50 +748,6 @@ public class ModelTest {
 		m.endAction(env, otherAction);
 	}
 
-	@Test(expected=IllegalArgumentException.class)
-	public void testEndAnAction_action_not_started() {
-		RandomRegistry.setRandom(new Random(0));
-		
-		Environment env = mock(Environment.class);
-		Entity e1 = mock(Entity.class);
-		Fitness f = mock(Fitness.class);
-		Action a = mock(Action.class);
-		Input i = mock(Input.class);
-		
-		Set<Entity> entityEnv = new HashSet<>();
-		entityEnv.add(e1);
-		
-		Set<Action> actions = new HashSet<>();
-		actions.add(a);
-		
-		Set<Input> inputs = new HashSet<>();
-		inputs.add(i);
-		Set<Entity> outputs = new HashSet<>();
-		outputs.add(e1);
-		
-		when(env.containsEntity(anyString())).thenReturn(true);
-		when(env.getEntity("e1")).thenReturn(e1);
-		when(env.getEntities()).thenReturn(entityEnv);
-		
-		when(e1.getName()).thenReturn("e1");
-		when(e1.getQuantity()).thenReturn(10);
-		
-		when(a.getOutputs()).thenReturn(outputs);
-		when(a.getInputs()).thenReturn(inputs);
-		when(a.getName()).thenReturn("action");
-		when(a.getTime()).thenReturn(5);
-		
-		when(i.getName()).thenReturn("e1");
-		when(i.getQuantity()).thenReturn(5);
-		when(i.getRelation()).thenReturn(Relation.c);
-		
-		when(f.eval(a)).thenReturn(Long.valueOf(3));
-		
-		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
-		
-		m.endAction(env, a);
-	}
-
 	@Test(expected=NullPointerException.class)
 	public void testEndAnAction_null_action() {
 		RandomRegistry.setRandom(new Random(0));
@@ -837,36 +791,5 @@ public class ModelTest {
 		
 		m.endAction(env, null);
 	}
-	
-//	@Test
-//	public void test_empty() {
-//		RandomRegistry.setRandom(new Random(0));
-//		
-//		Environment env = mock(Environment.class);
-//		Entity e1 = mock(Entity.class);
-//		Fitness f = mock(Fitness.class);
-//		Input i = mock(Input.class);
-//		Action a1 = Action.EMPTY();
-//		Action a2 = Action.EMPTY();
-//		
-//		Set<Entity> entityEnv = new HashSet<>();
-//		entityEnv.add(e1);
-//		
-//		Set<Action> actions = new HashSet<>();
-//		actions.add(a1);
-//		
-//		Set<Input> inputs = new HashSet<>();
-//		inputs.add(i);
-//		Set<Entity> outputs = new HashSet<>();
-//		outputs.add(e1);
-//		
-//		when(env.containsEntity(anyString())).thenReturn(true);
-//		when(env.getEntity("e1")).thenReturn(e1);
-//		when(env.getEntities()).thenReturn(entityEnv);
-//		
-//		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
-//		
-//		m.startAnAction(env, a2);
-//	}
 
 }
