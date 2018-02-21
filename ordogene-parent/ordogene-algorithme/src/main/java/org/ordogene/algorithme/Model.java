@@ -56,6 +56,12 @@ public class Model {
 		List<Integer> snaps = jm.getSnaps().stream().collect(Collectors.toList());
 		return new Model(snaps, jm.getName(), jm.getSlots(), jm.getExecTime(), env, actions, Fitness.createFitness(jm.getFitness()));
 	}
+	
+	public boolean hasWorkableAction(Environment currentEnvironment, int currentTime) {
+		return actions.stream()
+				.filter(a -> !a.equals(Action.EMPTY()))
+				.anyMatch(a -> this.workable(a, currentEnvironment, currentTime));
+	}
 
 	/**
 	 * Check if the action can be done with the actual environment
@@ -65,11 +71,12 @@ public class Model {
 	 * @param currentEnvironment 
 	 * @return True if the action can be done, else False
 	 */
-	public boolean workable(Action a, Environment currentEnvironment) {
+	public boolean workable(Action a, Environment currentEnvironment, int currentTime) {
 		if (!isInModel(a)) {
 			throw new IllegalArgumentException("The Action given don't exist in this model");
 		}
-		return a.getInputs().stream().allMatch(input -> input.getQuantity() <= currentEnvironment.getEntity(input.getName()).getQuantity());
+		return a.getInputs().stream().allMatch(input -> input.getQuantity() <= currentEnvironment.getEntity(input.getName()).getQuantity()) 
+				&& ((currentTime + a.getTime()) <= slots);
 	}
 
 	/**
@@ -78,26 +85,26 @@ public class Model {
 	 * 
 	 * @return an {@link Action workable} else the empty Action
 	 */
-	public Action getWorkableAction(Environment currentEnvironment) {
+	public Action getWorkableAction(Environment currentEnvironment, int currentTime) {
 		if (!actionSelector.isReset()) {
 			// Select one action here
 			return actionSelector.select();
 		}
 		for (Action a : actions) {
-			if (workable(a, currentEnvironment)) {
+			if (workable(a, currentEnvironment, currentTime)) {
 				actionSelector.add(a, fitness.eval(a));
 			}
 		}
 		return actionSelector.select();
 	}
 
-	public void startAnAction(Environment currentEnvironment, Action a) {
+	public void startAction(Action a, Environment currentEnvironment, int currentTime) {
 		requireNonNull(a);
 		requireNonNull(currentEnvironment);
 		if (!isInModel(a)) {
 			throw new IllegalArgumentException("The Action given doesn't exist in this model");
 		}
-		if (!workable(a, currentEnvironment)) {
+		if (!workable(a, currentEnvironment, currentTime)) {
 			throw new IllegalArgumentException("The Action given cannot be started");
 		}
 		for(Input input : a.getInputs()) {
@@ -112,7 +119,7 @@ public class Model {
 		actionSelector.reset();
 	}
 
-	public void endAnAction(Environment currentEnvironment, Action a) {
+	public void endAction(Environment currentEnvironment, Action a) {
 		requireNonNull(a);
 		requireNonNull(currentEnvironment);
 		if (!isInModel(a)) {
@@ -134,6 +141,7 @@ public class Model {
 			int quantityToAdd = outputEntity.getQuantity();
 			environmentEntity.addQuantity(quantityToAdd);
 		}
+		actionSelector.reset();
 	}
 	
 	public Fitness getFitness() {
@@ -151,11 +159,9 @@ public class Model {
 	public Environment getStartEnvironment() {
 		return startEnvironment;
 	}
-
-	public Model copy() {
-		Set<Action> actions = new HashSet<>();
-		actions.forEach(a -> actions.add(a));
-		return new Model(snaps, name, slots, execTime, startEnvironment.copy(), actions, fitness);
+	
+	public void resetModel() {
+		actionSelector.reset();
 	}
 
 	public boolean isInModel(Action action) {

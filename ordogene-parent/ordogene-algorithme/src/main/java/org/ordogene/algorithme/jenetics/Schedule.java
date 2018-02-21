@@ -2,7 +2,6 @@ package org.ordogene.algorithme.jenetics;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.ordogene.algorithme.Model;
@@ -18,48 +17,12 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 	private static final long serialVersionUID = 1L;
 
 	private Model model;
-	//private Environment endEnvironment;
 
-	public Schedule(ISeq<ActionGene> seq, Model model/*, Environment endEnvironement*/) {
+	public Schedule(ISeq<ActionGene> seq, Model model) {
 		super(seq);
 		this.model = model;
-		//this.endEnvironment = endEnvironement;
 	}
 
-	// /**
-	// * Factory d'action utilisé par l'engine de jenetics
-	// * @param bundle
-	// * @return
-	// */
-	// public static Action createAction(ActionFactoryObjectValue bundle) {
-	// Model model = bundle.getModel();
-	// bundle.getCurSeq().stream().filter(g -> g != null).forEach(g -> {
-	// Action a = g.getAllele();
-	// if (bundle.getCurrentAction() != null &&
-	// a.getStartTime() + a.getTime() == bundle.getCurrentAction().getStartTime()) {
-	// model.endAnAction(bundle.getCurrentEnvironment(), a);
-	// }
-	// });
-	//
-	// Action action = model.getWorkableAction(bundle.getCurrentEnvironment());
-	//
-	// if (bundle.getCurrentAction() != null) {
-	// if ("EMPTY".equals(bundle.getCurrentAction().getName()) &&
-	// bundle.getCurrentAction().getName().equals(action.getName())) {
-	// action.setStartTime(bundle.getCurrentAction().getStartTime() + 1);
-	// } else {
-	// action.setStartTime(bundle.getCurrentAction().getStartTime());
-	// }
-	// } else {
-	// action.setStartTime(0);
-	// }
-	// model.startAnAction(bundle.getCurrentEnvironment(), action);
-	// return action;
-	// }
-
-//	public Environment getEndEnvironment() {
-//		return endEnvironment;
-//	}
 
 	@Override
 	public Chromosome<ActionGene> newInstance() {
@@ -68,11 +31,12 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 
 	@Override
 	public Chromosome<ActionGene> newInstance(ISeq<ActionGene> genes) {
-		return new Schedule(genes, model/*, currentEnv*/);
+		return new Schedule(genes, model);
 	}
 
 	public static Schedule of(Model model) {
 		System.out.println("\n\nNEW SCHEDULE");
+		model.resetModel();
 		// Environment which evolve with the creation
 		Environment currentEnv = model.getStartEnvironment().copy();
 		// Map with action to stop at key value
@@ -84,9 +48,9 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 		// The current time
 		int currentTime = 0;
 
-		// TODO change endpoint condition ==> when empty is the only one action possible
-		// with currentEnv
-		while (currentTime < model.getSlots()) {
+		// Continue while a action is in progress or a Action is possible
+		// TODO add possibility to stop while and stop Schedule building
+		while (model.hasWorkableAction(currentEnv, currentTime) || !map.isEmpty()) {
 			// if it's the first time at currentTime when end actions
 			if (needToEndAction) {
 				endAll(map, currentTime, model, currentEnv);
@@ -94,26 +58,28 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 			}
 
 			// Select a action
-			ActionGene actionGene = ActionGene.of(currentEnv, model);
+			System.out.println("Time :" + currentTime);
+			ActionGene actionGene = ActionGene.of(currentEnv, currentTime, model);
 			Action action = actionGene.getAllele();
-
-			// Start the action
-			model.startAnAction(currentEnv, action);
-
-			// Add action in map to end it
-			int endTime = currentTime + action.getTime();
-			List<Action> actions = map.get(endTime);
-			if (actions == null) {
-				actions = new ArrayList<>();
-				map.put(endTime, actions);
-			}
-			actions.add(action);
 
 			// Add action in the seq
 			seq.add(actionGene);
 
-			// If the action is the Empty action so change the currentTime
-			if (action.equals(Action.EMPTY())) {
+			System.out.println("Action : " + action);
+			if(!action.equals(Action.EMPTY())) {
+				// Start the action
+				model.startAction(action, currentEnv, currentTime);
+	
+				// Add action in map to end it
+				int endTime = currentTime + action.getTime();
+				List<Action> actions = map.get(endTime);
+				if (actions == null) {
+					actions = new ArrayList<>();
+					map.put(endTime, actions);
+				}
+				actions.add(action);
+			} else {
+				// If the action is the Empty action so change the currentTime
 				currentTime++;
 				needToEndAction = true;
 			}
@@ -127,7 +93,7 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 		List<Action> actions = map.get(currentTime);
 		if (actions != null) {
 			for (Action a : actions) {
-				model.endAnAction(currentEnvironment, a);
+				model.endAction(currentEnvironment, a);
 			}
 		}
 		map.remove(currentTime);

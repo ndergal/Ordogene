@@ -264,7 +264,7 @@ public class ModelTest {
 		
 		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
-		assertTrue(m.workable(a, env));
+		assertTrue(m.workable(a, env, 0));
 	}
 	
 	@Test
@@ -304,7 +304,7 @@ public class ModelTest {
 		
 		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
-		assertFalse(m.workable(a, env));
+		assertFalse(m.workable(a, env, 0));
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
@@ -350,7 +350,7 @@ public class ModelTest {
 		
 		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
-		assertFalse(m.workable(otherAction, env));
+		assertFalse(m.workable(otherAction, env, 0));
 	}
 
 	@Test
@@ -394,7 +394,7 @@ public class ModelTest {
 		
 		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
-		assertEquals(a, m.getWorkableAction(env));
+		assertEquals(a, m.getWorkableAction(env, 0));
 	}
 
 	@Test
@@ -438,9 +438,9 @@ public class ModelTest {
 		
 		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
-		assertEquals(a, m.getWorkableAction(env));
-		assertEquals(a, m.getWorkableAction(env));
-		assertEquals(Action.EMPTY(), m.getWorkableAction(env));
+		assertEquals(a, m.getWorkableAction(env, 0));
+		assertEquals(a, m.getWorkableAction(env, 0));
+		assertEquals(Action.EMPTY(), m.getWorkableAction(env, 0));
 	}
 
 	@Test
@@ -497,7 +497,7 @@ public class ModelTest {
 		
 		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
-		m.startAnAction(env, a);
+		m.startAction(a, env, 0);
 	}
 
 	@Test(expected=NullPointerException.class)
@@ -541,7 +541,7 @@ public class ModelTest {
 		
 		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
-		m.startAnAction(env, null);
+		m.startAction(null, env, 0);
 	}
 
 	@Test(expected=IllegalArgumentException.class)
@@ -591,7 +591,7 @@ public class ModelTest {
 		
 		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
-		m.startAnAction(env, otherAction);
+		m.startAction(otherAction, env, 0);
 	}
 
 	@Test(expected=IllegalArgumentException.class)
@@ -635,7 +635,7 @@ public class ModelTest {
 		
 		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
-		m.startAnAction(env, a);
+		m.startAction(a, env, 0);
 	}
 
 	@Test
@@ -692,8 +692,8 @@ public class ModelTest {
 		
 		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
-		m.startAnAction(env, a);
-		m.endAnAction(env, a);
+		m.startAction(a, env, 0);
+		m.endAction(env, a);
 	}
 
 	@Test(expected=IllegalArgumentException.class)
@@ -743,8 +743,8 @@ public class ModelTest {
 		
 		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
-		m.startAnAction(env, a);
-		m.endAnAction(env, otherAction);
+		m.startAction(a, env, 0);
+		m.endAction(env, otherAction);
 	}
 
 	@Test(expected=IllegalArgumentException.class)
@@ -788,7 +788,7 @@ public class ModelTest {
 		
 		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
-		m.endAnAction(env, a);
+		m.endAction(env, a);
 	}
 
 	@Test(expected=NullPointerException.class)
@@ -832,7 +832,7 @@ public class ModelTest {
 		
 		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
-		m.endAnAction(env, null);
+		m.endAction(env, null);
 	}
 	
 //	@Test

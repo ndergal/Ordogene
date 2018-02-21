@@ -39,8 +39,8 @@ public class ActionGene implements Gene<Action, ActionGene> {
 		return new ActionGene(action, model);
 	}
 	
-	public static ActionGene of(Environment currentEnvironment, Model model) {
-		Action newAction = model.getWorkableAction(currentEnvironment);
+	public static ActionGene of(Environment currentEnvironment, int currentTime, Model model) {
+		Action newAction = model.getWorkableAction(currentEnvironment, currentTime);
 		return new ActionGene(newAction, model);
 	}
 

@@ -2,7 +2,6 @@ package org.ordogene.algorithme.jenetics;
 
 import org.ordogene.algorithme.Model;
 import org.ordogene.algorithme.master.ThreadHandler;
-import org.ordogene.algorithme.models.Action;
 import org.ordogene.file.models.Type;
 
 import io.jenetics.Genotype;
@@ -18,7 +17,7 @@ public class ScheduleBuilder {
 	
 	private final ThreadHandler th;
 	private final Model model;
-	private final int POPULATION_SIZE = 10;
+	private final int POPULATION_SIZE = 1;
 	
 	public ScheduleBuilder(ThreadHandler th, Model model) {
 		this.th = th;
