@@ -54,11 +54,12 @@ public class Commands {
 
 	@PostConstruct
 	public void login() {
-		log.info("\nDo you want to create a new group id ? [y/N] : ");
-		@SuppressWarnings("resource") // problem if the scanner is closed
-		Scanner scanner = new Scanner(System.in);
-		String choice = scanner.nextLine();
+
 		loop: for (;;) {
+			log.info("\nDo you want to create a new group id ? [y/N] : ");
+			@SuppressWarnings("resource") // problem if the scanner is closed
+			Scanner scanner = new Scanner(System.in);
+			String choice = scanner.nextLine();
 			switch (choice) {
 			case "":
 			case "n":
@@ -209,13 +210,13 @@ public class Commands {
 	 * @param cid
 	 *            id of the calculation
 	 */
-	@ShellMethod(value = "Remove a calculation") //TODO : TU
+	@ShellMethod(value = "Remove a calculation") // TODO : TU
 	public boolean removeCalculation(int calculationID) {
 		// Request
 
 		ResponseEntity<ApiJsonResponse> response = null;
 		try {
-			response = restTemplate.exchange("/" + id + "/calculations/"+calculationID, HttpMethod.DELETE, null,
+			response = restTemplate.exchange("/" + id + "/calculations/" + calculationID, HttpMethod.DELETE, null,
 					ApiJsonResponse.class);
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
 			log.error(e.getStatusCode() + " -- " + e.getStatusText());
@@ -225,7 +226,7 @@ public class Commands {
 			log.error(PROBLEM_WITH_THE_COMMUNICATION_BETWEEN_CLIENT_AND_SERVER);
 			return false;
 		}
-		log.info("Calculation "+calculationID+" has been deleted.");
+		log.info("Calculation " + calculationID + " has been deleted.");
 		return true;
 	}
 
