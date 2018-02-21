@@ -83,10 +83,10 @@ public class ScheduleBuilder {
 	 */
 	public Long fitness(Genotype<ActionGene> ind) {
 		long startFitness = model.getFitness().evalEnv(model.getStartEnvironment());
-		long transformationFitness = ind	.stream()
-											.flatMap(c -> c.stream())
-											.mapToLong(ag -> model.getFitness().eval(ag.getAllele()))
-											.sum();
+		long transformationFitness = ind.stream()
+				.flatMap(c -> c.stream())
+				.mapToLong(ag -> model.getFitness().eval(ag.getAllele()))
+				.sum();
 		return startFitness + transformationFitness;
 	}
 

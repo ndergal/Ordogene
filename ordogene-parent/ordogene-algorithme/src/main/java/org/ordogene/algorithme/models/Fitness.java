@@ -5,6 +5,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 
 import org.ordogene.file.models.JSONFitness;
+import org.ordogene.file.models.Relation;
 import org.ordogene.file.models.Type;
 
 public class Fitness {
@@ -48,10 +49,12 @@ public class Fitness {
 		long score = 0;
 		for(Input i : a.getInputs()) {
 			Objects.requireNonNull(i);
-			String entityName = i.getName();
-			long coef = operands.getOrDefault(entityName, Long.valueOf(0));
-			long quantity = i.getQuantity();
-			score -= coef * quantity;
+			if(i.getRelation() == Relation.c) {
+				String entityName = i.getName();
+				long coef = operands.getOrDefault(entityName, Long.valueOf(0));
+				long quantity = i.getQuantity();
+				score -= coef * quantity;
+			}
 		}
 		for(Entity e : a.getOutputs()) {
 			Objects.requireNonNull(e);

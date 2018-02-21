@@ -60,7 +60,7 @@ public class CalculationControllerTest {
 		// MvcResult result =
 		// mvc.perform(get("/"+username).accept(MediaType.APPLICATION_JSON_UTF8)).andExpect(status().isOk()).andReturn();
 		URL urlTestFile = CalculationControllerTest.class.getClassLoader()
-				.getResource("OrdogeneCalculationExamples" + File.separator + "short_path_100.json");
+				.getResource("OrdogeneCalculationExamples" + File.separator + "short_path_10.json");
 		byte[] contentFileTest = Files.readAllBytes(Paths.get(urlTestFile.toURI()));
 		String jsonContentPost = new String(contentFileTest);
 		/*

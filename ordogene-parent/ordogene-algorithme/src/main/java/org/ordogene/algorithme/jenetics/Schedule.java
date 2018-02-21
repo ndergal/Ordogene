@@ -26,7 +26,7 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 
 	@Override
 	public Chromosome<ActionGene> newInstance() {
-		return Schedule.of(model);
+		return new Schedule(_genes, model);
 	}
 
 	@Override
@@ -35,7 +35,7 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 	}
 
 	public static Schedule of(Model model) {
-		System.out.println("\n\nNEW SCHEDULE");
+		//System.out.println("\n\nNEW SCHEDULE");
 		model.resetModel();
 		// Environment which evolve with the creation
 		Environment currentEnv = model.getStartEnvironment().copy();
@@ -44,28 +44,22 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 		// List which represent the sequence
 		ArrayList<ActionGene> seq = new ArrayList<>();
 		// Boolean to end action at current time
-		boolean needToEndAction = true;
 		// The current time
 		int currentTime = 0;
 
 		// Continue while a action is in progress or a Action is possible
 		// TODO add possibility to stop while and stop Schedule building
 		while (model.hasWorkableAction(currentEnv, currentTime) || !map.isEmpty()) {
-			// if it's the first time at currentTime when end actions
-			if (needToEndAction) {
-				endAll(map, currentTime, model, currentEnv);
-				needToEndAction = false;
-			}
 
 			// Select a action
-			System.out.println("Time :" + currentTime);
+			//System.out.println("Time :" + currentTime);
 			ActionGene actionGene = ActionGene.of(currentEnv, currentTime, model);
 			Action action = actionGene.getAllele();
 
 			// Add action in the seq
 			seq.add(actionGene);
 
-			System.out.println("Action : " + action);
+			//System.out.println("Action : " + action);
 			if(!action.equals(Action.EMPTY())) {
 				// Start the action
 				model.startAction(action, currentEnv, currentTime);
@@ -79,13 +73,14 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 				}
 				actions.add(action);
 			} else {
-				// If the action is the Empty action so change the currentTime
+				// If the action is the Empty action so change the currentTime and finish action
 				currentTime++;
-				needToEndAction = true;
+				endAll(map, currentTime, model, currentEnv);
 			}
 		}
 		System.out.println("End Env : " + currentEnv);
-		return new Schedule(ISeq.of(seq), model/*, currentEnv*/);
+		
+		return new Schedule(ISeq.of(seq), model);
 	}
 
 	private static void endAll(HashMap<Integer, List<Action>> map, int currentTime, Model model,

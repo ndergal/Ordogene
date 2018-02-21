@@ -38,7 +38,7 @@ public class DummyTest {
 	public void execCalculationDummy() throws IOException, URISyntaxException, InstantiationException,
 			IllegalAccessException, UnmarshalException, InterruptedException {
 		URL urlTestFile = DummyTest.class.getClassLoader()
-				.getResource("OrdogeneCalculationExamples" + File.separator + "short_path_100.json");
+				.getResource("OrdogeneCalculationExamples" + File.separator + "short_path_10.json");
 		byte[] contentFileTest = Files.readAllBytes(Paths.get(urlTestFile.toURI()));
 		String jsonContentPost = new String(contentFileTest);
 		// System.out.println(jsonContentPost);
