@@ -1,5 +1,6 @@
 package org.ordogene.cli;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -299,10 +300,34 @@ public class CommandsTest {
 
 	}
 
-	@Ignore
 	@Test
-	public void testRemoveCalculation() {
-		fail("Not yet implemented");
+	public void testRemoveCalculationWithoutExceptions() {
+		ResponseEntity<ApiJsonResponse> re = mock(ResponseEntity.class);
+		ApiJsonResponse ajr = mock(ApiJsonResponse.class);
+		
+		when(re.getBody()).thenReturn(ajr);
+		
+		when(restTemplate.exchange(anyString(), 
+				any(HttpMethod.class), 
+				any(HttpEntity.class), 
+				any(Class.class))).thenReturn(re);
+		
+		assertThat(commands.removeCalculation(0)).isTrue();
+	}
+	
+	@Test
+	public void remove_calculation_should_return_false_on_exception() {
+		when(restTemplate.exchange(anyString(), 
+				any(HttpMethod.class), 
+				any(HttpEntity.class), 
+				any(Class.class)))
+		.thenThrow(HttpClientErrorException.class, 
+				HttpServerErrorException.class,
+				RestClientException.class);
+
+		assertThat(commands.removeCalculation(0)).isFalse();
+		assertThat(commands.removeCalculation(0)).isFalse();
+		assertThat(commands.removeCalculation(0)).isFalse();
 	}
 
 }
