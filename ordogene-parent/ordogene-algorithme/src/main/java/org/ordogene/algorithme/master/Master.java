@@ -3,7 +3,6 @@ package org.ordogene.algorithme.master;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +24,6 @@ public class Master {
 	private final int maxThread;
 	private int currentThread;
 	private final Map<Integer, ThreadHandler> threadMap = new HashMap<>();
-	private final SimpleDateFormat formater = new SimpleDateFormat("dd/MM/yyyy-hh:mm");
 
 	public Master() {
 		maxThread = DEFAULT_THREAD;
@@ -74,7 +72,6 @@ public class Master {
 
 		synchronized (threadMap) {
 			threadMap.put(calculationId, th);
-			th.setThread(t);
 			t.start();
 			return calculationId;
 		}
