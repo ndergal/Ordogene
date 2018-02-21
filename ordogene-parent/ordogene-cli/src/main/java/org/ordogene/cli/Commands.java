@@ -304,7 +304,7 @@ public class Commands {
 	 * @param id
 	 * @param iter
 	 */
-	@ShellMethod(value = "Remove a calculation")
+	@ShellMethod(value = "Remove snapshot")
 	public boolean removeSnapshot(int id, int iter) {
 		log.info(NOT_IMPLEMENTED_BLOCK_ON_CLI_SIDE);
 		return false;
