@@ -26,10 +26,13 @@ public class UserHandler {
 		if (username == null || username.isEmpty()) {
 			return false;
 		} else {
+			Path newUserPath = Paths.get(Const.getConst().get("ApplicationPath") + File.separatorChar + username);
+			if(Files.exists(newUserPath)) {
+				return false;
+			}
 			try {
 				System.out.println("Create new user " + username);
-				Files.createDirectories(
-						Paths.get(Const.getConst().get("ApplicationPath") + File.separatorChar + username));
+				Files.createDirectories(newUserPath);
 			} catch (IOException e) {
 				System.err.println("... failed :");
 				e.printStackTrace();

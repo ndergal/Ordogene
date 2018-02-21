@@ -27,8 +27,8 @@ public class Model {
 	private final Fitness fitness;
 	private ActionSelector actionSelector = new ActionSelector();
 
-	public Model(List<Integer> snaps, String name, int slots, int execTime, Environment environment, Set<Action> actions,
-			Fitness fitness) {
+	public Model(List<Integer> snaps, String name, int slots, int execTime, Environment environment,
+			Set<Action> actions, Fitness fitness) {
 		if (slots <= 0) {
 			throw new IllegalArgumentException("slots has to be a positive integer");
 		}
@@ -54,10 +54,18 @@ public class Model {
 				jm.getEnvironment().stream().map(Entity::createEntity).collect(Collectors.toSet()));
 		Set<Action> actions = jm.getActions().stream().map(Action::createAction).collect(Collectors.toSet());
 		List<Integer> snaps = jm.getSnaps().stream().collect(Collectors.toList());
-		return new Model(snaps, jm.getName(), jm.getSlots(), jm.getExecTime(), env, actions, Fitness.createFitness(jm.getFitness()));
+		return new Model(snaps, jm.getName(), jm.getSlots(), jm.getExecTime(), env, actions,
+				Fitness.createFitness(jm.getFitness()));
+	}
+
+	public String getName() {
+		return name;
 	}
 	
 	public boolean hasWorkableAction(Environment currentEnvironment, int currentTime) {
+		if(currentTime < 0) {
+			throw new IllegalArgumentException("The current time cannot be negative");
+		}
 		return actions.stream()
 				.filter(a -> !a.equals(Action.EMPTY()))
 				.anyMatch(a -> this.workable(a, currentEnvironment, currentTime));
@@ -72,6 +80,9 @@ public class Model {
 	 * @return True if the action can be done, else False
 	 */
 	public boolean workable(Action a, Environment currentEnvironment, int currentTime) {
+		if(currentTime < 0) {
+			throw new IllegalArgumentException("The current time cannot be negative");
+		}
 		if (!isInModel(a)) {
 			throw new IllegalArgumentException("The Action given don't exist in this model");
 		}
@@ -86,6 +97,9 @@ public class Model {
 	 * @return an {@link Action workable} else the empty Action
 	 */
 	public Action getWorkableAction(Environment currentEnvironment, int currentTime) {
+		if(currentTime < 0) {
+			throw new IllegalArgumentException("The current time cannot be negative");
+		}
 		if (!actionSelector.isReset()) {
 			// Select one action here
 			return actionSelector.select();
@@ -99,6 +113,9 @@ public class Model {
 	}
 
 	public void startAction(Action a, Environment currentEnvironment, int currentTime) {
+		if(currentTime < 0) {
+			throw new IllegalArgumentException("The current time cannot be negative");
+		}
 		requireNonNull(a);
 		requireNonNull(currentEnvironment);
 		if (!isInModel(a)) {
@@ -107,7 +124,7 @@ public class Model {
 		if (!workable(a, currentEnvironment, currentTime)) {
 			throw new IllegalArgumentException("The Action given cannot be started");
 		}
-		for(Input input : a.getInputs()) {
+		for (Input input : a.getInputs()) {
 			String inputEntityName = input.getName();
 			Relation inputType = input.getRelation();
 			if (inputType == Relation.c || inputType == Relation.p) {
@@ -152,10 +169,6 @@ public class Model {
 		return slots;
 	}
 
-	public int getExecTime() {
-		return execTime;
-	}
-
 	public Environment getStartEnvironment() {
 		return startEnvironment;
 	}
@@ -167,4 +180,9 @@ public class Model {
 	public boolean isInModel(Action action) {
 		return actions.contains(action);
 	}
+
+	public int getExecTime() {
+		return execTime;
+	}
+
 }

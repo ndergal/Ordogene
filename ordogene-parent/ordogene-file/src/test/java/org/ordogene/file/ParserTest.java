@@ -2,6 +2,7 @@ package org.ordogene.file;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,17 +19,15 @@ public class ParserTest {
 
 	@Test(expected = UnmarshalException.class)
 	public void should_UE_if_Missing_Field_in_file() throws JsonParseException, JsonMappingException,
-			InstantiationException, IllegalAccessException, UnmarshalException, IOException {
-		Parser.parseJsonFile(Paths.get(
-				"/home/ordogene/git/ordogene/ordogene-parent/ordogene-file/src/test/resources/testJson/missingFieldJson.json"),
+			InstantiationException, IllegalAccessException, UnmarshalException, IOException, URISyntaxException {
+		Parser.parseJsonFile(Paths.get(ParserTest.class.getClassLoader().getResource("testJson/missingFieldJson.json").toURI()),
 				JSONModel.class);
 	}
 
 	@Test(expected = UnmarshalException.class)
 	public void should_UE_if_Missing_Field_in_string() throws JsonParseException, JsonMappingException,
-			InstantiationException, IllegalAccessException, UnmarshalException, IOException {
-		Path path = Paths.get(
-				"/home/ordogene/git/ordogene/ordogene-parent/ordogene-file/src/test/resources/testJson/missingFieldJson.json");
+			InstantiationException, IllegalAccessException, UnmarshalException, IOException, URISyntaxException {
+		Path path = Paths.get(ParserTest.class.getClassLoader().getResource("testJson/missingFieldJson.json").toURI());
 		BufferedReader br = Files.newBufferedReader(path);
 		StringBuilder sb = new StringBuilder();
 		String str;

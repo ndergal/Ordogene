@@ -1,21 +1,24 @@
 package org.ordogene.api;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.HashMap;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
-import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import javax.xml.bind.UnmarshalException;
 
 import org.ordogene.algorithme.master.Master;
+import org.ordogene.api.utils.ApiJsonResponseCreator;
 import org.ordogene.file.FileService;
 import org.ordogene.file.utils.ApiJsonResponse;
 import org.ordogene.file.utils.Calculation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,165 +32,204 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 @RestController
 public class CalculationController {
+	private static final Logger log = LoggerFactory.getLogger(CalculationController.class);
 
 	@Autowired
 	private FileService fs;
-	
+
 	@Autowired
 	private Master masterAlgorithme;
-	
-	private static String JSONTest = "{\n" + 
-			"    \"snaps\" : [5,10,20,100],\n" + 
-			"    \"name\" : \"CalculTest\",\n" + 
-			"    \"slots\" : 300,\n" + 
-			"    \"exec_time\" : 10000,\n" + 
-			"    \"environment\" : [\n" + 
-			"		{\"name\" : \"FUEL\", \"quantity\" : 200},\n" + 
-			"		{\"name\" : \"BIG_GOOD\", \"quantity\" : 0},\n" + 
-			"		{\"name\" : \"SMALL_BAD\", \"quantity\" : 0}\n" + 
-			"    ],\n" + 
-			"    \"actions\" : [\n" + 
-			"		{\n" + 
-			"			\"name\" : \"MAKE_GOOD\", \"time\" : 5,\n" + 
-			"			\"input\" : [\n" + 
-			"		     	{ \"name\" : \"FUEL\", \"quantity\" : 60, \"relation\" : \"c\" }\n" + 
-			"		 	],\n" + 
-			"		 	\"output\" : [\n" + 
-			"		    	{\"name\" : \"BIG_GOOD\", \"quantity\" : 1}\n" + 
-			"		 	]\n" + 
-			"		},\n" + 
-			"		{\n" + 
-			"			\"name\" : \"MAKE_BAD\", \"time\" : 2,\n" + 
-			"		 	\"input\" : [\n" + 
-			"		     	{ \"name\" : \"FUEL\", \"quantity\" : 6, \"relation\" : \"c\" }\n" + 
-			"		 	],\n" + 
-			"		 	\"output\" : [\n" + 
-			"		     	{\"name\" : \"SMALL_BAD\", \"quantity\" : 1}\n" + 
-			"		 	]\n" + 
-			"		}\n" + 
-			"    ],\n" + 
-			"    \"fitness\" : {\n" + 
-			"		\"type\" : \"max\",\n" + 
-			"		\"operands\" : [\n" + 
-			"		    {\"name\" : \"BIG_GOOD\", \"coef\" : 11},\n" + 
-			"		    {\"name\" : \"SMALL_BAD\", \"coef\" : 1}\n" + 
-			"		]\n" + 
-			"    }\n" + 
-			"}";
-	
-	
 
-	@Autowired
-	Master masterAlgo;
-
-	private static final Map<Integer, String> currentCalculation = new HashMap<>();
-	private final Object token = new Object();
-
-
+	/**
+	 * 
+	 * @param userId
+	 * @return
+	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/{userId}/calculations", produces = "application/json")
 	@ResponseBody
 	public ResponseEntity<ApiJsonResponse> getUserCalculations(@PathVariable String userId) {
-		if (userId == null) { // never
-			//return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(id + " does not exist");
-			return new ResponseEntity<ApiJsonResponse>(
-					new ApiJsonResponse(null, 0, "userId can't be null", null, null),
-					HttpStatus.BAD_REQUEST
-				);
+
+		if (userId == null || "".equals(userId)) {
+			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
 		}
 		if (!fs.userExist(userId)) {
-			//return ResponseEntity.status(HttpStatus.NOT_FOUND).body(id + " does not exist");
-			return new ResponseEntity<ApiJsonResponse>(
-					new ApiJsonResponse(null, 0, userId + " does not exist", null, null),
-					HttpStatus.NOT_FOUND
-				);
+			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNotExist(userId),
+					HttpStatus.NOT_FOUND);
 		} else {
+			// Do list
 			List<Calculation> calculations = fs.getUserCalculations(userId);
-			StringBuilder sb = new StringBuilder();
 			calculations.forEach(c -> {
 				try {
-					masterAlgorithme.updateCalculation(c);
+					masterAlgorithme.updateCalculation(c, userId);
 				} catch (InternalError e) {
 					System.err.println("Problem with calculation format informations");
 					return;
 				}
-				sb.append(c).append('\n');
 			});
-			return new ResponseEntity<ApiJsonResponse>(
-					new ApiJsonResponse(null, 0, null, calculations, null),
-					HttpStatus.OK
-				);
+			// Return it
+			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.listCalculation(calculations),
+					HttpStatus.OK);
 		}
 	}
 
-	@RequestMapping(value = "/{uid}/calculations", method = RequestMethod.PUT /*, consumes = MediaType.APPLICATION_JSON_VALUE */)
+	@RequestMapping(method = RequestMethod.DELETE, value = "/{userId}/calculations/{calculationId}"/*
+																									 * , produces =
+																									 * "application/json"
+																									 */)
 	@ResponseBody
-	public ResponseEntity<ApiJsonResponse> launchCalculation(@PathVariable String uid, @RequestBody String jsonBody) {
+	public ResponseEntity<ApiJsonResponse> removeCalculation(@PathVariable String userId,
+			@PathVariable int calculationId) {
+		if (userId == null || "".equals(userId))
+			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
 
-		if (uid == null) {
-			// return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(id + " does not
-			// exist");
-			return new ResponseEntity<ApiJsonResponse>(
-					new ApiJsonResponse(null, 0, "the user can't be null", null, null), HttpStatus.BAD_REQUEST);
-		}
+		if (!fs.userExist(userId))
+			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNotExist(userId),
+					HttpStatus.NOT_FOUND);
 
-		if (jsonBody == null) {
-			// return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(id + " does not
-			// exist");
-			return new ResponseEntity<ApiJsonResponse>(
-					new ApiJsonResponse(null, 0, "the query can't be null, should send JSON object.", null, null),
+		Optional<Calculation> optCalc = fs.getUserCalculations(userId).stream().filter(c -> c.getId() == calculationId)
+				.findFirst();
+
+		if (!optCalc.isPresent()) {
+			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.calculationIDNotExist(calculationId),
 					HttpStatus.BAD_REQUEST);
+		} else {
+			try {
+				Calculation calcToDelete = optCalc.get();
+				if (fs.removeUserCalculation(userId, calcToDelete)) {
+					return new ResponseEntity<ApiJsonResponse>(
+							new ApiJsonResponse(userId, calculationId, null, null, null), HttpStatus.OK);
+				} else {
+					return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.InternalServerError(),
+							HttpStatus.INTERNAL_SERVER_ERROR);
+				}
+			} catch (NoSuchElementException e) {
+				return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.calculationIDNotExist(calculationId),
+						HttpStatus.BAD_REQUEST);
+			}
 		}
 
-		boolean exist = fs.userExist(uid);
+	}
 
-		if (!exist) {
-			// return ResponseEntity.status(HttpStatus.NOT_FOUND).body(id + " does not
-			// exist");
-			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(null, 0, uid + " does not exist", null, null),
+	/**
+	 * 
+	 * @param userId
+	 * @return
+	 */
+	@RequestMapping(method = RequestMethod.POST, value = "/{userId}/calculations/{calculationId}"/*
+																									 * , produces =
+																									 * "application/json"
+																									 */)
+	@ResponseBody
+	public ResponseEntity<ApiJsonResponse> stopCalculation(@PathVariable String userId,
+			@PathVariable int calculationId) {
+		if (userId == null || "".equals(userId)) {
+			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
+		}
+		if (!fs.userExist(userId)) {
+			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNotExist(userId),
+					HttpStatus.NOT_FOUND);
+		} else {
+			if (fs.getUserCalculations(userId).stream().anyMatch(c -> c.getId() == calculationId)) {
+				if (masterAlgorithme.interruptCalculation(calculationId)) {
+					return new ResponseEntity<ApiJsonResponse>(
+							new ApiJsonResponse(userId, calculationId, null, null, null), HttpStatus.OK);
+				} else {
+					return new ResponseEntity<ApiJsonResponse>(
+							new ApiJsonResponse(userId, calculationId, "The calcul is not running.", null, null),
+							HttpStatus.NOT_FOUND);
+				}
+			} else {
+				return new ResponseEntity<ApiJsonResponse>(
+						new ApiJsonResponse(userId, calculationId, "The calculationId is wrong", null, null),
+						HttpStatus.FORBIDDEN);
+			}
+		}
+	}
+
+	/**
+	 * 
+	 * @param userId
+	 * @param jsonBody
+	 * @return
+	 */
+	@RequestMapping(value = "/{userId}/calculations", method = RequestMethod.PUT /*
+																					 * , consumes =
+																					 * MediaType.APPLICATION_JSON_VALUE
+																					 */)
+	@ResponseBody
+	public ResponseEntity<ApiJsonResponse> launchCalculation(@PathVariable String userId,
+			@RequestBody String jsonBody) {
+		if (userId == null || "".equals(userId)) {
+			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
+		}
+		if (jsonBody == null || "".equals(jsonBody)) {
+			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.jsonBodyNull(), HttpStatus.BAD_REQUEST);
+		}
+		if (!fs.userExist(userId)) {
+			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNotExist(userId),
 					HttpStatus.NOT_FOUND);
 		}
-			
-		int calculationId = 0;
 		try {
-			calculationId= this.masterAlgo.compute(uid, jsonBody);
+			Integer calculationId = this.masterAlgorithme.compute(userId, jsonBody);
+			if (calculationId == null) {
+				return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.serverFull(),
+						HttpStatus.SERVICE_UNAVAILABLE);
+			}
+			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(userId, calculationId, null, null, null),
+					HttpStatus.OK);
 		} catch (JsonParseException e) {
-			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(uid, calculationId, "Invalid JSON (JsonParseException) ", null, null),
+			log.error("Problem during Json parsing", e);
+			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.jsonInvalid(userId, "JsonParseException"),
 					HttpStatus.BAD_REQUEST);
 		} catch (JsonMappingException e) {
-			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(uid, calculationId, "Invalid JSON (JsonMappingException) ", null, null),
-					HttpStatus.BAD_REQUEST);
-		} catch (InstantiationException e) {
-			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(uid, calculationId, "Invalid JSON (InstantiationException) ", null, null),
-					HttpStatus.BAD_REQUEST);
-		} catch (IllegalAccessException e) {
-			StringWriter sw = new StringWriter();
-			PrintWriter pw = new PrintWriter(sw);
-			e.printStackTrace(pw);
-			String sStackTrace = sw.toString(); // stack trace as a string
-			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(uid, calculationId, sStackTrace, null, null),
-					HttpStatus.INTERNAL_SERVER_ERROR);
+			log.error("Problem during Json mapping", e);
+			return new ResponseEntity<ApiJsonResponse>(
+					ApiJsonResponseCreator.jsonInvalid(userId, "JsonMappingException"), HttpStatus.BAD_REQUEST);
 		} catch (UnmarshalException e) {
-			StringWriter sw = new StringWriter();
-			PrintWriter pw = new PrintWriter(sw);
-			e.printStackTrace(pw);
-			String sStackTrace = sw.toString(); // stack trace as a string
-			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(uid, calculationId, sStackTrace, null, null),
-					HttpStatus.INTERNAL_SERVER_ERROR);
+			log.error("Missing fields in the JSON", e);
+			return new ResponseEntity<ApiJsonResponse>(
+					ApiJsonResponseCreator.jsonInvalid(userId, "Missing fields in the JSON"), HttpStatus.BAD_REQUEST);
 		} catch (IOException e) {
-			StringWriter sw = new StringWriter();
-			PrintWriter pw = new PrintWriter(sw);
-			e.printStackTrace(pw);
-			String sStackTrace = sw.toString(); // stack trace as a string
-			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(uid, calculationId, sStackTrace, null, null),
-					HttpStatus.INTERNAL_SERVER_ERROR);
-		} catch (InterruptedException e) {
-			StringWriter sw = new StringWriter();
-			PrintWriter pw = new PrintWriter(sw);
-			e.printStackTrace(pw);
-			String sStackTrace = sw.toString(); // stack trace as a string
-			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(uid, calculationId, sStackTrace, null, null),
+			log.error("I/O problem", e);
+			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.InternalServerError(),
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(uid, calculationId, null, null, null), HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/{id}/calculations/{calculationid}")
+	@ResponseBody
+	public ResponseEntity<ApiJsonResponse> getCalculation(@PathVariable String id, @PathVariable int calculationid) {
+
+		if (id == null || "".equals(id)) {
+			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
+		}
+
+		if (!fs.userExist(id)) {
+			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNotExist(id), HttpStatus.NOT_FOUND);
+		} else {
+			List<Calculation> calculations = fs.getUserCalculations(id);
+			Optional<Calculation> calcul = calculations.stream().filter(x -> x.getId() == calculationid).findFirst();
+			if (calcul.isPresent()) {
+
+				try {
+					Path imgPath = Paths.get(FileService.getCalculationPath(id, calcul.get()));
+					String base64img = FileService.encodeImage(imgPath);
+					return new ResponseEntity<ApiJsonResponse>(
+							new ApiJsonResponse(id, calculationid, null, null, base64img), HttpStatus.OK);
+				} catch (FileNotFoundException e) {
+					return new ResponseEntity<ApiJsonResponse>(
+							new ApiJsonResponse(id, 0, "cannot find calculation path", null, null),
+							HttpStatus.NOT_FOUND);
+				} catch (IOException e) {
+					return new ResponseEntity<ApiJsonResponse>(
+							new ApiJsonResponse(id, 0, "cannot open calculation path", null, null),
+							HttpStatus.NOT_FOUND);
+				}
+
+			}
+			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(id, 0,
+					"calculation " + calculationid + " does not exist for user " + id, null, null),
+					HttpStatus.NOT_FOUND);
+		}
 	}
 }

@@ -37,11 +37,8 @@
 			<scope>test</scope>
 		</dependency>
 
-<!--		<dependency>
-			<groupId>fr.ordogene</groupId>
-			<artifactId>ordogene-file</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency> -->
+		<!-- <dependency> <groupId>fr.ordogene</groupId> <artifactId>ordogene-file</artifactId> 
+			<version>0.0.1-SNAPSHOT</version> </dependency> -->
 
 		<dependency>
 			<groupId>org.jacoco</groupId>
@@ -109,6 +106,7 @@
 					</execution>
 				</executions>
 			</plugin>
+
 
 			<plugin>
 				<groupId>org.jacoco</groupId>
