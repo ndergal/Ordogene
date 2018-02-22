@@ -123,4 +123,9 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 		map.remove(currentTime);
 	}
 
+
+	public Model getModel() {
+		return model;
+	}
+
 }
