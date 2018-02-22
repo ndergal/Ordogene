@@ -11,6 +11,7 @@ import org.ordogene.algorithme.models.Environment;
 import io.jenetics.AbstractChromosome;
 import io.jenetics.Chromosome;
 import io.jenetics.util.ISeq;
+import io.jenetics.util.RandomRegistry;
 
 public class Schedule extends AbstractChromosome<ActionGene> {
 
@@ -34,7 +35,7 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 		return new Schedule(genes, model);
 	}
 
-	public static Schedule of(Model model) {
+	public static Schedule of(Model model, double probaToStop) {
 		//System.out.println("\n\nNEW SCHEDULE");
 		model.resetModel();
 		// Environment which evolve with the creation
@@ -77,11 +78,35 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 				currentTime++;
 				endAll(map, currentTime, model, currentEnv);
 			}
+			
+			double randomValue = RandomRegistry.getRandom().nextDouble();
+			if(randomValue < probaToStop) {
+				completeSchedule(seq, map, currentTime, model, currentEnv);
+				break;
+			}
+			
 		}
-		System.out.println("End Env : " + currentEnv);
-		
+		System.out.println("Seq : " + seq);
+		System.out.println("End Env :" + currentEnv);
 		return new Schedule(ISeq.of(seq), model);
 	}
+
+	private static void completeSchedule(ArrayList<ActionGene> seq, HashMap<Integer, List<Action>> map, int currentTime, Model model,
+			Environment currentEnvironment) {
+		while(!map.isEmpty()) {
+			List<Action> actions = map.get(currentTime);
+			if (actions != null) {
+				for (Action a : actions) {
+					model.endAction(currentEnvironment, a);
+				}
+				seq.add(ActionGene.emptyActionGene());
+			}
+			map.remove(currentTime);
+			currentTime++;
+		}
+		
+	}
+
 
 	private static void endAll(HashMap<Integer, List<Action>> map, int currentTime, Model model,
 			Environment currentEnvironment) {

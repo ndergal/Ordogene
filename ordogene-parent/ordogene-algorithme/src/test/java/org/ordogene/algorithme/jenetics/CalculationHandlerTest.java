@@ -1,31 +1,36 @@
-package org.ordogene.api;
+package org.ordogene.algorithme.jenetics;
 
 import java.io.File;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Random;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.ordogene.algorithme.Model;
-import org.ordogene.algorithme.jenetics.ScheduleBuilder;
 import org.ordogene.algorithme.master.ThreadHandler;
 import org.ordogene.file.JSONModel;
 import org.ordogene.file.parser.Parser;
 
+import io.jenetics.util.RandomRegistry;
+
 @RunWith(MockitoJUnitRunner.class)
-public class ScheduleBuilderTest {
+public class CalculationHandlerTest {
 	
+private static final String userId = "tester";
+
 //	@Ignore
 	@Test
-	public void testScheduleBuilder() throws Exception {
-		URL urlTestFile = ScheduleBuilderTest.class.getClassLoader()
+	public void testCalculationHandler() throws Exception {
+		//RandomRegistry.setRandom(new Random(0));
+		URL urlTestFile = CalculationHandlerTest.class.getClassLoader()
 				.getResource("OrdogeneCalculationExamples" + File.separator + "short_path_10.json");
 		byte[] contentFile = Files.readAllBytes(Paths.get(urlTestFile.toURI()));
 		String jsonContent = new String(contentFile);
 		
-		ScheduleBuilder sb = new ScheduleBuilder(new ThreadHandler(), Model.createModel((JSONModel) Parser.parseJsonFile(jsonContent, JSONModel.class)));
-		sb.run();
+		CalculationHandler sb = new CalculationHandler(new ThreadHandler(), Model.createModel((JSONModel) Parser.parseJsonFile(jsonContent, JSONModel.class)), userId, 0);
+		sb.launchCalculation();
 	}
 }

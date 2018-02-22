@@ -15,7 +15,7 @@ public class Calculation implements Validable {
 	private boolean running;
 	private int iterationNumber;
 	private int maxIteration;
-	private int fitnessSaved;
+	private long fitnessSaved;
 	private int lastIterationSaved;
 	private long startTimestamp;
 
@@ -90,11 +90,11 @@ public class Calculation implements Validable {
 		this.lastIterationSaved = lastIterationSaved;
 	}
 
-	public int getFitnessSaved() {
+	public long getFitnessSaved() {
 		return fitnessSaved;
 	}
 
-	public void setFitnessSaved(int fitnessSaved) {
+	public void setFitnessSaved(long fitnessSaved) {
 		this.fitnessSaved = fitnessSaved;
 	}
 
@@ -109,12 +109,12 @@ public class Calculation implements Validable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = prime + id;
-		result = prime * result + fitnessSaved;
 		result = prime * result + iterationNumber;
 		result = prime * result + lastIterationSaved;
 		result = prime * result + maxIteration;
 		result = prime * result + name.hashCode();
 		result = prime * result + (running ? 1231 : 1237);
+		result = prime * result + (int) (fitnessSaved ^ (fitnessSaved >>> 32));
 		result = prime * result + (int) (startTimestamp ^ (startTimestamp >>> 32));
 		return result;
 	}
@@ -141,7 +141,7 @@ public class Calculation implements Validable {
 
 	@JsonIgnore
 	public void setCalculation(long startTimestamp, int iterationNumber, int lstIterationSaved, int maxIteration,
-			int id, String name, int fitness) {
+			int id, String name, long fitness) {
 		setStartTimestamp(startTimestamp);
 		setIterationNumber(iterationNumber);
 		setLastIterationSaved(lstIterationSaved);
