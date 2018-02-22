@@ -2,6 +2,7 @@ package org.ordogene.algorithme;
 
 import static java.util.Objects.requireNonNull;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -17,7 +18,10 @@ import org.ordogene.algorithme.util.ActionSelector;
 import org.ordogene.file.JSONModel;
 import org.ordogene.file.models.Relation;
 
-public class Model {
+public class Model implements Serializable {
+	private static final long serialVersionUID = 1L;
+	
+	private static final String CURRENT_TIME_CANNOT_BE_NEGATIVE = "The current time cannot be negative";
 	private final List<Integer> snaps;
 	private final String name;
 	private final int slots;
@@ -64,7 +68,7 @@ public class Model {
 	
 	public boolean hasWorkableAction(Environment currentEnvironment, int currentTime) {
 		if(currentTime < 0) {
-			throw new IllegalArgumentException("The current time cannot be negative");
+			throw new IllegalArgumentException(CURRENT_TIME_CANNOT_BE_NEGATIVE);
 		}
 		return actions.stream()
 				.filter(a -> !a.equals(Action.EMPTY()))
@@ -81,7 +85,7 @@ public class Model {
 	 */
 	public boolean workable(Action a, Environment currentEnvironment, int currentTime) {
 		if(currentTime < 0) {
-			throw new IllegalArgumentException("The current time cannot be negative");
+			throw new IllegalArgumentException(CURRENT_TIME_CANNOT_BE_NEGATIVE);
 		}
 		if (!isInModel(a)) {
 			throw new IllegalArgumentException("The Action given don't exist in this model");
@@ -98,7 +102,7 @@ public class Model {
 	 */
 	public Action getWorkableAction(Environment currentEnvironment, int currentTime) {
 		if(currentTime < 0) {
-			throw new IllegalArgumentException("The current time cannot be negative");
+			throw new IllegalArgumentException(CURRENT_TIME_CANNOT_BE_NEGATIVE);
 		}
 		if (!actionSelector.isReset()) {
 			// Select one action here
@@ -114,7 +118,7 @@ public class Model {
 
 	public void startAction(Action a, Environment currentEnvironment, int currentTime) {
 		if(currentTime < 0) {
-			throw new IllegalArgumentException("The current time cannot be negative");
+			throw new IllegalArgumentException(CURRENT_TIME_CANNOT_BE_NEGATIVE);
 		}
 		requireNonNull(a);
 		requireNonNull(currentEnvironment);

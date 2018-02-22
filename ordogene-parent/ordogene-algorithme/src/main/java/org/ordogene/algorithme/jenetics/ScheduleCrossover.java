@@ -11,10 +11,6 @@ public class ScheduleCrossover extends Crossover<ActionGene, Long> {
 
 	@Override
 	protected int crossover(MSeq<ActionGene> papa, MSeq<ActionGene> mama) {
-		MSeq<ActionGene> fiston = MSeq.ofLength(300);
-		
-		
-		
 		return 0;
 	}
 

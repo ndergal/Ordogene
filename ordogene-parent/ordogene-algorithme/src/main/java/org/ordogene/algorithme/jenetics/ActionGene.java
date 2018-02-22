@@ -18,7 +18,6 @@ public class ActionGene implements Gene<Action, ActionGene> {
 	@Override
 	public boolean isValid() {
 		return true;
-		//return model.workable(action, currentEnvironment);
 	}
 
 	@Override

@@ -7,6 +7,8 @@ import java.util.List;
 import org.ordogene.algorithme.Model;
 import org.ordogene.algorithme.models.Action;
 import org.ordogene.algorithme.models.Environment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.jenetics.AbstractChromosome;
 import io.jenetics.Chromosome;
@@ -16,6 +18,8 @@ import io.jenetics.util.RandomRegistry;
 public class Schedule extends AbstractChromosome<ActionGene> {
 
 	private static final long serialVersionUID = 1L;
+	
+	private static final Logger logger = LoggerFactory.getLogger(Schedule.class);
 
 	private Model model;
 
@@ -36,7 +40,7 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 	}
 
 	public static Schedule of(Model model, double probaToStop) {
-		//System.out.println("\n\nNEW SCHEDULE");
+		logger.debug("\n\nNEW SCHEDULE");
 		model.resetModel();
 		// Environment which evolve with the creation
 		Environment currentEnv = model.getStartEnvironment().copy();
@@ -53,14 +57,14 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 		while (model.hasWorkableAction(currentEnv, currentTime) || !map.isEmpty()) {
 
 			// Select a action
-			//System.out.println("Time :" + currentTime);
+			logger.debug("Time :" + currentTime);
 			ActionGene actionGene = ActionGene.of(currentEnv, currentTime, model);
 			Action action = actionGene.getAllele();
 
 			// Add action in the seq
 			seq.add(actionGene);
 
-			//System.out.println("Action : " + action);
+			logger.debug("Action : " + action);
 			if(!action.equals(Action.EMPTY())) {
 				// Start the action
 				model.startAction(action, currentEnv, currentTime);

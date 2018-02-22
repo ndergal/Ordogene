@@ -219,7 +219,7 @@ public class Commands {
 
 		ResponseEntity<ApiJsonResponse> response = null;
 		try {
-			response = restTemplate.exchange("/" + id + "/calculations/" + calculationID, HttpMethod.DELETE, null,
+			response = restTemplate.exchange("/" + id + CALCULATIONS + calculationID, HttpMethod.DELETE, null,
 					ApiJsonResponse.class);
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
 			log.error(e.getStatusCode() + " -- " + e.getStatusText());

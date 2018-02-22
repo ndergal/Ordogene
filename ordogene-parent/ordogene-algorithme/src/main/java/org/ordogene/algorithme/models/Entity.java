@@ -1,10 +1,13 @@
 package org.ordogene.algorithme.models;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import org.ordogene.file.models.JSONEntity;
 
-public class Entity {
+public class Entity implements Serializable {
+	private static final long serialVersionUID = 1L;
+	
 	private final String name;
 	private int quantity;
 	

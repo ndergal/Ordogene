@@ -12,6 +12,8 @@ import org.ordogene.file.FileService;
 import org.ordogene.file.models.Type;
 import org.ordogene.file.utils.Calculation;
 import org.ordogene.file.utils.Const;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.jenetics.Genotype;
 import io.jenetics.Optimize;
@@ -23,6 +25,8 @@ import io.jenetics.engine.EvolutionStatistics;
 import io.jenetics.stat.DoubleMomentStatistics;
 
 public class CalculationHandler {
+	private final Logger logger = LoggerFactory.getLogger(CalculationHandler.class);
+	
 	private final int POPULATION_SIZE = 10;
 	private final double CHANCE_TO_STOP_SCHEDULE_CREATION = 0.01;
 	
@@ -96,10 +100,10 @@ public class CalculationHandler {
 			String calculationSaveDest = Const.getConst().get("ApplicationPath") + File.separator + userId
 					+ File.separator + tmpCalc.getId() + "_" + model.getName() + File.separatorChar + "state.json";
 			FileService.writeInFile(tmpCalc, Paths.get(calculationSaveDest));
-			System.out.println(tmpCalc + " saved in " + calculationSaveDest);
+			logger.debug(tmpCalc + " saved in " + calculationSaveDest);
 		} catch (IOException e) {
 			e.printStackTrace();
-			System.err.println(tmpCalc + " not saved.");
+			logger.debug(tmpCalc + " not saved.");
 		}
 		
 		System.out.println(statistics);
