@@ -42,11 +42,11 @@ public class Commands {
 	private static final String NOT_IMPLEMENTED_BLOCK_ON_CLI_SIDE = "Not implemented (block on CLI side)";
 	private static final String CALCULATIONS = "/calculations/";
 	private static final String PROBLEM_WITH_THE_COMMUNICATION_BETWEEN_CLIENT_AND_SERVER = "Problem with the communication between client and server";
-	private final SimpleDateFormat formater = new SimpleDateFormat("dd/MM/yyyy-hh:mm");
+	private final SimpleDateFormat formater = new SimpleDateFormat("dd/MM/yyyy-HH:mm");
 	private String id;
 	private static final Logger log = LoggerFactory.getLogger(Commands.class);
 
-	private final String[] headerFields = { "Id", "Name", "Date", "Running", "Fitness", "Iteration done",
+	private final String[] tableFields = { "CID", "Name", "Date", "Running", "Fitness", "Iteration done",
 			"Last iteration saved", "Max iteration" };
 
 	@Autowired
@@ -139,11 +139,12 @@ public class Commands {
 
 		// Build ascii table
 		List<Calculation> list = response.getBody().getList();
+
 		if (!(list != null && !list.isEmpty())) {
+
 			log.info("No calculations yet");
 			return null;
 		}
-
 		TableBuilder builder = fillTable(list);
 		return builder.addFullBorder(BorderStyle.oldschool).build();
 	}
@@ -158,7 +159,9 @@ public class Commands {
 	public boolean launchCalculation(File model) {
 		// Parameter validation
 		String jsonContentRead = getFileContent(model);
-
+		if (jsonContentRead == null) {
+			return false;
+		}
 		// Request
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
@@ -309,11 +312,11 @@ public class Commands {
 	/* UTILS */
 
 	private TableBuilder fillTable(List<Calculation> list) {
-		String[][] data = new String[list.size() + 1][headerFields.length];
+		String[][] data = new String[list.size() + 1][tableFields.length];
 		TableModel model = new ArrayTableModel(data);
 		TableBuilder builder = new TableBuilder(model);
-		for (int i = 0; i < headerFields.length; i++) {
-			data[0][i] = headerFields[i];
+		for (int i = 0; i < tableFields.length; i++) {
+			data[0][i] = tableFields[i];
 		}
 		for (int i = 0; i < list.size(); i++) {
 			Calculation c = list.get(i);
@@ -326,7 +329,6 @@ public class Commands {
 			data[i + 1][5] = String.valueOf(c.getIterationNumber());
 			data[i + 1][6] = String.valueOf(c.getLastIterationSaved());
 			data[i + 1][7] = String.valueOf(c.getMaxIteration());
-
 		}
 		return builder;
 	}
