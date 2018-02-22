@@ -41,11 +41,4 @@ public class Parser {
 		return instance;
 	}
 
-	public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException,
-			InstantiationException, IllegalAccessException, UnmarshalException {
-		System.out.println(Parser.parseJsonFile(Paths.get(
-				"/home/ordogene/git/ordogene/ordogene-parent/ordogene-file/src/main/java/org/ordogene/file/testJson/fitness1.json"),
-				JSONModel.class));
-	}
-
 }
