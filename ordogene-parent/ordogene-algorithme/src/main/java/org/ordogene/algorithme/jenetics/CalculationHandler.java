@@ -89,6 +89,7 @@ public class CalculationHandler {
 		Calculation tmpCalc = new Calculation();
 		
 		if(best != null) {
+			Drawer.drawActionList(best);
 			tmpCalc.setCalculation(currentDate.getTime(), iteration, 1, maxIteration, calculationId,
 					model.getName(), best.getFitness());
 		} else {

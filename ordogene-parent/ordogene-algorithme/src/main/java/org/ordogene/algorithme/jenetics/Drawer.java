@@ -7,8 +7,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 
 import org.ordogene.algorithme.models.Action;
 
@@ -18,9 +16,8 @@ import io.jenetics.Phenotype;
 public class Drawer {
 
 	static void drawActionList(Phenotype<ActionGene, Long> individu) { // maxSize = model.getslot()
-		List<Action> actions = individu.getGenotype().getChromosome().stream().map(ActionGene::getAllele)
-				.collect(Collectors.toList());
 		Schedule s = (Schedule) individu.getGenotype().getChromosome();
+		List<Action> actions = s.stream().map(ActionGene::getAllele).collect(Collectors.toList());
 		int maxSize = s.getModel().getSlots();
 		HashMap<Integer, Action> indexedActions = new HashMap<>();
 		int nextIndex = 1; // index start from 1
@@ -180,7 +177,7 @@ public class Drawer {
 		sb.append("</table>");
 		JLabel html = new JLabel(sb.toString());
 
-		JOptionPane.showMessageDialog(null, html);
+//		JOptionPane.showMessageDialog(null, html);
 	}
 
 }
