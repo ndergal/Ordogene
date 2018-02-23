@@ -44,7 +44,6 @@ public class Model {
 		this.execTime = execTime;
 		this.startEnvironment = Objects.requireNonNull(environment);
 		actions.forEach(a -> this.actions.add(Objects.requireNonNull(a)));
-		this.actions.add(Action.EMPTY());
 		this.fitness = Objects.requireNonNull(fitness);
 	}
 
@@ -67,7 +66,6 @@ public class Model {
 			throw new IllegalArgumentException("The current time cannot be negative");
 		}
 		return actions.stream()
-				.filter(a -> !a.equals(Action.EMPTY()))
 				.anyMatch(a -> this.workable(a, currentEnvironment, currentTime));
 	}
 
@@ -100,14 +98,13 @@ public class Model {
 		if(currentTime < 0) {
 			throw new IllegalArgumentException("The current time cannot be negative");
 		}
-		if (!actionSelector.isReset()) {
-			// Select one action here
-			return actionSelector.select();
-		}
 		for (Action a : actions) {
 			if (workable(a, currentEnvironment, currentTime)) {
 				actionSelector.add(a, fitness.eval(a));
 			}
+		}
+		if (actionSelector.isEmpty()) {
+			return null;
 		}
 		return actionSelector.select();
 	}

@@ -38,9 +38,9 @@ public class CalculationHandlerTest {
 	// @Ignore
 	@Test
 	public void testCalculationHandler() throws Exception {
-		RandomRegistry.setRandom(new Random(0));
+		//RandomRegistry.setRandom(new Random(0));
 		URL urlTestFile = CalculationHandlerTest.class.getClassLoader()
-				.getResource("OrdogeneCalculationExamples" + File.separator + "short_path_10.json");
+				.getResource("OrdogeneCalculationExamples" + File.separator + "river_enigma.json");
 		byte[] contentFile = Files.readAllBytes(Paths.get(urlTestFile.toURI()));
 		String jsonContent = new String(contentFile);
 

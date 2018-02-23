@@ -3,6 +3,8 @@ package org.ordogene.algorithme.jenetics;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.ordogene.algorithme.Model;
 import org.ordogene.algorithme.models.Action;
@@ -39,84 +41,92 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 		//System.out.println("\n\nNEW SCHEDULE");
 		model.resetModel();
 		// Environment which evolve with the creation
-		Environment currentEnv = model.getStartEnvironment().copy();
+		Environment envAfterStart = model.getStartEnvironment().copy();
+		Environment envAfterEnd = model.getStartEnvironment().copy();
 		// Map with action to stop at key value
-		HashMap<Integer, List<Action>> map = new HashMap<>();
+		SortedMap<Integer, List<Action>> map = new TreeMap<>();
 		// List which represent the sequence
 		ArrayList<ActionGene> seq = new ArrayList<>();
 		// Boolean to end action at current time
 		// The current time
-		int currentTime = 0;
+		int timeAtStart = 0;
+		int timeAtEnd = 0;
 
 		// Continue while a action is in progress or a Action is possible
 		// TODO add possibility to stop while and stop Schedule building
-		while (model.hasWorkableAction(currentEnv, currentTime) || !map.isEmpty()) {
+		while (model.hasWorkableAction(envAfterEnd, timeAtEnd) || !map.isEmpty()) {
 
 			// Select a action
 			//System.out.println("Time :" + currentTime);
-			ActionGene actionGene = ActionGene.of(currentEnv, currentTime, model);
-			Action action = actionGene.getAllele();
+			Action action = model.getWorkableAction(envAfterEnd, timeAtEnd);
+			if(action != null) {
+				
+				// Parallele start
+				if(model.workable(action, envAfterStart, timeAtStart)) {
+					// Create ActionGene and add it on seq
+					ActionGene actionGene = ActionGene.of(action, timeAtStart);
+					seq.add(actionGene);	
 
-			// Add action in the seq
-			seq.add(actionGene);
-
-			//System.out.println("Action : " + action);
-			if(!action.equals(Action.EMPTY())) {
-				// Start the action
-				model.startAction(action, currentEnv, currentTime);
-	
-				// Add action in map to end it
-				int endTime = currentTime + action.getTime();
-				List<Action> actions = map.get(endTime);
+					//Change StartEnvironment
+					model.startAction(action, envAfterStart, timeAtStart);
+					
+				} else {
+				// start After
+					ActionGene actionGene = ActionGene.of(action, timeAtEnd);
+					seq.add(actionGene);
+					
+					// Change startTime
+					timeAtStart = timeAtEnd;
+					
+					// Change StartEnvironment
+					envAfterStart = envAfterEnd;
+					model.startAction(action, envAfterStart, timeAtStart);
+				}
+				
+				// Calcul actionEndTime
+				int actionEndTime = timeAtStart + action.getTime();
+				// Add action in map to end it later
+				List<Action> actions = map.get(actionEndTime);
 				if (actions == null) {
 					actions = new ArrayList<>();
-					map.put(endTime, actions);
+					map.put(actionEndTime, actions);
 				}
 				actions.add(action);
-			} else {
-				// If the action is the Empty action so change the currentTime and finish action
-				currentTime++;
-				endAll(map, currentTime, model, currentEnv);
+			}
+			
+			if(timeAtEnd == timeAtStart) {
+				// Remove action which ended in previous startTime
+				map.remove(timeAtEnd);
+			}
+			
+			// Change timeAtEnd
+			timeAtEnd = map.firstKey();
+			
+			// Change EndEnvironment
+			envAfterEnd = envAfterStart.copy();
+			for(Action a : map.get(timeAtEnd)) {
+				model.endAction(envAfterEnd, a);
 			}
 			
 			double randomValue = RandomRegistry.getRandom().nextDouble();
 			if(randomValue < probaToStop) {
-				completeSchedule(seq, map, currentTime, model, currentEnv);
 				break;
 			}
 			
 		}
-		System.out.println("Seq : " + seq);
-		System.out.println("End Env :" + currentEnv);
-		return new Schedule(ISeq.of(seq), model);
-	}
-
-	private static void completeSchedule(ArrayList<ActionGene> seq, HashMap<Integer, List<Action>> map, int currentTime, Model model,
-			Environment currentEnvironment) {
-		while(!map.isEmpty()) {
-			List<Action> actions = map.get(currentTime);
-			if (actions != null) {
-				for (Action a : actions) {
-					model.endAction(currentEnvironment, a);
-				}
-				seq.add(ActionGene.emptyActionGene());
-			}
-			map.remove(currentTime);
-			currentTime++;
-		}
 		
-	}
-
-
-	private static void endAll(HashMap<Integer, List<Action>> map, int currentTime, Model model,
-			Environment currentEnvironment) {
-		List<Action> actions = map.get(currentTime);
-		if (actions != null) {
-			for (Action a : actions) {
-				model.endAction(currentEnvironment, a);
+		map.remove(timeAtEnd);
+		final Environment finalEnv = envAfterEnd;
+		map.forEach((endTime,actionList) -> {
+			for(Action a : actionList) {
+				model.endAction(finalEnv, a);
 			}
-		}
-		map.remove(currentTime);
+		});
+		
+		System.out.println("Seq : " + seq);
+		System.out.println("Size seq : " + seq.size());
+		System.out.println("End Env :" + finalEnv);
+		return new Schedule(ISeq.of(seq), model);
 	}
 
 }

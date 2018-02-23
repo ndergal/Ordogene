@@ -23,7 +23,7 @@ import io.jenetics.engine.EvolutionStatistics;
 import io.jenetics.stat.DoubleMomentStatistics;
 
 public class CalculationHandler {
-	private final int POPULATION_SIZE = 10;
+	private final int POPULATION_SIZE = 1;
 	private final double CHANCE_TO_STOP_SCHEDULE_CREATION = 0.01;
 	
 	private final Date currentDate = new Date();
@@ -54,7 +54,7 @@ public class CalculationHandler {
 		
 		Iterator<EvolutionResult<ActionGene, Long>> itEngine = engine.iterator();
 		int iteration = 0;
-		int maxIteration = 10; // TODO change it by model.getExecTime()
+		int maxIteration = 1; // TODO change it by model.getExecTime()
 		boolean interupted = false;
 		Phenotype<ActionGene, Long> best = null;
 		

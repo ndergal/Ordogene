@@ -1,6 +1,5 @@
 package org.ordogene.algorithme.models;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -9,9 +8,6 @@ import java.util.stream.Collectors;
 import org.ordogene.file.models.JSONAction;
 
 public class Action {
-	public static Action EMPTY() {
-		return new Action("EMPTY", 1, Collections.emptySet(), Collections.emptySet());
-	}
 	
 	private final String name;
 	private final int time;
