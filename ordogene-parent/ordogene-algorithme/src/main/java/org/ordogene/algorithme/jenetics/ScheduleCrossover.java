@@ -11,12 +11,6 @@ public class ScheduleCrossover extends Crossover<ActionGene, Long> {
 
 	@Override
 	protected int crossover(MSeq<ActionGene> papa, MSeq<ActionGene> mama) {
-		try {
-			Thread.sleep(400);
-		} catch (InterruptedException e) {
-			System.err.println("Problemo crossover sleep");
-		}
-		
 		return 0;
 	}
 
