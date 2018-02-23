@@ -23,8 +23,8 @@
 	</properties>
 
 	<scm>
-		<connection>scm:git:git@bitbucket.org:darwinners/ordogene.git</connection>
- 		<developerConnection>scm:git:git@bitbucket.org:darwinners/ordogene.git</developerConnection>
+		<connection>scm:git:https://bitbucket.org/darwinners/ordogene.git</connection>
+ 		<developerConnection>scm:git:https://bitbucket.org/darwinners/ordogene.git</developerConnection>
 		<url>https://bitbucket.org/darwinners/ordogene.git</url>
 		<tag>HEAD</tag>	
 	</scm>
