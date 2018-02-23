@@ -87,15 +87,7 @@ public class CalculationHandler {
 		Calculation tmpCalc = new Calculation();
 
 		if (best != null) {
-			String[][] stringRes = Drawer.buildStringActionMatrix(best);
-			Path destPng = Paths.get(Const.getConst().get("ApplicationPath") + File.separator + userId + File.separator
-					+ tmpCalc.getId() + "_" + model.getName() + File.separatorChar + "result.png");
-			try {
-				Drawer.saveHtmlTable(null, stringRes, destPng, true);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			
+
 			tmpCalc.setCalculation(currentDate.getTime(), iteration, 1, maxIteration, calculationId, model.getName(),
 					best.getFitness());
 		} else {
@@ -107,7 +99,16 @@ public class CalculationHandler {
 			String calculationSaveDest = Const.getConst().get("ApplicationPath") + File.separator + userId
 					+ File.separator + tmpCalc.getId() + "_" + model.getName() + File.separatorChar + "state.json";
 			FileService.writeInFile(tmpCalc, Paths.get(calculationSaveDest));
-			Drawer.buildStringActionMatrix(best);
+			
+			String[][] stringRes = Drawer.buildStringActionMatrix(best);
+			Path destPng = Paths.get(Const.getConst().get("ApplicationPath") + File.separator + userId + File.separator
+					+ "" + +tmpCalc.getId() + "_" + model.getName() + File.separatorChar + "result.png");
+			try {
+				Drawer.saveHtmlTable(null, stringRes, destPng, false);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
 			logger.debug(tmpCalc + " saved in " + calculationSaveDest);
 		} catch (IOException e) {
 			e.printStackTrace();

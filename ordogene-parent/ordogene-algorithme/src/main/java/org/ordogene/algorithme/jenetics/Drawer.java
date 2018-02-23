@@ -191,6 +191,7 @@ public class Drawer {
 		sb.append("</table>");
 
 		if (pngDestPath != null) {
+			System.out.println("try to save : "+pngDestPath.toString());
 			FileService.saveHtmlAsPng(sb.toString(), pngDestPath);
 		}
 
