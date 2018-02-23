@@ -56,7 +56,7 @@ public class CalculationHandler {
 
 		Iterator<EvolutionResult<ActionGene, Long>> itEngine = engine.iterator();
 		int iteration = 0;
-		int maxIteration = 10; // TODO change it by model.getExecTime()
+		int maxIteration = 100; // TODO change it by model.getExecTime()
 		boolean interupted = false;
 		Phenotype<ActionGene, Long> best = null;
 
