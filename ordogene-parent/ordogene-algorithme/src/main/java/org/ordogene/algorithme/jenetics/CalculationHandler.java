@@ -2,6 +2,7 @@ package org.ordogene.algorithme.jenetics;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
 import java.util.Iterator;
@@ -26,16 +27,16 @@ import io.jenetics.stat.DoubleMomentStatistics;
 
 public class CalculationHandler {
 	private final Logger logger = LoggerFactory.getLogger(CalculationHandler.class);
-	
+
 	private final int POPULATION_SIZE = 10;
 	private final double CHANCE_TO_STOP_SCHEDULE_CREATION = 0.01;
-	
+
 	private final Date currentDate = new Date();
 	private final ThreadHandler th;
 	private final Model model;
 	private final String userId;
 	private final int calculationId;
-	
+
 	public CalculationHandler(ThreadHandler th, Model model, String userId, int calculationId) {
 		this.th = th;
 		this.model = model;
@@ -44,37 +45,34 @@ public class CalculationHandler {
 	}
 
 	public void launchCalculation() {
-		
+
 		Engine<ActionGene, Long> engine = Engine
-			.builder(this::fitness, Genotype.of(Schedule.of(model, CHANCE_TO_STOP_SCHEDULE_CREATION), 1))
-			.optimize(Type.min.equals(model.getFitness().getType()) ? Optimize.MINIMUM : Optimize.MAXIMUM)
-			.fitnessScaler(this::fitnessScaler)
-			.populationSize(POPULATION_SIZE)
-			.selector(new TournamentSelector<>())
-			.alterers(new ScheduleCrossover(0.2))
-			.build();
-		
+				.builder(this::fitness, Genotype.of(Schedule.of(model, CHANCE_TO_STOP_SCHEDULE_CREATION), 1))
+				.optimize(Type.min.equals(model.getFitness().getType()) ? Optimize.MINIMUM : Optimize.MAXIMUM)
+				.fitnessScaler(this::fitnessScaler).populationSize(POPULATION_SIZE).selector(new TournamentSelector<>())
+				.alterers(new ScheduleCrossover(0.2)).build();
+
 		EvolutionStatistics<Long, DoubleMomentStatistics> statistics = EvolutionStatistics.ofNumber();
-		
+
 		Iterator<EvolutionResult<ActionGene, Long>> itEngine = engine.iterator();
 		int iteration = 0;
 		int maxIteration = 10; // TODO change it by model.getExecTime()
 		boolean interupted = false;
 		Phenotype<ActionGene, Long> best = null;
-		
-		while(itEngine.hasNext() && iteration < maxIteration && !interupted) {
+
+		while (itEngine.hasNext() && iteration < maxIteration && !interupted) {
 			EvolutionResult<ActionGene, Long> generation = itEngine.next();
 			statistics.accept(generation);
-			
+
 			best = generation.getBestPhenotype();
-			
+
 			iteration++;
 
 			try {
 				String str = th.threadFromMaster();
 				if (str != null && str.equals("state")) {
 					// TODO change 1 by real value
-					String msg = constructStateString(iteration, maxIteration, 1,best.getFitness());
+					String msg = constructStateString(iteration, maxIteration, 1, best.getFitness());
 					th.threadToMaster(msg.toString());
 				} else if (str != null && str.equals("interrupt")) {
 					interupted = true;
@@ -87,26 +85,35 @@ public class CalculationHandler {
 
 		// TODO change 1 by real value
 		Calculation tmpCalc = new Calculation();
-		
-		if(best != null) {
-			Drawer.drawActionList(best);
-			tmpCalc.setCalculation(currentDate.getTime(), iteration, 1, maxIteration, calculationId,
-					model.getName(), best.getFitness());
+
+		if (best != null) {
+			String[][] stringRes = Drawer.buildStringActionMatrix(best);
+			Path destPng = Paths.get(Const.getConst().get("ApplicationPath") + File.separator + userId + File.separator
+					+ tmpCalc.getId() + "_" + model.getName() + File.separatorChar + "result.png");
+			try {
+				Drawer.saveHtmlTable(null, stringRes, destPng, true);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			tmpCalc.setCalculation(currentDate.getTime(), iteration, 1, maxIteration, calculationId, model.getName(),
+					best.getFitness());
 		} else {
-			tmpCalc.setCalculation(currentDate.getTime(), iteration, 1, maxIteration, calculationId,
-					model.getName(), 0);
+			tmpCalc.setCalculation(currentDate.getTime(), iteration, 1, maxIteration, calculationId, model.getName(),
+					0);
 		}
-		
+
 		try {
 			String calculationSaveDest = Const.getConst().get("ApplicationPath") + File.separator + userId
 					+ File.separator + tmpCalc.getId() + "_" + model.getName() + File.separatorChar + "state.json";
 			FileService.writeInFile(tmpCalc, Paths.get(calculationSaveDest));
+			Drawer.buildStringActionMatrix(best);
 			logger.debug(tmpCalc + " saved in " + calculationSaveDest);
 		} catch (IOException e) {
 			e.printStackTrace();
 			logger.debug(tmpCalc + " not saved.");
 		}
-		
+
 		System.out.println(statistics);
 	}
 
@@ -119,9 +126,10 @@ public class CalculationHandler {
 		sb.append(fitness);
 		return sb.toString();
 	}
-	
+
 	/**
 	 * Fitness Scaler de l'engine
+	 * 
 	 * @param value
 	 * @return
 	 */
@@ -134,18 +142,17 @@ public class CalculationHandler {
 		}
 		return value;
 	}
-	
+
 	/**
 	 * Fonction de fitness de l'engine
+	 * 
 	 * @param ind
 	 * @return
 	 */
 	public Long fitness(Genotype<ActionGene> ind) {
 		long startFitness = model.getFitness().evalEnv(model.getStartEnvironment());
-		long transformationFitness = ind.stream()
-				.flatMap(c -> c.stream())
-				.mapToLong(ag -> model.getFitness().eval(ag.getAllele()))
-				.sum();
+		long transformationFitness = ind.stream().flatMap(c -> c.stream())
+				.mapToLong(ag -> model.getFitness().eval(ag.getAllele())).sum();
 		return startFitness + transformationFitness;
 	}
 

@@ -1,5 +1,10 @@
 package org.ordogene.algorithme.jenetics;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,15 +12,18 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 import org.ordogene.algorithme.models.Action;
+import org.ordogene.file.FileService;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
+import gui.ava.html.image.generator.HtmlImageGenerator;
 import io.jenetics.Phenotype;
 
 public class Drawer {
 
-	static void drawActionList(Phenotype<ActionGene, Long> individu) { // maxSize = model.getslot()
+	static String[][] buildStringActionMatrix(Phenotype<ActionGene, Long> individu) { // maxSize = model.getslot()
 		Schedule s = (Schedule) individu.getGenotype().getChromosome();
 		List<Action> actions = s.stream().map(ActionGene::getAllele).collect(Collectors.toList());
 		int maxSize = s.getModel().getSlots();
@@ -27,7 +35,7 @@ public class Drawer {
 		int[] currentArray = new int[maxSize];
 		for (Action action : actions) {
 			int line = searchFreeCell(indexedList, time); // Find the next index : the next free int[] at (time). <-
-															// current list index
+			// current list index
 			if (line == -1) {
 				// no free space at (time) : create a new int[]
 				int[] newLine = new int[maxSize];
@@ -77,12 +85,13 @@ public class Drawer {
 		String[][] toPrintArray = new String[actionReplacedList.size()][];
 		toPrintArray = actionReplacedList.toArray(toPrintArray);
 
-		// System.out.println(Arrays.deepToString(toPrintArray)); // TODO afficher en
-		// colonne
-		System.out.println();
-		print2DArray(toPrintArray);
-		System.out.println();
-		drawHtmlTable(null, toPrintArray);
+		 
+//		System.out.println();
+//		print2DArray(toPrintArray);
+//		System.out.println();
+
+		return toPrintArray;
+
 	}
 
 	private static String[] replaceRefByAction(int[] indexed, Map<Integer, Action> corresp, boolean displayEmpty) {
@@ -124,7 +133,8 @@ public class Drawer {
 
 	}
 
-	private static void drawHtmlTable(String[] colNames, Object[][] toPrintData) {
+	static void saveHtmlTable(String[] colNames, Object[][] toPrintData, Path pngDest, boolean display)
+			throws IOException {
 		if (colNames == null) {
 			colNames = new String[] {};
 		}
@@ -136,11 +146,13 @@ public class Drawer {
 		 * @Override public void run() { htmlTableDrawer(cName, toPrintData); } };
 		 * SwingUtilities.invokeLater(r);
 		 */
-		htmlTableDrawer(cName, toPrintData);
+		String htmlArray = htmlTableBuilder(cName, 50.0, "px", toPrintData, pngDest,
+				display);
 
 	}
 
-	private static void htmlTableDrawer(String[] colNames, Object[][] toPrintData) {
+	private static String htmlTableBuilder(String[] colNames, double cellSize, String unit, Object[][] toPrintData,
+			Path pngDestPath, boolean display) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<html><body><table border=1>");
 
@@ -153,19 +165,21 @@ public class Drawer {
 		sb.append("</tr>");
 		for (Object[] row : toPrintData) {
 			sb.append("<tr>");
-			for (int i = 0; i < row.length; i++) { // print data
+			for (int i = 0; i < row.length; i++) { // write data
 				// check if the nexts cells are == to row[i]
 				int counterEquals = 1;
-				while (i+counterEquals<row.length && row[i + counterEquals].equals(row[i])) {
+				while (i + counterEquals < row.length && row[i + counterEquals].equals(row[i])
+						&& !row[i].equals("         ") && !row[i].equals(" (Empty) ")) {
 					counterEquals++;
 				}
 				if (counterEquals > 1) {
-					sb.append("<td colspan="+counterEquals+">");
+					sb.append(
+							"<td style='width:" + cellSize * counterEquals + unit + "' colspan=" + counterEquals + ">");
 					sb.append(row[i]);
 					sb.append("</td>");
-					i = i+counterEquals-1;
+					i = i + counterEquals - 1;
 				} else {
-					sb.append("<td>");
+					sb.append("<td style='width:" + cellSize + unit + "'>");
 					sb.append(row[i]);
 					sb.append("</td>");
 				}
@@ -175,9 +189,19 @@ public class Drawer {
 			sb.append("</tr>");
 		}
 		sb.append("</table>");
-		JLabel html = new JLabel(sb.toString());
 
-//		JOptionPane.showMessageDialog(null, html);
+		if (pngDestPath != null) {
+			FileService.saveHtmlAsPng(sb.toString(), pngDestPath);
+		}
+
+		String res = sb.toString();
+		if (display) {
+			System.out.println(res);
+			JOptionPane.showMessageDialog(null, new JLabel(res));
+		}
+		return res;
+
+		// JOptionPane.showMessageDialog(null, html);
 	}
 
 }

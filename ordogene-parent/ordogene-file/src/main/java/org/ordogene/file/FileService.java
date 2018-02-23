@@ -16,6 +16,8 @@ import org.ordogene.file.utils.Const;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import gui.ava.html.image.generator.HtmlImageGenerator;
+
 public class FileService {
 
 	private final UserHandler uh = new UserHandler();
@@ -46,11 +48,11 @@ public class FileService {
 	public List<Calculation> getUserCalculations(String username) {
 		return ch.getCalculations(username);
 	}
-	
+
 	public boolean removeUserCalculation(String username, Calculation c) {
 		return ch.removeCalculation(username, c.getId(), c.getName());
 	}
-	
+
 	public static void writeInFile(Object content, Path dest) throws IOException {
 
 		if (Files.exists(dest)) {
@@ -84,6 +86,18 @@ public class FileService {
 			return false;
 		} catch (IOException e) {
 			System.err.println("cannot write to the path : " + e);
+			return false;
+		}
+	}
+
+	public static boolean saveHtmlAsPng(String html, Path pngPath) {
+		try {
+			HtmlImageGenerator imageGenerator = new HtmlImageGenerator();
+			imageGenerator.loadHtml(html);
+			imageGenerator.saveAsImage(pngPath.toString());
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
 			return false;
 		}
 	}
