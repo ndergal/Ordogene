@@ -18,6 +18,7 @@ public class ScheduleBuilder {
 	private final ThreadHandler th;
 	private final Model model;
 	private final int POPULATION_SIZE = 100;
+	private final double probability = 0.01;
 	
 	public ScheduleBuilder(ThreadHandler th, Model model) {
 		this.th = th;
@@ -27,7 +28,7 @@ public class ScheduleBuilder {
 	public void run() {
 		
 		Engine<ActionGene, Long> engine = Engine
-			.builder(this::fitness, Genotype.of(Schedule.of(model), 1))
+			.builder(this::fitness, Genotype.of(Schedule.of(model, probability), 1))
 			.optimize(Type.min.equals(model.getFitness().getType()) ? Optimize.MINIMUM : Optimize.MAXIMUM)
 			//.fitnessScaler(this::fitnessScaler)
 			.populationSize(POPULATION_SIZE)
