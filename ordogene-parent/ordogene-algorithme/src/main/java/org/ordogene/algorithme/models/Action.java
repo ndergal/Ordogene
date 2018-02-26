@@ -1,5 +1,6 @@
 package org.ordogene.algorithme.models;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
@@ -8,7 +9,9 @@ import java.util.stream.Collectors;
 
 import org.ordogene.file.models.JSONAction;
 
-public class Action {
+public class Action implements Serializable {
+	private static final long serialVersionUID = 1L;
+	
 	public static Action EMPTY() {
 		return new Action("EMPTY", 1, Collections.emptySet(), Collections.emptySet());
 	}

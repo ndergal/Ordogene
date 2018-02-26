@@ -1,12 +1,15 @@
 package org.ordogene.algorithme.models;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-public class Environment {
+public class Environment implements Serializable {
+	private static final long serialVersionUID = 1L;
+	
 	private final Map<String, Entity> entities = new HashMap<>();
 	
 	public Environment(Set<Entity> entities) {

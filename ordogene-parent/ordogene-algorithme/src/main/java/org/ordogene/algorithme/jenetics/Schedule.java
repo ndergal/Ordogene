@@ -7,20 +7,21 @@ import java.util.List;
 import org.ordogene.algorithme.Model;
 import org.ordogene.algorithme.models.Action;
 import org.ordogene.algorithme.models.Environment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.jenetics.AbstractChromosome;
 import io.jenetics.Chromosome;
 import io.jenetics.util.ISeq;
+import io.jenetics.util.RandomRegistry;
 
 public class Schedule extends AbstractChromosome<ActionGene> {
 
 	private static final long serialVersionUID = 1L;
+	
+	private static final Logger logger = LoggerFactory.getLogger(Schedule.class);
 
 	private Model model;
-
-	public Model getModel() {
-		return model;
-	}
 
 	public Schedule(ISeq<ActionGene> seq, Model model) {
 		super(seq);
@@ -37,8 +38,9 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 		return new Schedule(genes, model);
 	}
 
-	public static Schedule of(Model model) {
-		// System.out.println("\n\nNEW SCHEDULE");
+
+	public static Schedule of(Model model, double probaToStop) {
+		logger.debug("\n\nNEW SCHEDULE");
 		model.resetModel();
 		// Environment which evolve with the creation
 		Environment currentEnv = model.getStartEnvironment().copy();
@@ -55,15 +57,18 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 		while (model.hasWorkableAction(currentEnv, currentTime) || !map.isEmpty()) {
 
 			// Select a action
-			// System.out.println("Time :" + currentTime);
+			logger.debug("Time :" + currentTime);
+
 			ActionGene actionGene = ActionGene.of(currentEnv, currentTime, model);
 			Action action = actionGene.getAllele();
 
 			// Add action in the seq
 			seq.add(actionGene);
 
-			// System.out.println("Action : " + action);
-			if (!action.equals(Action.EMPTY())) {
+
+			logger.debug("Action : " + action);
+			if(!action.equals(Action.EMPTY())) {
+
 				// Start the action
 				model.startAction(action, currentEnv, currentTime);
 
@@ -80,11 +85,37 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 				currentTime++;
 				endAll(map, currentTime, model, currentEnv);
 			}
+			
+			double randomValue = RandomRegistry.getRandom().nextDouble();
+			if(randomValue < probaToStop) {
+				completeSchedule(seq, map, currentTime, model, currentEnv);
+				break;
+			}
+			
 		}
-		System.out.println("End Env : " + currentEnv);
+
+		System.out.println("Seq : " + seq);
+		System.out.println("End Env :" + currentEnv);
 
 		return new Schedule(ISeq.of(seq), model);
 	}
+
+	private static void completeSchedule(ArrayList<ActionGene> seq, HashMap<Integer, List<Action>> map, int currentTime, Model model,
+			Environment currentEnvironment) {
+		while(!map.isEmpty()) {
+			List<Action> actions = map.get(currentTime);
+			if (actions != null) {
+				for (Action a : actions) {
+					model.endAction(currentEnvironment, a);
+				}
+				seq.add(ActionGene.emptyActionGene());
+			}
+			map.remove(currentTime);
+			currentTime++;
+		}
+		
+	}
+
 
 	private static void endAll(HashMap<Integer, List<Action>> map, int currentTime, Model model,
 			Environment currentEnvironment) {
@@ -95,6 +126,11 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 			}
 		}
 		map.remove(currentTime);
+	}
+
+
+	public Model getModel() {
+		return model;
 	}
 
 }

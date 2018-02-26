@@ -42,8 +42,7 @@ public class Commands {
 	private static final String NOT_IMPLEMENTED_BLOCK_ON_CLI_SIDE = "Not implemented (block on CLI side)";
 	private static final String CALCULATIONS = "/calculations/";
 	private static final String PROBLEM_WITH_THE_COMMUNICATION_BETWEEN_CLIENT_AND_SERVER = "Problem with the communication between client and server";
-
-	private final SimpleDateFormat formater = new SimpleDateFormat("dd/MM/yyyy-hh:mm");
+	private final SimpleDateFormat formater = new SimpleDateFormat("dd/MM/yyyy-HH:mm");
 	private String id;
 	private static final Logger log = LoggerFactory.getLogger(Commands.class);
 
@@ -220,7 +219,7 @@ public class Commands {
 
 		ResponseEntity<ApiJsonResponse> response = null;
 		try {
-			response = restTemplate.exchange("/" + id + "/calculations/" + calculationID, HttpMethod.DELETE, null,
+			response = restTemplate.exchange("/" + id + CALCULATIONS + calculationID, HttpMethod.DELETE, null,
 					ApiJsonResponse.class);
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
 			log.error(e.getStatusCode() + " -- " + e.getStatusText());

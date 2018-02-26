@@ -2,6 +2,8 @@ package org.ordogene.algorithme.master;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
 import java.util.HashMap;
@@ -11,6 +13,7 @@ import java.util.Objects;
 import javax.xml.bind.UnmarshalException;
 
 import org.ordogene.algorithme.Model;
+import org.ordogene.algorithme.jenetics.CalculationHandler;
 import org.ordogene.file.JSONModel;
 import org.ordogene.file.parser.Parser;
 import org.ordogene.file.utils.Calculation;
@@ -54,6 +57,9 @@ public class Master {
 
 		String toHash = jsonString + (new Date()).toString();
 		int calculationId = toHash.hashCode();
+
+		Path calculationPath = Paths.get(Const.getConst().get("ApplicationPath") + File.separatorChar + idUser+ File.separatorChar +""+calculationId+"_"+model.getName());
+		Files.createDirectories(calculationPath);
 
 		ThreadHandler th = new ThreadHandler();
 
