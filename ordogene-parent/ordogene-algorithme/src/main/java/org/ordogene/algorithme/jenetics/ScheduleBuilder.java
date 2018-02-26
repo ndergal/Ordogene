@@ -17,7 +17,7 @@ public class ScheduleBuilder {
 	
 	private final ThreadHandler th;
 	private final Model model;
-	private final int POPULATION_SIZE = 1;
+	private final int POPULATION_SIZE = 100;
 	
 	public ScheduleBuilder(ThreadHandler th, Model model) {
 		this.th = th;
@@ -32,13 +32,13 @@ public class ScheduleBuilder {
 			//.fitnessScaler(this::fitnessScaler)
 			.populationSize(POPULATION_SIZE)
 			.selector(new TournamentSelector<>())
-			.alterers(new ScheduleCrossover(0.2))
+			.alterers(new ScheduleCrossover(0.2), new ScheduleMutator(0.005))
 			.build();
 		
 		EvolutionStatistics<Long, DoubleMomentStatistics> statistics = EvolutionStatistics.ofNumber();
 		
 		Phenotype<ActionGene, Long> best = engine.stream()
-			.limit(1)
+			.limit(1000)
 			.peek(result -> {
 				//System.out.println(result.getGeneration() + " : " + result.getBestFitness());
 				result.getPopulation().forEach(pheno -> {

@@ -18,11 +18,14 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 
 	private Model model;
 
+	public Model getModel() {
+		return model;
+	}
+
 	public Schedule(ISeq<ActionGene> seq, Model model) {
 		super(seq);
 		this.model = model;
 	}
-
 
 	@Override
 	public Chromosome<ActionGene> newInstance() {
@@ -35,7 +38,7 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 	}
 
 	public static Schedule of(Model model) {
-		//System.out.println("\n\nNEW SCHEDULE");
+		// System.out.println("\n\nNEW SCHEDULE");
 		model.resetModel();
 		// Environment which evolve with the creation
 		Environment currentEnv = model.getStartEnvironment().copy();
@@ -52,18 +55,18 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 		while (model.hasWorkableAction(currentEnv, currentTime) || !map.isEmpty()) {
 
 			// Select a action
-			//System.out.println("Time :" + currentTime);
+			// System.out.println("Time :" + currentTime);
 			ActionGene actionGene = ActionGene.of(currentEnv, currentTime, model);
 			Action action = actionGene.getAllele();
 
 			// Add action in the seq
 			seq.add(actionGene);
 
-			//System.out.println("Action : " + action);
-			if(!action.equals(Action.EMPTY())) {
+			// System.out.println("Action : " + action);
+			if (!action.equals(Action.EMPTY())) {
 				// Start the action
 				model.startAction(action, currentEnv, currentTime);
-	
+
 				// Add action in map to end it
 				int endTime = currentTime + action.getTime();
 				List<Action> actions = map.get(endTime);
@@ -79,7 +82,7 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 			}
 		}
 		System.out.println("End Env : " + currentEnv);
-		
+
 		return new Schedule(ISeq.of(seq), model);
 	}
 

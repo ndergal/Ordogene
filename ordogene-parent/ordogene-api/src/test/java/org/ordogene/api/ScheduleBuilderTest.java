@@ -21,7 +21,7 @@ public class ScheduleBuilderTest {
 	@Test
 	public void testScheduleBuilder() throws Exception {
 		URL urlTestFile = ScheduleBuilderTest.class.getClassLoader()
-				.getResource("OrdogeneCalculationExamples" + File.separator + "short_path_10.json");
+				.getResource("OrdogeneCalculationExamples" + File.separator + "tiny_strategy_game.json");
 		byte[] contentFile = Files.readAllBytes(Paths.get(urlTestFile.toURI()));
 		String jsonContent = new String(contentFile);
 		
