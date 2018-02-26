@@ -8,7 +8,7 @@ public class ActionGene implements Gene<Action, ActionGene> {
 
 	private final Action action;
 	private final int startTime;
-	
+
 	public ActionGene(Action action, int startTime) {
 		this.action = action;
 		this.startTime = startTime;
@@ -18,7 +18,7 @@ public class ActionGene implements Gene<Action, ActionGene> {
 	@Override
 	public boolean isValid() {
 		return true;
-		//return model.workable(action, currentEnvironment);
+		// return model.workable(action, currentEnvironment);
 	}
 
 	@Override
@@ -35,7 +35,7 @@ public class ActionGene implements Gene<Action, ActionGene> {
 	public ActionGene newInstance(Action action) {
 		return new ActionGene(action, startTime);
 	}
-	
+
 	public static ActionGene of(Action action, int startTime) {
 		return new ActionGene(action, startTime);
 	}
@@ -43,6 +43,10 @@ public class ActionGene implements Gene<Action, ActionGene> {
 	@Override
 	public String toString() {
 		return "ActionGene [action=" + action.getName() + "]";
+	}
+
+	public int getStartTime() {
+		return startTime;
 	}
 
 }

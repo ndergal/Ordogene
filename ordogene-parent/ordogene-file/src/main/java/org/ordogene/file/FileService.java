@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.SecureRandom;
@@ -15,6 +16,8 @@ import org.ordogene.file.utils.Calculation;
 import org.ordogene.file.utils.Const;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import gui.ava.html.image.generator.HtmlImageGenerator;
 
 public class FileService {
 
@@ -46,11 +49,11 @@ public class FileService {
 	public List<Calculation> getUserCalculations(String username) {
 		return ch.getCalculations(username);
 	}
-	
+
 	public boolean removeUserCalculation(String username, Calculation c) {
 		return ch.removeCalculation(username, c.getId(), c.getName());
 	}
-	
+
 	public static void writeInFile(Object content, Path dest) throws IOException {
 
 		if (Files.exists(dest)) {
@@ -88,8 +91,27 @@ public class FileService {
 		}
 	}
 
-	public static String getCalculationPath(String userId, Calculation calcul) {
+	public static String getCalculationPngPath(String userId, Calculation calcul) {
 		return Const.getConst().get("ApplicationPath") + File.separator + userId + File.separator + calcul.getId() + "_"
 				+ calcul.getName() + File.separator + "result.png";
+	}
+
+	public static boolean saveHtmlAndPng(String html, Path pngPath, Path htmlPath) {
+		try {
+			Files.createDirectories(pngPath.getParent());
+			Files.createDirectories(htmlPath.getParent());
+			if (htmlPath != null) {
+				Files.write(htmlPath, html.getBytes(StandardCharsets.UTF_8));
+			}
+
+			HtmlImageGenerator imageGenerator = new HtmlImageGenerator();
+			imageGenerator.loadHtml(html);
+			imageGenerator.saveAsImage(pngPath.toString());
+
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 }
