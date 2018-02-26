@@ -1,17 +1,17 @@
 package org.ordogene.algorithme.jenetics;
 
-import org.ordogene.algorithme.Model;
 import org.ordogene.algorithme.models.Action;
-import org.ordogene.algorithme.models.Environment;
 
 import io.jenetics.Gene;
 
 public class ActionGene implements Gene<Action, ActionGene> {
 
 	private final Action action;
-	
-	public ActionGene(Action action) {
+	private final int startTime;
+
+	public ActionGene(Action action, int startTime) {
 		this.action = action;
+		this.startTime = startTime;
 	}
 
 	// TODO find a solution
@@ -27,26 +27,25 @@ public class ActionGene implements Gene<Action, ActionGene> {
 
 	@Override
 	public ActionGene newInstance() {
-		return new ActionGene(action);
+		return new ActionGene(action, startTime);
 	}
 
 	@Override
 	public ActionGene newInstance(Action action) {
-		return new ActionGene(action);
+		return new ActionGene(action, startTime);
 	}
-	
-	public static ActionGene of(Environment currentEnvironment, int currentTime, Model model) {
-		Action newAction = model.getWorkableAction(currentEnvironment, currentTime);
-		return new ActionGene(newAction);
-	}
-	
-	public static ActionGene emptyActionGene() {
-		return new ActionGene(Action.EMPTY());
+
+	public static ActionGene of(Action action, int startTime) {
+		return new ActionGene(action, startTime);
 	}
 
 	@Override
 	public String toString() {
 		return "ActionGene [action=" + action.getName() + "]";
+	}
+
+	public int getStartTime() {
+		return startTime;
 	}
 
 }

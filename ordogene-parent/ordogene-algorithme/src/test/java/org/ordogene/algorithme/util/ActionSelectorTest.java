@@ -23,7 +23,7 @@ public class ActionSelectorTest {
 	
 	@Test
 	public void should_assert_true_for_empty_action_list() {
-		assertThat(mockActionSelector.isReset()).isTrue();
+		assertThat(mockActionSelector.isEmpty()).isTrue();
 	}
 	
 	@Test
@@ -32,7 +32,7 @@ public class ActionSelectorTest {
 		Action action = mock(Action.class);
 		
 		mockActionSelector.add(action, 0);
-		assertThat(mockActionSelector.isReset()).isFalse();
+		assertThat(mockActionSelector.isEmpty()).isFalse();
 	}
 	
 	@Test
@@ -45,10 +45,10 @@ public class ActionSelectorTest {
 		
 		// then - assertions via assertj
 		mockActionSelector.add(action, 0);
-		assertThat(mockActionSelector.isReset()).isFalse();
+		assertThat(mockActionSelector.isEmpty()).isFalse();
 		
 		mockActionSelector.reset();
-		assertThat(mockActionSelector.isReset()).isTrue();
+		assertThat(mockActionSelector.isEmpty()).isTrue();
 	}
 	
 	@Test

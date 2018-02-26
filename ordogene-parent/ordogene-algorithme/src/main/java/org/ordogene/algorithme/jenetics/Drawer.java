@@ -1,10 +1,5 @@
 package org.ordogene.algorithme.jenetics;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,27 +9,40 @@ import java.util.stream.Collectors;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
-import org.ordogene.algorithme.models.Action;
-import org.ordogene.file.FileService;
-
 import edu.emory.mathcs.backport.java.util.Arrays;
-import gui.ava.html.image.generator.HtmlImageGenerator;
 import io.jenetics.Phenotype;
 
 public class Drawer {
 
-	static String[][] buildStringActionMatrix(Phenotype<ActionGene, Long> individu) { // maxSize = model.getslot()
+	static String buildHtmlTableHeader(String prefix, Object[][] content) {
+		int nbCol = 0;
+		for (Object[] aga : content) {
+			if (aga.length > nbCol)
+				nbCol = aga.length;
+		}
+		StringBuilder sb = new StringBuilder();
+		// header
+		sb.append("<tr>");
+		for (int j = 0; j < nbCol; j++) {
+			sb.append("<th>").append(prefix).append(" ").append(j).append("</th>");
+		}
+
+		sb.append("</tr>");
+		return sb.toString();
+	}
+
+	static ActionGene[][] buildStringActionMatrix(Phenotype<ActionGene, Long> individu) { // maxSize = model.getslot()
 		Schedule s = (Schedule) individu.getGenotype().getChromosome();
-		List<Action> actions = s.stream().map(ActionGene::getAllele).collect(Collectors.toList());
+		List<ActionGene> actions = s.stream().collect(Collectors.toList());
 		int maxSize = s.getModel().getSlots();
-		HashMap<Integer, Action> indexedActions = new HashMap<>();
+		HashMap<Integer, ActionGene> indexedActions = new HashMap<>();
 		int nextIndex = 1; // index start from 1
 		List<int[]> indexedList = new ArrayList<>(); // list = (Y axis on the paper) int[] = X axis
-		int time = 0;
 		int realMaxSize = 0;
-		int[] currentArray = new int[maxSize];
-		for (Action action : actions) {
-			int line = searchFreeCell(indexedList, time); // Find the next index : the next free int[] at (time). <-
+		for (ActionGene action : actions) {
+			int startTime = action.getStartTime();
+			int line = searchFreeCell(indexedList, startTime); // Find the next index : the next free int[] at (time).
+																// <-
 			// current list index
 			if (line == -1) {
 				// no free space at (time) : create a new int[]
@@ -43,17 +51,13 @@ public class Drawer {
 				indexedList.add(newLine);
 				line = indexedList.size() - 1;
 			}
-			if (action.equals(Action.EMPTY())) {
-				addIntToArray(0, indexedList.get(line), time, action.getTime());
-				time++;
-			} else {
-				indexedActions.put(nextIndex, action);
-				addIntToArray(nextIndex, indexedList.get(line), time, action.getTime());
-				if (time + action.getTime() > realMaxSize) {
-					realMaxSize = time + action.getTime();
-				}
-				nextIndex++;
+
+			indexedActions.put(nextIndex, action);
+			addIntToArray(nextIndex, indexedList.get(line), startTime, action.getAllele().getTime());
+			if (startTime + action.getAllele().getTime() > realMaxSize) {
+				realMaxSize = startTime + action.getAllele().getTime();
 			}
+			nextIndex++;
 
 			int[][] toPrintArray2 = new int[indexedList.size()][];
 			toPrintArray2 = indexedList.toArray(toPrintArray2);
@@ -62,7 +66,6 @@ public class Drawer {
 		// remove all "-1" useless cells
 
 		final int realMaxSizef = realMaxSize;
-		System.out.println("realMaxSizef = " + realMaxSizef);
 		//
 		// for (int i = 0; i < indexedList.size(); i++) {
 		// int[] intArray = indexedList.get(i);
@@ -72,38 +75,34 @@ public class Drawer {
 		// indexedList.set(i, truncatedArray);
 		// System.out.println("truncatedArray after = " + truncatedArray.length);
 		// }
-		boolean displayEmpty = true;
-		List<String[]> actionReplacedList = new ArrayList<>();
+		List<ActionGene[]> actionReplacedList = new ArrayList<>();
 		indexedList.forEach(intArray -> {
 			int[] truncatedArray = new int[realMaxSizef];
 			System.arraycopy(intArray, 0, truncatedArray, 0, realMaxSizef);
 
-			actionReplacedList.add(replaceRefByAction(truncatedArray, indexedActions, displayEmpty));
+			actionReplacedList.add(replaceRefByAction(truncatedArray, indexedActions));
 
 		});
 
-		String[][] toPrintArray = new String[actionReplacedList.size()][];
-		toPrintArray = actionReplacedList.toArray(toPrintArray);
+		ActionGene[][] res = new ActionGene[actionReplacedList.size()][];
+		res = actionReplacedList.toArray(res);
 
-		 
-//		System.out.println();
-//		print2DArray(toPrintArray);
-//		System.out.println();
+		System.out.println();
+		print2DArray(res);
+		System.out.println();
 
-		return toPrintArray;
+		return res;
 
 	}
 
-	private static String[] replaceRefByAction(int[] indexed, Map<Integer, Action> corresp, boolean displayEmpty) {
-		String[] res = new String[indexed.length];
+	private static ActionGene[] replaceRefByAction(int[] indexed, Map<Integer, ActionGene> corresp) {
+		ActionGene[] res = new ActionGene[indexed.length];
 		for (int counter = 0; counter < indexed.length; counter++) {
 			if (indexed[counter] > 0) {
-				Action currentAction = corresp.get(indexed[counter]);
-				res[counter] = currentAction.getName();
-			} else if (displayEmpty && indexed[counter] == 0) {
-				res[counter] = " (Empty) ";
+				res[counter] = corresp.get(indexed[counter]);
+
 			} else {
-				res[counter] = "         ";
+				res[counter] = null;
 			}
 		}
 
@@ -133,69 +132,49 @@ public class Drawer {
 
 	}
 
-	static void saveHtmlTable(String[] colNames, Object[][] toPrintData, Path pngDest, boolean display)
-			throws IOException {
-		if (colNames == null) {
-			colNames = new String[] {};
-		}
-		final String[] cName = colNames;
-
-		/*
-		 * Runnable r = new Runnable() {
-		 * 
-		 * @Override public void run() { htmlTableDrawer(cName, toPrintData); } };
-		 * SwingUtilities.invokeLater(r);
-		 */
-		String htmlArray = htmlTableBuilder(cName, 50.0, "px", toPrintData, pngDest,
-				display);
-
-	}
-
-	private static String htmlTableBuilder(String[] colNames, double cellSize, String unit, Object[][] toPrintData,
-			Path pngDestPath, boolean display) {
+	static String htmlTableBuilder(String header, double cellSize, String unit, ActionGene[][] toPrintData,
+			boolean display) {
+		// content
+		StringBuilder sbTr = new StringBuilder();
 		StringBuilder sb = new StringBuilder();
 		sb.append("<html><body><table border=1>");
-
-		sb.append("<tr>");
-		for (String columnName : colNames) {
-			sb.append("<th>");
-			sb.append(columnName);
-			sb.append("</th>");
-		}
-		sb.append("</tr>");
-		for (Object[] row : toPrintData) {
-			sb.append("<tr>");
+		int nbColsMax = 0;
+		for (ActionGene[] row : toPrintData) {
+			sbTr.append("<tr>");
 			for (int i = 0; i < row.length; i++) { // write data
 				// check if the nexts cells are == to row[i]
-				int counterEquals = 1;
-				while (i + counterEquals < row.length && row[i + counterEquals].equals(row[i])
-						&& !row[i].equals("         ") && !row[i].equals(" (Empty) ")) {
-					counterEquals++;
+				int currentActionDuration = 1;
+				int nbCols = 0;
+				if (row[i] != null && row[i].getAllele() != null) {
+					currentActionDuration = row[i].getAllele().getTime();
 				}
-				if (counterEquals > 1) {
-					sb.append(
-							"<td style='width:" + cellSize * counterEquals + unit + "' colspan=" + counterEquals + ">");
-					sb.append(row[i]);
-					sb.append("</td>");
-					i = i + counterEquals - 1;
+				nbCols += currentActionDuration;
+				if (currentActionDuration > 1) {
+					sbTr.append("<td style='width:" + cellSize * currentActionDuration + unit + "' colspan="
+							+ currentActionDuration + ">");
+					if (row[i] != null) {
+						sbTr.append(row[i].getAllele().getName());
+					}
+					sbTr.append("</td>");
+					i = i + currentActionDuration - 1;
 				} else {
-					sb.append("<td style='width:" + cellSize + unit + "'>");
-					sb.append(row[i]);
-					sb.append("</td>");
+					sbTr.append("<td style='width:" + cellSize + unit + "'>");
+					if (row[i] != null) {
+						sbTr.append(row[i].getAllele().getName());
+					}
+					sbTr.append("</td>");
 				}
-
+				if (nbCols > nbColsMax) {
+					nbColsMax = nbCols;
+				}
 			}
-
-			sb.append("</tr>");
+			sbTr.append("</tr>");
 		}
-		sb.append("</table>");
+		sbTr.append("</table>");
 
-		if (pngDestPath != null) {
-			System.out.println("try to save : "+pngDestPath.toString());
-			FileService.saveHtmlAsPng(sb.toString(), pngDestPath);
-		}
+		sb.append(header);
 
-		String res = sb.toString();
+		String res = sb.toString() + sbTr.toString();
 		if (display) {
 			System.out.println(res);
 			JOptionPane.showMessageDialog(null, new JLabel(res));

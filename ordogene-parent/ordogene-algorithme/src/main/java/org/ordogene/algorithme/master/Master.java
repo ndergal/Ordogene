@@ -33,7 +33,7 @@ public class Master {
 	}
 
 	public Master(int maxThread) {
-		if(maxThread <= 0) {
+		if (maxThread <= 0) {
 			throw new IllegalArgumentException("The max Thread can not be zero or negative");
 		}
 		this.maxThread = maxThread;
@@ -44,7 +44,7 @@ public class Master {
 
 		Objects.requireNonNull(idUser);
 		Objects.requireNonNull(jsonString);
-		
+
 		synchronized (threadMap) {
 			if (currentThread == maxThread) {
 				return null;
@@ -58,7 +58,8 @@ public class Master {
 		String toHash = jsonString + (new Date()).toString();
 		int calculationId = toHash.hashCode();
 
-		Path calculationPath = Paths.get(Const.getConst().get("ApplicationPath") + File.separatorChar + idUser+ File.separatorChar +""+calculationId+"_"+model.getName());
+		Path calculationPath = Paths.get(Const.getConst().get("ApplicationPath") + File.separatorChar + idUser
+				+ File.separatorChar + "" + calculationId + "_" + model.getName());
 		Files.createDirectories(calculationPath);
 
 		ThreadHandler th = new ThreadHandler();

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.SecureRandom;
@@ -90,20 +91,27 @@ public class FileService {
 		}
 	}
 
-	public static boolean saveHtmlAsPng(String html, Path pngPath) {
+	public static String getCalculationPngPath(String userId, Calculation calcul) {
+		return Const.getConst().get("ApplicationPath") + File.separator + userId + File.separator + calcul.getId() + "_"
+				+ calcul.getName() + File.separator + "result.png";
+	}
+
+	public static boolean saveHtmlAndPng(String html, Path pngPath, Path htmlPath) {
 		try {
+			Files.createDirectories(pngPath.getParent());
+			Files.createDirectories(htmlPath.getParent());
+			if (htmlPath != null) {
+				Files.write(htmlPath, html.getBytes(StandardCharsets.UTF_8));
+			}
+
 			HtmlImageGenerator imageGenerator = new HtmlImageGenerator();
 			imageGenerator.loadHtml(html);
 			imageGenerator.saveAsImage(pngPath.toString());
+
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}
-	}
-
-	public static String getCalculationPath(String userId, Calculation calcul) {
-		return Const.getConst().get("ApplicationPath") + File.separator + userId + File.separator + calcul.getId() + "_"
-				+ calcul.getName() + File.separator + "result.png";
 	}
 }
