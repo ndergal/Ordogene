@@ -46,7 +46,7 @@ public class CalculationHandler {
 				.builder(this::fitness, Genotype.of(Schedule.of(model, CHANCE_TO_STOP_SCHEDULE_CREATION), 1))
 				.optimize(Type.min.equals(model.getFitness().getType()) ? Optimize.MINIMUM : Optimize.MAXIMUM)
 				.fitnessScaler(this::fitnessScaler).populationSize(POPULATION_SIZE).selector(new TournamentSelector<>())
-				.alterers(new ScheduleCrossover(0.2)).build();
+				.alterers(new ScheduleCrossover(model, 0.2)).build();
 
 		// Instantiate a module to have information at the end of calculation
 		EvolutionStatistics<Long, DoubleMomentStatistics> statistics = EvolutionStatistics.ofNumber();

@@ -1,5 +1,5 @@
 {
-    "snaps" : [5,-10,20,100],
+	"name" : "test1.json",
     "slots" : 300,
     "exec_time" : 10000,
     "environment" : [
