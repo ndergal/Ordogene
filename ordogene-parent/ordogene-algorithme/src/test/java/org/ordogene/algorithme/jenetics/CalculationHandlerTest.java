@@ -68,7 +68,7 @@ public class CalculationHandlerTest {
 		String jsonContent = new String(contentFile);
 
 		CalculationHandler sb = new CalculationHandler(new ThreadHandler(),
-				Model.createModel((JSONModel) Parser.parseJsonFile(jsonContent, JSONModel.class)), userId, 0);
+				Model.createModel((JSONModel) Parser.parseJsonFile(jsonContent, JSONModel.class)), userId, 10);
 		sb.launchCalculation();
 	}
 }

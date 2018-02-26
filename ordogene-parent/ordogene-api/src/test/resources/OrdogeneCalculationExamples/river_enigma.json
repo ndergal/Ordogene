@@ -1,5 +1,4 @@
 {
-    "snaps" : [5,10,20,100],
     "name" : "river_enigma.json",
     "slots" : 100,
     "exec_time" : 10000,
@@ -11,7 +10,7 @@
 	{"name" : "A_D", "quantity" : 0},
 	{"name" : "B_D", "quantity" : 0},
 	{"name" : "C_D", "quantity" : 0},	
-	{"name" : "D_D", "quantity" : 0}
+	{"name" : "D_D", "quantity" : 0},
 	{"name" : "Boat_G", "quantity" : 1},
 	{"name" : "Boat_D", "quantity" : 0}
     ],
