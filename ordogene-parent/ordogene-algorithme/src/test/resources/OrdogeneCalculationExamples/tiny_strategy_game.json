@@ -1,7 +1,7 @@
 {
     "name" : "small_strategy_game.json",
     "slots" : 300,
-    "exec_time" : 10000,
+    "exec_time" : 5,
     "environment" : [
 	{"name" : "Nexus", "quantity" : 1},
 	{"name" : "Peon", "quantity" : 1},
