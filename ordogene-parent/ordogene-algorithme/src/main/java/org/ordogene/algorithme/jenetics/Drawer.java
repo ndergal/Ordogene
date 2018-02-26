@@ -132,12 +132,12 @@ public class Drawer {
 
 	}
 
-	static String htmlTableBuilder(String header, double cellSize, String unit, ActionGene[][] toPrintData,
+	static String htmlTableBuilder(String title, String header, double cellSize, String unit, ActionGene[][] toPrintData,
 			boolean display) {
 		// content
 		StringBuilder sbTr = new StringBuilder();
 		StringBuilder sb = new StringBuilder();
-		sb.append("<html><body><table border=1>");
+		sb.append("<html><body><h2>").append(title).append("</h2><table border=1>");
 		int nbColsMax = 0;
 		for (ActionGene[] row : toPrintData) {
 			sbTr.append("<tr>");

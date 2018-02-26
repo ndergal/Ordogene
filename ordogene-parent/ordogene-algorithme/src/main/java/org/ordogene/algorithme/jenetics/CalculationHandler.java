@@ -113,7 +113,7 @@ public class CalculationHandler {
 					+ tmpCalc.getId() + "_" + model.getName() + File.separatorChar + "result.html");
 
  
-			String htmlArray = Drawer.htmlTableBuilder(htmlTableHeader, 60.0, "px", actionGeneArray, false);
+			String htmlArray = Drawer.htmlTableBuilder(model.getName(), htmlTableHeader, 60.0, "px", actionGeneArray, false);
 			System.out.print("try to save : " + destPng.toString() + " and " + htmlDest.toString() + " ... ");
 			boolean saveSuccess = FileService.saveHtmlAndPng(htmlArray, destPng, htmlDest);
 			if (saveSuccess) {
