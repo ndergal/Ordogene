@@ -23,7 +23,6 @@ import org.ordogene.file.utils.Const;
 public class MasterTest {
 	
 	String JSONmodel = "{\n" + 
-			"    \"snaps\" : [5,10,20,100],\n" + 
 			"    \"name\" : \"small_strategy_game.json\",\n" + 
 			"    \"slots\" : 300,\n" + 
 			"    \"exec_time\" : 5,\n" + 

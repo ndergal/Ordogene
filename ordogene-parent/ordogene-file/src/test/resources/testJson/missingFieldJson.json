@@ -1,5 +1,4 @@
 {
-    "slots" : 300,
     "exec_time" : 10000,
     "environment" : [
 	{"name" : "FUEL", "quantity" : 200},

@@ -1,10 +1,9 @@
 {
-    "snaps" : [5,-10,20,100],
     "slots" : 300,
     "exec_time" : 10000,
     "environment" : [
 	{"name" : "FUEL", "quantity" : 200},
-	{"name" : "BIG_GOOD", "quantity" : 0},
+	{"name" : "BIG_GOOD", "quantity" : 0}
 	{"name" : "SMALL_BAD", "quantity" : 0}
     ],
     "actions" : [
