@@ -59,6 +59,8 @@ public class CalculationHandler {
 		int maxIteration = 100; // TODO change it by model.getExecTime()
 		boolean interupted = false;
 		Phenotype<ActionGene, Long> best = null;
+		long lastSave = System.currentTimeMillis();
+		long lastSavedIteration = 0;
 
 		while (itEngine.hasNext() && iteration < maxIteration && !interupted) {
 			EvolutionResult<ActionGene, Long> generation = itEngine.next();
@@ -71,8 +73,7 @@ public class CalculationHandler {
 			try {
 				String str = th.threadFromMaster();
 				if (str != null && str.equals("state")) {
-					// TODO change 1 by real value
-					String msg = constructStateString(iteration, maxIteration, 1, best.getFitness());
+					String msg = constructStateString(iteration, maxIteration, lastSavedIteration, best.getFitness());
 					th.threadToMaster(msg.toString());
 				} else if (str != null && str.equals("interrupt")) {
 					interupted = true;
@@ -81,6 +82,13 @@ public class CalculationHandler {
 				interupted = true;
 				Thread.currentThread().interrupt();
 			}
+			
+			long currentTime = System.currentTimeMillis();
+			if (lastSave + 60_000 < currentTime) {
+				lastSave = currentTime;
+				lastSavedIteration = generation.getGeneration();
+				Drawer.buildStringActionMatrix(best);
+			}
 		}
 
 		// TODO change 1 by real value
@@ -88,10 +96,10 @@ public class CalculationHandler {
 
 		if (best != null) {
 
-			tmpCalc.setCalculation(currentDate.getTime(), iteration, 1, maxIteration, calculationId, model.getName(),
+			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, calculationId, model.getName(),
 					best.getFitness());
 		} else {
-			tmpCalc.setCalculation(currentDate.getTime(), iteration, 1, maxIteration, calculationId, model.getName(),
+			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, calculationId, model.getName(),
 					0);
 		}
 
@@ -118,7 +126,7 @@ public class CalculationHandler {
 		System.out.println(statistics);
 	}
 
-	private String constructStateString(int iteration, int maxIter, int lastIterationSaved, long fitness) {
+	private String constructStateString(int iteration, int maxIter, long lastIterationSaved, long fitness) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(currentDate.getTime()).append("_");
 		sb.append(iteration).append("_");
