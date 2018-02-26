@@ -1,7 +1,6 @@
 package org.ordogene.algorithme.jenetics;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -19,7 +18,7 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 
 	private static final long serialVersionUID = 1L;
 
-	private Model model;
+	private final Model model;
 
 	public Schedule(ISeq<ActionGene> seq, Model model) {
 		super(seq);
@@ -127,6 +126,11 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 		System.out.println("Size seq : " + seq.size());
 		System.out.println("End Env :" + finalEnv);
 		return new Schedule(ISeq.of(seq), model);
+	}
+
+
+	public Model getModel() {
+		return model;
 	}
 
 }
