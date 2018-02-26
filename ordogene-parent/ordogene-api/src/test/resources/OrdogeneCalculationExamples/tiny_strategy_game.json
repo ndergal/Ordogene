@@ -1,5 +1,4 @@
 {
-    "snaps" : [5,10,20,100],
     "name" : "small_strategy_game.json",
     "slots" : 300,
     "exec_time" : 5,

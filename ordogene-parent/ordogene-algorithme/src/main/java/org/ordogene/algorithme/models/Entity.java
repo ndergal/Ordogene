@@ -10,13 +10,25 @@ public class Entity implements Serializable {
 	
 	private final String name;
 	private int quantity;
+	private boolean available = false;
 	
 	public Entity(String name, int quantity) {
-		if(quantity <0){
+		if(quantity < 0){
 			throw new IllegalArgumentException("the quantity of an entity cannot be negative");
 		}
 		this.name = Objects.requireNonNull(name);
 		this.quantity = quantity;
+		if(quantity > 0) {
+			this.available = true;
+		}
+	}
+	
+	public boolean isAvailable() {
+		return available;
+	}
+
+	public void setAvailable(boolean available) {
+		this.available = available;
 	}
 	
 	public static Entity createEntity(JSONEntity je) {
@@ -32,6 +44,9 @@ public class Entity implements Serializable {
 		if(quantity + q < 0) {
 			throw new IllegalArgumentException("The end quantity can't be negative.");
 		}
+		if(quantity == 0) {
+			available = false;
+		}
 		quantity += q;
 	}
 
@@ -40,6 +55,20 @@ public class Entity implements Serializable {
 			throw new IllegalArgumentException("The end quantity can't be negative.");
 		}
 		this.quantity = quantity;
+	}
+	
+	public void putInPending(int q) {
+		if(q < 0) {
+			throw new IllegalArgumentException("The quantity to put in pending can't be negative.");
+		}
+		quantity -= q;
+	}
+	
+	public void free(int q) {
+		if(q < 0) {
+			throw new IllegalArgumentException("The quantity to free can't be negative.");
+		}
+		quantity += q;
 	}
 
 	public String getName() {

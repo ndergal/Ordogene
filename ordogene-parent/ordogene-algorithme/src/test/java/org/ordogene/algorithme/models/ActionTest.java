@@ -17,11 +17,6 @@ import edu.emory.mathcs.backport.java.util.Collections;
 public class ActionTest {
 
 	@Test
-	public void testEMPTY() {
-		Action.EMPTY();
-	}
-
-	@Test
 	public void testAction() {
 		new Action("name", 1, Collections.emptySet(), Collections.emptySet());
 	}

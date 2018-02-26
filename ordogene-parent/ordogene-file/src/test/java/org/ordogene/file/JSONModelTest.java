@@ -7,7 +7,6 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 
 import javax.xml.bind.UnmarshalException;
 
@@ -30,14 +29,6 @@ public class JSONModelTest {
 		when(m.toString()).thenReturn("Model\n[snaps=[5, 10, 20, 100],\nname=fitness1.json,\nslots=300,\nexecTime=10000,\nenvironment=[Entity [name=FUEL, quantity=200], Entity [name=BIG_GOOD, quantity=0], Entity [name=SMALL_BAD, quantity=0]],\nactions=[Action [name=MAKE_GOOD, time=5, input=[Input [name=FUEL, quantity=60, relation=c]], output=[Entity [name=BIG_GOOD, quantity=1]]], Action [name=MAKE_BAD, time=2, input=[Input [name=FUEL, quantity=6, relation=c]], output=[Entity [name=SMALL_BAD, quantity=1]]]],\nfitness=Fitness [type=max, value=null, operands=[Operand [name=BIG_GOOD, coef=11], Operand [name=SMALL_BAD, coef=1]]]]");
 		JSONModel m1 = (JSONModel) Parser.parseJsonFile(Paths.get(JSONModelTest.class.getClassLoader().getResource("testJson/fitness1.json").toURI()), JSONModel.class);
 		assertEquals(m.toString(), m1.toString());
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void should_IAE_if_a_snap_negatif() {
-		JSONModel m = new JSONModel();
-		ArrayList<Integer> l = new ArrayList<>();
-		l.add(-2);
-		m.setSnaps(l);
 	}
 
 	@Test(expected = JsonMappingException.class)

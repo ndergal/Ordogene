@@ -22,7 +22,6 @@ public class Model implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private static final String CURRENT_TIME_CANNOT_BE_NEGATIVE = "The current time cannot be negative";
-	private final List<Integer> snaps;
 	private final String name;
 	private final int slots;
 	private final int execTime;
@@ -31,7 +30,7 @@ public class Model implements Serializable {
 	private final Fitness fitness;
 	private ActionSelector actionSelector = new ActionSelector();
 
-	public Model(List<Integer> snaps, String name, int slots, int execTime, Environment environment,
+	public Model(String name, int slots, int execTime, Environment environment,
 			Set<Action> actions, Fitness fitness) {
 		if (slots <= 0) {
 			throw new IllegalArgumentException("slots has to be a positive integer");
@@ -43,12 +42,10 @@ public class Model implements Serializable {
 			throw new IllegalArgumentException("The name can't be empty");
 		}
 		this.name = name;
-		this.snaps = Objects.requireNonNull(snaps);
 		this.slots = slots;
 		this.execTime = execTime;
 		this.startEnvironment = Objects.requireNonNull(environment);
 		actions.forEach(a -> this.actions.add(Objects.requireNonNull(a)));
-		this.actions.add(Action.EMPTY());
 		this.fitness = Objects.requireNonNull(fitness);
 	}
 
@@ -57,8 +54,7 @@ public class Model implements Serializable {
 		Environment env = new Environment(
 				jm.getEnvironment().stream().map(Entity::createEntity).collect(Collectors.toSet()));
 		Set<Action> actions = jm.getActions().stream().map(Action::createAction).collect(Collectors.toSet());
-		List<Integer> snaps = jm.getSnaps().stream().collect(Collectors.toList());
-		return new Model(snaps, jm.getName(), jm.getSlots(), jm.getExecTime(), env, actions,
+		return new Model(jm.getName(), jm.getSlots(), jm.getExecTime(), env, actions,
 				Fitness.createFitness(jm.getFitness()));
 	}
 
@@ -71,7 +67,6 @@ public class Model implements Serializable {
 			throw new IllegalArgumentException(CURRENT_TIME_CANNOT_BE_NEGATIVE);
 		}
 		return actions.stream()
-				.filter(a -> !a.equals(Action.EMPTY()))
 				.anyMatch(a -> this.workable(a, currentEnvironment, currentTime));
 	}
 
@@ -104,14 +99,13 @@ public class Model implements Serializable {
 		if(currentTime < 0) {
 			throw new IllegalArgumentException(CURRENT_TIME_CANNOT_BE_NEGATIVE);
 		}
-		if (!actionSelector.isReset()) {
-			// Select one action here
-			return actionSelector.select();
-		}
 		for (Action a : actions) {
 			if (workable(a, currentEnvironment, currentTime)) {
 				actionSelector.add(a, fitness.eval(a));
 			}
+		}
+		if (actionSelector.isEmpty()) {
+			return null;
 		}
 		return actionSelector.select();
 	}
@@ -131,10 +125,15 @@ public class Model implements Serializable {
 		for (Input input : a.getInputs()) {
 			String inputEntityName = input.getName();
 			Relation inputType = input.getRelation();
-			if (inputType == Relation.c || inputType == Relation.p) {
-				Entity environmentEntity = currentEnvironment.getEntity(inputEntityName);
-				int quantityToRemoved = input.getQuantity();
-				environmentEntity.addQuantity(-quantityToRemoved);
+			Entity environmentEntity = currentEnvironment.getEntity(inputEntityName);
+			int quantityToRemoved = input.getQuantity();
+			switch (inputType) {
+				case c :
+					environmentEntity.addQuantity(-quantityToRemoved);
+					break;
+				case p :
+					environmentEntity.putInPending(quantityToRemoved);
+					break;
 			}
 		}
 		actionSelector.reset();
@@ -152,7 +151,7 @@ public class Model implements Serializable {
 			if (inputType == Relation.p) {
 				Entity environmentEntity = currentEnvironment.getEntity(inputEntityName);
 				int quantityToAdd = input.getQuantity();
-				environmentEntity.addQuantity(quantityToAdd);
+				environmentEntity.free(quantityToAdd);
 			}
 		}
 

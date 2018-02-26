@@ -1,5 +1,4 @@
 {
-    "snaps" : [5,10,20,100],
     "name" : "fibonacci_dummy_6_core.json",
     "slots" : 300,
     "exec_time" : 10000,
