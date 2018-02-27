@@ -1,13 +1,17 @@
 package org.ordogene.algorithme.jenetics;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+
+import org.ordogene.algorithme.models.Action;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
 import io.jenetics.Phenotype;
@@ -42,7 +46,7 @@ public class Drawer {
 		for (ActionGene action : actions) {
 			int startTime = action.getStartTime();
 			int line = searchFreeCell(indexedList, startTime); // Find the next index : the next free int[] at (time).
-																// <-
+			// <-
 			// current list index
 			if (line == -1) {
 				// no free space at (time) : create a new int[]
@@ -132,8 +136,15 @@ public class Drawer {
 
 	}
 
-	static String htmlTableBuilder(String title, String header, double cellSize, String unit, ActionGene[][] toPrintData,
-			boolean display) {
+	private static Color randomLightColorGenerator() {
+		float hue = (float) Math.random();
+		int rgb = Color.HSBtoRGB(hue, 0.5f, 0.9f);
+		return new Color(rgb);
+	}
+
+	static String htmlTableBuilder(String title, String header, double cellSize, String unit,
+			ActionGene[][] toPrintData, boolean display) {
+		Map<Action, Color> colorAction = new HashMap<>();
 		// content
 		StringBuilder sbTr = new StringBuilder();
 		StringBuilder sb = new StringBuilder();
@@ -141,8 +152,21 @@ public class Drawer {
 		int nbColsMax = 0;
 		for (ActionGene[] row : toPrintData) {
 			sbTr.append("<tr>");
-			for (int i = 0; i < row.length; i++) { // write data
-				// check if the nexts cells are == to row[i]
+			for (int i = 0; i < row.length; i++) {
+				// handle colors
+				Color currentActionColor = null;
+				if (row[i] != null) {
+					currentActionColor = colorAction.get(row[i].getAllele());
+					if (currentActionColor == null) {
+						currentActionColor = randomLightColorGenerator();
+						colorAction.put(row[i].getAllele(), currentActionColor);
+					}
+				} else {
+					currentActionColor = Color.WHITE;
+				}
+				String htmlRgb = "rgb(" + currentActionColor.getRed() + ',' + currentActionColor.getGreen() + ','
+						+ currentActionColor.getBlue() + ')';
+				// write data in large or small td
 				int currentActionDuration = 1;
 				int nbCols = 0;
 				if (row[i] != null && row[i].getAllele() != null) {
@@ -150,15 +174,16 @@ public class Drawer {
 				}
 				nbCols += currentActionDuration;
 				if (currentActionDuration > 1) {
-					sbTr.append("<td style='width:" + cellSize * currentActionDuration + unit + "' colspan="
-							+ currentActionDuration + ">");
+					sbTr.append("<td style='background-color: ").append(htmlRgb).append("; width:").append(cellSize)
+							.append(unit).append("' colspan=" + currentActionDuration + ">");
 					if (row[i] != null) {
 						sbTr.append(row[i].getAllele().getName());
 					}
 					sbTr.append("</td>");
 					i = i + currentActionDuration - 1;
 				} else {
-					sbTr.append("<td style='width:" + cellSize + unit + "'>");
+					sbTr.append("<td style='background-color: ").append(htmlRgb).append("; width:").append(cellSize)
+							.append(unit).append("'>");
 					if (row[i] != null) {
 						sbTr.append(row[i].getAllele().getName());
 					}
@@ -172,6 +197,7 @@ public class Drawer {
 		}
 		sbTr.append("</table>");
 
+		// header
 		sb.append(header);
 
 		String res = sb.toString() + sbTr.toString();
