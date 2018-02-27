@@ -28,7 +28,7 @@ public class JSONModel implements Validable {
 	public boolean isValid() {
 		return slots != 0 && execTime != 0 && environment != null && actions != null && fitness != null
 				&& environment.stream().allMatch(Validable::isValid) && actions.stream().allMatch(Validable::isValid)
-				&& fitness.isValid() && this.Consistency();
+				&& fitness.isValid() && this.Consistency() && name != null;
 	}
 
 	private boolean Consistency() {
