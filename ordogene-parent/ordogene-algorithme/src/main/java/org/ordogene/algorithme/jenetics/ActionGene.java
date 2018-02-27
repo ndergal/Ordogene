@@ -47,5 +47,7 @@ public class ActionGene implements Gene<Action, ActionGene> {
 	public int getStartTime() {
 		return startTime;
 	}
+	
+	
 
 }

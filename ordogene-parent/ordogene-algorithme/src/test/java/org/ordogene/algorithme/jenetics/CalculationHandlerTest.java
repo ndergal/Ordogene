@@ -63,7 +63,7 @@ public class CalculationHandlerTest {
 	public void testCalculationHandler3() throws Exception {
 		//RandomRegistry.setRandom(new Random(0));
 		URL urlTestFile = CalculationHandlerTest.class.getClassLoader()
-				.getResource("OrdogeneCalculationExamples" + File.separator + "small_strategy_game.json");
+				.getResource("OrdogeneCalculationExamples" + File.separator + "short_path_500.json");
 		byte[] contentFile = Files.readAllBytes(Paths.get(urlTestFile.toURI()));
 		String jsonContent = new String(contentFile);
 
