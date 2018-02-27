@@ -242,14 +242,19 @@ public class Commands {
 	 *            path of the generated image
 	 * @param force
 	 *            if set, overwrite if dst already exists
+	 * @param html
+	 *            if set, write the result in .html file
 	 */
 	@ShellMethod(value = "Get the result of a calculation")
-	public boolean resultCalculation(int cid, File dst, @ShellOption(arity = 0, defaultValue = "false") boolean force) {
+	public boolean resultCalculation(int cid, File dst, @ShellOption(arity = 0, defaultValue = "false") boolean force,
+			@ShellOption(arity = 0, defaultValue = "false") boolean html) {
 
 		// Parameter validation
 		Path path = dst.toPath();
-		if (dst.isDirectory()) {
-			path = Paths.get(dst.toPath().toString() + File.separator + this.id + "_" + cid);
+		if (dst.isDirectory() && !html) {
+			path = Paths.get(dst.toPath().toString() + File.separator + this.id + "_" + cid + ".png");
+		} else if (dst.isDirectory() && html) {
+			path = Paths.get(dst.toPath().toString() + File.separator + this.id + "_" + cid + ".html");
 		}
 		if (path.toFile().exists() && !force) {
 			log.error("A file already exists, use --force to overwrite.");
@@ -259,17 +264,24 @@ public class Commands {
 		// Request
 		ResponseEntity<ApiJsonResponse> response = null;
 		try {
-			response = restTemplate.exchange("/" + id + CALCULATIONS + cid, HttpMethod.GET, null,
-					ApiJsonResponse.class);
+			if (html) {
+				response = restTemplate.exchange("/" + id + CALCULATIONS + cid+"/html", HttpMethod.GET, null,
+						ApiJsonResponse.class);
 
-			// Writing the image
-
-			String base64img = response.getBody().getBase64img();
-			if (!FileService.decodeAndSaveImage(base64img, path.toAbsolutePath().toString())) {
-				return false;
+				String base64html = response.getBody().getBase64img();
+				if (!FileService.decodeAndSaveHtml(base64html, path.toAbsolutePath().toString())) {
+					return false;
+				}
+				log.info("The html of the result is downloaded at " + dst);
+			} else { // Writing the image
+				response = restTemplate.exchange("/" + id + CALCULATIONS + cid, HttpMethod.GET, null,
+						ApiJsonResponse.class);
+				String base64img = response.getBody().getBase64img();
+				if (!FileService.decodeAndSaveImage(base64img, path.toAbsolutePath().toString())) {
+					return false;
+				}
+				log.info("The image of the result is downloaded at " + dst);
 			}
-
-			log.info("The image of the result is downloaded at " + dst);
 			return true;
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
 			log.error(e.getStatusCode() + " -- " + e.getStatusText());

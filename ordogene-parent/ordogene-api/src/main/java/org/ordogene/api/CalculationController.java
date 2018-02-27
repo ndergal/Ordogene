@@ -198,7 +198,7 @@ public class CalculationController {
 
 	@RequestMapping(value = "/{id}/calculations/{calculationid}")
 	@ResponseBody
-	public ResponseEntity<ApiJsonResponse> getCalculation(@PathVariable String id, @PathVariable int calculationid) {
+	public ResponseEntity<ApiJsonResponse> getCalculationPng(@PathVariable String id, @PathVariable int calculationid) {
 
 		if (id == null || "".equals(id)) {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
@@ -213,9 +213,46 @@ public class CalculationController {
 
 				try {
 					Path imgPath = Paths.get(FileService.getCalculationPngPath(id, calcul.get()));
-					String base64img = FileService.encodeImage(imgPath);
+					String base64img = FileService.encodeB64File(imgPath);
 					return new ResponseEntity<ApiJsonResponse>(
 							new ApiJsonResponse(id, calculationid, null, null, base64img), HttpStatus.OK);
+				} catch (FileNotFoundException e) {
+					return new ResponseEntity<ApiJsonResponse>(
+							new ApiJsonResponse(id, 0, "cannot find calculation path", null, null),
+							HttpStatus.NOT_FOUND);
+				} catch (IOException e) {
+					return new ResponseEntity<ApiJsonResponse>(
+							new ApiJsonResponse(id, 0, "cannot open calculation path", null, null),
+							HttpStatus.NOT_FOUND);
+				}
+
+			}
+			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(id, 0,
+					"calculation " + calculationid + " does not exist for user " + id, null, null),
+					HttpStatus.NOT_FOUND);
+		}
+	}
+
+	@RequestMapping(value = "/{id}/calculations/{calculationid}/html")
+	@ResponseBody
+	public ResponseEntity<ApiJsonResponse> getCalculationHtml(@PathVariable String id, @PathVariable int calculationid) {
+
+		if (id == null || "".equals(id)) {
+			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
+		}
+
+		if (!fs.userExist(id)) {
+			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNotExist(id), HttpStatus.NOT_FOUND);
+		} else {
+			List<Calculation> calculations = fs.getUserCalculations(id);
+			Optional<Calculation> calcul = calculations.stream().filter(x -> x.getId() == calculationid).findFirst();
+			if (calcul.isPresent()) {
+
+				try {
+					Path htmlPath = Paths.get(FileService.getCalculationHtmlPath(id, calcul.get()));
+					String b64html = FileService.encodeB64File(htmlPath);
+					return new ResponseEntity<ApiJsonResponse>(
+							new ApiJsonResponse(id, calculationid, null, null, b64html), HttpStatus.OK);
 				} catch (FileNotFoundException e) {
 					return new ResponseEntity<ApiJsonResponse>(
 							new ApiJsonResponse(id, 0, "cannot find calculation path", null, null),

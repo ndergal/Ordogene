@@ -308,12 +308,12 @@ public class CalculationControllerTest {
 	@Test
 	public void getCalculationUserNull() throws Exception {
 		CalculationController cc = new CalculationController();
-		ResponseEntity<ApiJsonResponse> responseAjr = cc.getCalculation(null, 0);
+		ResponseEntity<ApiJsonResponse> responseAjr = cc.getCalculationPng(null, 0);
 		ResponseEntity<ApiJsonResponse> resWaited = new ResponseEntity<ApiJsonResponse>(
 				ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
 		assertEquals(resWaited, responseAjr);
 
-		responseAjr = cc.getCalculation("", 0);
+		responseAjr = cc.getCalculationPng("", 0);
 		assertEquals(resWaited, responseAjr);
 	}
 

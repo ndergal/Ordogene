@@ -133,26 +133,35 @@ public class FileServiceTest {
 
 	@Test
 	public void testEncodeAndDecode() throws IOException {
-		String ref = FileService.encodeImage(Paths.get("../ordogene-file/test-image/doge_test.png"));
+		String ref = FileService.encodeB64File(Paths.get("../ordogene-file/test-image/doge_test.png"));
 		FileService.decodeAndSaveImage(ref, "../ordogene-file/test-image/result.png");
-		String end = FileService.encodeImage(Paths.get("../ordogene-file/test-image/result.png"));
+		String end = FileService.encodeB64File(Paths.get("../ordogene-file/test-image/result.png"));
 		assertEquals(ref, end);
 	}
 
 	@Test
 	public void testDecodeWithFolder() throws IOException {
-		String ref = FileService.encodeImage(Paths.get("../ordogene-file/test-image/doge_test.png"));
+		String ref = FileService.encodeB64File(Paths.get("../ordogene-file/test-image/doge_test.png"));
 		assertFalse(FileService.decodeAndSaveImage(ref, "../ordogene-file/test-image/"));
 	}
 
 	@Test
-	public void testDecode() throws IOException {
-		String ref = FileService.encodeImage(Paths.get("../ordogene-file/test-image/doge_test.png"));
+	public void testDecodePng() throws IOException {
+		String ref = FileService.encodeB64File(Paths.get("../ordogene-file/test-image/doge_test.png"));
 		assertTrue(FileService.decodeAndSaveImage(ref, "../ordogene-file/test-image/result.png"));
+	}
+	
+	@Test
+	public void testDecodeHtml() throws IOException {
+		Path path1=Paths.get("../ordogene-file/test-html/result.html");
+		Path path2=Paths.get("../ordogene-file/test-html/result2.html");
+		String ref = FileService.encodeB64File(path1);
+		assertTrue(FileService.decodeAndSaveHtml(ref, path2.toString()));
+		assertEquals(new String(Files.readAllBytes(path1)), new String(Files.readAllBytes(path2)));
 	}
 
 	@Test(expected = IOException.class)
 	public void testEncodeWithFolder() throws IOException {
-		FileService.encodeImage(Paths.get("../ordogene-file/test-image/"));
+		FileService.encodeB64File(Paths.get("../ordogene-file/test-image/"));
 	}
 }

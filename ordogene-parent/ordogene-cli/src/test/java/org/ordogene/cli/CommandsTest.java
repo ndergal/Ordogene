@@ -1,6 +1,7 @@
 package org.ordogene.cli;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -12,6 +13,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -241,7 +245,7 @@ public class CommandsTest {
 		String dst = "/tmp/result.png";
 		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
 				.thenThrow(HttpServerErrorException.class);
-		assertFalse(commands.resultCalculation(666, new File(dst), true));
+		assertFalse(commands.resultCalculation(666, new File(dst), true, false));
 	}
 
 	@Test
@@ -249,7 +253,7 @@ public class CommandsTest {
 		String dst = "/tmp/result.png";
 		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
 				.thenThrow(HttpClientErrorException.class);
-		assertFalse(commands.resultCalculation(666, new File(dst), true));
+		assertFalse(commands.resultCalculation(666, new File(dst), true, false));
 	}
 
 	@Test
@@ -257,11 +261,11 @@ public class CommandsTest {
 		String dst = "/tmp/result.png";
 		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
 				.thenThrow(RestClientException.class);
-		assertFalse(commands.resultCalculation(666, new File(dst), true));
+		assertFalse(commands.resultCalculation(666, new File(dst), true, false));
 	}
 
 	@Test
-	public void testResultCalculation() {
+	public void testResultCalculationPng() {
 		String dst = "/tmp/result.png";
 		ResponseEntity<ApiJsonResponse> re = mock(ResponseEntity.class);
 		ApiJsonResponse ajr = mock(ApiJsonResponse.class);
@@ -270,7 +274,36 @@ public class CommandsTest {
 				.thenReturn(re);
 		when(re.getBody()).thenReturn(ajr);
 		when(ajr.getBase64img()).thenReturn(base64img);
-		assertTrue(commands.resultCalculation(666, new File(dst), true));
+		assertTrue(commands.resultCalculation(666, new File(dst), true, false));
+	}
+	
+	@Test
+	public void testResultCalculationHtml() {
+		String dst = "/tmp/result.html";
+		ResponseEntity<ApiJsonResponse> re = mock(ResponseEntity.class);
+		ApiJsonResponse ajr = mock(ApiJsonResponse.class);
+		String base64img = "Y291Y291";
+		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
+				.thenReturn(re);
+		when(re.getBody()).thenReturn(ajr);
+		when(ajr.getBase64img()).thenReturn(base64img);
+		assertTrue(commands.resultCalculation(666, new File(dst), true, true));
+	}
+
+	@Test
+	public void testResultCalculationHtml2() throws IOException {
+		String dst = "/tmp/";
+		ResponseEntity<ApiJsonResponse> re = mock(ResponseEntity.class);
+		ApiJsonResponse ajr = mock(ApiJsonResponse.class);
+		String base64img = "Y291Y291"; /// = coucou en utf8
+		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
+				.thenReturn(re);
+		when(re.getBody()).thenReturn(ajr);
+		when(ajr.getBase64img()).thenReturn(base64img);
+		assertTrue(commands.resultCalculation(666, new File(dst), true, true));
+        String content = new String(Files.readAllBytes(Paths.get(dst+File.separator+"null_666.html")));
+        assertEquals("coucou",content);
+
 	}
 
 	@Test

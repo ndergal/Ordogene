@@ -1,12 +1,15 @@
 package org.ordogene.file;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.List;
@@ -69,7 +72,7 @@ public class FileService {
 
 	}
 
-	public static String encodeImage(Path pathSrcImg) throws IOException {
+	public static String encodeB64File(Path pathSrcImg) throws IOException {
 		Objects.requireNonNull(pathSrcImg);
 		byte[] imageData = Files.readAllBytes(pathSrcImg);
 		return Base64.getEncoder().encodeToString(imageData);
@@ -91,9 +94,31 @@ public class FileService {
 		}
 	}
 
+	public static boolean decodeAndSaveHtml(String base64Html, String pathDstHtml) {
+		Objects.requireNonNull(base64Html);
+		Path destPath = Paths.get(Objects.requireNonNull(pathDstHtml));
+		try (BufferedWriter writer = Files.newBufferedWriter(destPath, Charset.forName("UTF-8"))) {
+			byte[] decodedBytes = Base64.getDecoder().decode(base64Html);
+			String decodedStr = new String(decodedBytes);
+			writer.write(decodedStr);
+			return true;
+		} catch (FileNotFoundException e) {
+			System.err.println("Destination path is not a file : " + e);
+			return false;
+		} catch (IOException e) {
+			System.err.println("cannot write to the path : " + e);
+			return false;
+		}
+	}
+
 	public static String getCalculationPngPath(String userId, Calculation calcul) {
 		return Const.getConst().get("ApplicationPath") + File.separator + userId + File.separator + calcul.getId() + "_"
 				+ calcul.getName() + File.separator + "result.png";
+	}
+
+	public static String getCalculationHtmlPath(String userId, Calculation calcul) {
+		return Const.getConst().get("ApplicationPath") + File.separator + userId + File.separator + calcul.getId() + "_"
+				+ calcul.getName() + File.separator + "result.html";
 	}
 
 	public static boolean saveHtmlAndPng(String html, Path pngPath, Path htmlPath) {
