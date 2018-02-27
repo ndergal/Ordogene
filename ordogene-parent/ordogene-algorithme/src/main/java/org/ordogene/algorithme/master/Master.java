@@ -86,14 +86,23 @@ public class Master {
 	}
 
 	public void updateCalculation(Calculation cal, String userId) {
-		ThreadHandler th = threadMap.get(cal.getId());
+		ThreadHandler th = null;
+		synchronized (threadMap) {
+			th = threadMap.get(cal.getId());
+		}
 		if (th != null) {
 			// IsRunning
 			try {
+				th.clearMasterFromThread();
 				th.masterToThread("state");
 
 				// Format: epoch_iterationNumber_lastIterationSaved_maxIteration_fitness
-				String[] state = th.masterFromThread().split("_");
+				String response = th.masterFromThread();
+				if(response == null) {
+					System.err.println("The calculation does not respond at the request");
+					return;
+				}
+				String[] state = response.split("_");
 				try {
 					cal.setCalculation(Long.valueOf(state[0]), Integer.valueOf(state[1]), Integer.valueOf(state[2]),
 							Integer.valueOf(state[3]), cal.getId(), cal.getName(), Integer.valueOf(state[4]));

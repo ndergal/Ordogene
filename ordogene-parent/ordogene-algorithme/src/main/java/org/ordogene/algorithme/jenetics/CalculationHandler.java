@@ -121,7 +121,6 @@ public class CalculationHandler {
 			} else {
 				System.out.println(" Fail ");
 			}
-			
 			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, calculationId, model.getName(),
 					best.getFitness());
 		} else {

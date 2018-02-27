@@ -4,6 +4,7 @@ package org.ordogene.algorithme.master;
 import java.util.Objects;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public class ThreadHandler {
 		private final BlockingQueue<String> queue1 = new ArrayBlockingQueue<>(1);
@@ -18,11 +19,15 @@ public class ThreadHandler {
 		}
 
 		public String masterFromThread() throws InterruptedException {
-			return queue2.take();
+			return queue2.poll(10, TimeUnit.SECONDS);
 		}
 
 		public void threadToMaster(String str) throws InterruptedException {
 			queue2.put(Objects.requireNonNull(str));
+		}
+		
+		public void clearMasterFromThread() {
+			queue2.clear();
 		}
 
 	}
