@@ -22,14 +22,12 @@ import io.jenetics.Phenotype;
 import io.jenetics.TournamentSelector;
 import io.jenetics.engine.Engine;
 import io.jenetics.engine.EvolutionResult;
-import io.jenetics.engine.EvolutionStatistics;
-import io.jenetics.stat.DoubleMomentStatistics;
 
 public class CalculationHandler {
 	private final Logger logger = LoggerFactory.getLogger(CalculationHandler.class);
-
-	private final int POPULATION_SIZE = 1;
-	private final double CHANCE_TO_STOP_SCHEDULE_CREATION = 0.01;
+	
+	private final int POPULATION_SIZE = 100;
+	private final double CHANCE_TO_STOP_SCHEDULE_CREATION = 0.002;
 
 	private final Date currentDate = new Date();
 	private final ThreadHandler th;
@@ -50,11 +48,7 @@ public class CalculationHandler {
 				.builder(this::fitness, Genotype.of(Schedule.of(model, CHANCE_TO_STOP_SCHEDULE_CREATION), 1))
 				.optimize(Type.min.equals(model.getFitness().getType()) ? Optimize.MINIMUM : Optimize.MAXIMUM)
 				.fitnessScaler(this::fitnessScaler).populationSize(POPULATION_SIZE).selector(new TournamentSelector<>())
-				.alterers(new ScheduleCrossover(0.2)).build();
-
-		// Instantiate a module to have information at the end of calculation
-		EvolutionStatistics<Long, DoubleMomentStatistics> statistics = EvolutionStatistics.ofNumber();
-
+				.alterers(new ScheduleCrossover(model, 0.2)).build();
 
 		// Initialize all variable to do loop
 		// The engine have an iterator which gie next generation on next method
@@ -62,7 +56,7 @@ public class CalculationHandler {
 		// A variable to count the number of loop done
 		int iteration = 0;
 		// The number of loop to do
-		int maxIteration = 100; // TODO change it by model.getExecTime()
+		int maxIteration = model.getExecTime();
 		// A boolean to end correctly the calculation
 		boolean interupted = false;
 		// The best element of the population (to draw it later)
@@ -74,7 +68,6 @@ public class CalculationHandler {
 			// Get the next generation
 			EvolutionResult<ActionGene, Long> generation = itEngine.next();
 			// Get it on statistic module
-			statistics.accept(generation);
 
 			// Get the best member
 			best = generation.getBestPhenotype();
@@ -88,8 +81,7 @@ public class CalculationHandler {
 				String str = th.threadFromMaster();
 				// If the message is state, give informations
 				if (str != null && str.equals("state")) {
-					// TODO change 1 by real value
-					String msg = constructStateString(iteration, maxIteration, 1, best.getFitness());
+					String msg = constructStateString(iteration, maxIteration, lastSavedIteration, best.getFitness());
 					th.threadToMaster(msg.toString());
 					// If the message is interrupt, stop the loop
 				} else if (str != null && str.equals("interrupt")) {
@@ -129,6 +121,7 @@ public class CalculationHandler {
 			} else {
 				System.out.println(" Fail ");
 			}
+			
 			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, calculationId, model.getName(),
 					best.getFitness());
 		} else {
@@ -146,9 +139,6 @@ public class CalculationHandler {
 			e.printStackTrace();
 			System.err.println(tmpCalc + " not saved.");
 		}
-
-		// Print the statistic information
-		System.out.println(statistics);
 	}
 
 	private String constructStateString(int iteration, int maxIter, long lastIterationSaved, long fitness) {

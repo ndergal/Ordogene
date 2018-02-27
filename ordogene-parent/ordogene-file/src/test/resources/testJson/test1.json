@@ -1,4 +1,5 @@
 {
+	"name" : "test1.json",
     "slots" : 300,
     "exec_time" : 10000,
     "environment" : [

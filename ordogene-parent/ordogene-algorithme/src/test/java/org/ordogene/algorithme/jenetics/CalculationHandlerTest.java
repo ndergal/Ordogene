@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Random;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -15,6 +16,8 @@ import org.ordogene.algorithme.master.ThreadHandler;
 import org.ordogene.file.JSONModel;
 import org.ordogene.file.parser.Parser;
 import org.ordogene.file.utils.Const;
+
+import io.jenetics.util.RandomRegistry;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CalculationHandlerTest {
@@ -48,7 +51,7 @@ public class CalculationHandlerTest {
 	
 	@Test
 	public void testCalculationHandler2() throws Exception {
-		//RandomRegistry.setRandom(new Random(0));
+		RandomRegistry.setRandom(new Random(0));
 		URL urlTestFile = CalculationHandlerTest.class.getClassLoader()
 				.getResource("OrdogeneCalculationExamples" + File.separator + "small_strategy_game.json");
 		byte[] contentFile = Files.readAllBytes(Paths.get(urlTestFile.toURI()));
