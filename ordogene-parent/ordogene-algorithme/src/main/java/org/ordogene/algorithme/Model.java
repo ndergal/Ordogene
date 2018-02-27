@@ -4,7 +4,6 @@ import static java.util.Objects.requireNonNull;
 
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -85,8 +84,21 @@ public class Model implements Serializable {
 		if (!isInModel(a)) {
 			throw new IllegalArgumentException("The Action given don't exist in this model");
 		}
-		return a.getInputs().stream().allMatch(input -> input.getQuantity() <= currentEnvironment.getEntity(input.getName()).getQuantity()) 
-				&& ((currentTime + a.getTime()) <= slots);
+		for(Input i : a.getInputs()) {
+			switch (i.getRelation()) {
+				case c:
+				case p:
+					if(currentEnvironment.getEntity(i.getName()).getQuantity() < i.getQuantity()) {
+						return false;
+					}
+					break;
+				case r:
+					if(currentEnvironment.getEntity(i.getName()).getMaxQuantity() < i.getQuantity()){
+						return false;
+					}
+			}
+		}
+		return a.getTime() + currentTime < slots;
 	}
 
 	/**
@@ -151,7 +163,7 @@ public class Model implements Serializable {
 			if (inputType == Relation.p) {
 				Entity environmentEntity = currentEnvironment.getEntity(inputEntityName);
 				int quantityToAdd = input.getQuantity();
-				environmentEntity.free(quantityToAdd);
+				environmentEntity.freePending(quantityToAdd);
 			}
 		}
 

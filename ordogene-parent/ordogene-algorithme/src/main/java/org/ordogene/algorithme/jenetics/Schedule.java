@@ -50,13 +50,12 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 		SortedMap<Integer, List<Action>> map = new TreeMap<>();
 		// List which represent the sequence
 		ArrayList<ActionGene> seq = new ArrayList<>();
-		// Boolean to end action at current time
 		// The current time
 		int timeAtStart = 0;
 		int timeAtEnd = 0;
 
 		// Continue while a action is in progress or a Action is possible
-		while (model.hasWorkableAction(envAfterEnd, timeAtEnd) || !map.isEmpty()) {
+		while (model.hasWorkableAction(envAfterEnd, timeAtEnd)) {
 
 			// Select a action
 			//System.out.println("Time :" + currentTime);
@@ -96,9 +95,12 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 				actions.add(action);
 			}
 			
-			if(timeAtEnd == timeAtStart) {
+			if(timeAtEnd == timeAtStart || action == null) {
 				// Remove action which ended in previous startTime
 				map.remove(timeAtEnd);
+				if(map.isEmpty()) {
+					break;
+				}
 			}
 			
 			// Change timeAtEnd
@@ -116,18 +118,6 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 			}
 			
 		}
-		
-		map.remove(timeAtEnd);
-		final Environment finalEnv = envAfterEnd;
-		map.forEach((endTime,actionList) -> {
-			for(Action a : actionList) {
-				model.endAction(finalEnv, a);
-			}
-		});
-
-		System.out.println("Seq : " + seq);
-		System.out.println("Size seq : " + seq.size());
-		System.out.println("End Env :" + finalEnv);
 		return new Schedule(ISeq.of(seq), model);
 	}
 
