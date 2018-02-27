@@ -57,6 +57,18 @@ public class FileService {
 		return ch.removeCalculation(username, c.getId(), c.getName());
 	}
 
+	public static boolean createCalculationDirectory(String userId, int cId, String cName) {
+		Path calculationPath = Paths.get(Const.getConst().get("ApplicationPath") + File.separatorChar + userId
+				+ File.separatorChar + "" + cId + "_" + cName);
+		try {
+			Files.createDirectories(calculationPath);
+			return true;
+		} catch (IOException e) {
+			return false;
+		}
+
+	}
+
 	public static void writeInFile(Object content, Path dest) throws IOException {
 
 		if (Files.exists(dest)) {

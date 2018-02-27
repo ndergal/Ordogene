@@ -12,8 +12,10 @@ import java.util.Objects;
 
 import javax.xml.bind.UnmarshalException;
 
+import org.apache.maven.doxia.logging.Log;
 import org.ordogene.algorithme.Model;
 import org.ordogene.algorithme.jenetics.CalculationHandler;
+import org.ordogene.file.FileService;
 import org.ordogene.file.JSONModel;
 import org.ordogene.file.parser.Parser;
 import org.ordogene.file.utils.Calculation;
@@ -57,10 +59,10 @@ public class Master {
 
 		String toHash = jsonString + (new Date()).toString();
 		int calculationId = toHash.hashCode();
-
-		Path calculationPath = Paths.get(Const.getConst().get("ApplicationPath") + File.separatorChar + idUser
-				+ File.separatorChar + "" + calculationId + "_" + model.getName());
-		Files.createDirectories(calculationPath);
+		
+		if(!FileService.createCalculationDirectory(idUser, calculationId, model.getName())) {
+			System.err.println("Error while creating the calculation folder...");
+		}
 
 		ThreadHandler th = new ThreadHandler();
 
