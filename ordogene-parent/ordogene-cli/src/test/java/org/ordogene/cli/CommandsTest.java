@@ -202,7 +202,7 @@ public class CommandsTest {
 	}
 
 	@Test
-	public void testResultCalculation() {
+	public void testResultCalculationPng() {
 		String dst = "/tmp/result.png";
 		ResponseEntity<ApiJsonResponse> re = mock(ResponseEntity.class);
 		ApiJsonResponse ajr = mock(ApiJsonResponse.class);

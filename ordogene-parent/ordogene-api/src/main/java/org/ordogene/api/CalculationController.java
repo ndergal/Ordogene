@@ -221,4 +221,36 @@ public class CalculationController {
 					HttpStatus.NOT_FOUND);
 		}
 	}
+
+	@RequestMapping(value = "/{userId}/calculations/{calculationid}/html")
+	@ResponseBody
+	public ResponseEntity<ApiJsonResponse> getCalculationHtml(@PathVariable String userId, @PathVariable int calculationid) {
+
+		if (userId == null || "".equals(userId)) {
+			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
+		}
+
+		if (!FileUtils.userExist(userId)) {
+			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNotExist(userId), HttpStatus.NOT_FOUND);
+		} else {
+			List<Calculation> calculations = FileUtils.getUserCalculations(userId);
+			Optional<Calculation> calcul = calculations.stream().filter(x -> x.getId() == calculationid).findFirst();
+			if (calcul.isPresent()) {
+
+				try {
+					String b64html = FileUtils.encodeHtml(userId, calculationid, calcul.get().getName());
+					return new ResponseEntity<ApiJsonResponse>(
+							new ApiJsonResponse(userId, calculationid, null, null, b64html), HttpStatus.OK);
+				} catch (IOException e) {
+					return new ResponseEntity<ApiJsonResponse>(
+							new ApiJsonResponse(userId, 0, "cannot open calculation path", null, null),
+							HttpStatus.NOT_FOUND);
+				}
+
+			}
+			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(userId, 0,
+					"calculation " + calculationid + " does not exist for user " + userId, null, null),
+					HttpStatus.NOT_FOUND);
+		}
+	}
 }
