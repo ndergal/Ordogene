@@ -2,7 +2,6 @@ package org.ordogene.cli;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -12,7 +11,7 @@ import java.util.Scanner;
 
 import javax.annotation.PostConstruct;
 
-import org.ordogene.file.FileService;
+import org.ordogene.file.FileUtils;
 import org.ordogene.file.utils.ApiJsonResponse;
 import org.ordogene.file.utils.Calculation;
 import org.slf4j.Logger;
@@ -38,15 +37,13 @@ import org.springframework.web.client.RestTemplate;
 
 @ShellComponent
 public class Commands {
-
-	private static final String NOT_IMPLEMENTED_BLOCK_ON_CLI_SIDE = "Not implemented (block on CLI side)";
 	private static final String CALCULATIONS = "/calculations/";
 	private static final String PROBLEM_WITH_THE_COMMUNICATION_BETWEEN_CLIENT_AND_SERVER = "Problem with the communication between client and server";
 	private final SimpleDateFormat formater = new SimpleDateFormat("dd/MM/yyyy-HH:mm");
 	private String id;
 	private static final Logger log = LoggerFactory.getLogger(Commands.class);
 
-	private final String[] tableFields = { "CID", "Name", "Date", "Running", "Fitness", "Iteration done",
+	private final String[] tableFields = { "Calculation Id", "Name", "Date", "Running", "Fitness", "Iteration done",
 			"Last iteration saved", "Max iteration" };
 
 	@Autowired
@@ -54,69 +51,33 @@ public class Commands {
 
 	@PostConstruct
 	public void login() {
-
 		loop: for (;;) {
 			log.info("\nDo you want to create a new group id ? [y/N] : ");
 			@SuppressWarnings("resource") // problem if the scanner is closed
 			Scanner scanner = new Scanner(System.in);
 			String choice = scanner.nextLine();
 			switch (choice) {
-			case "":
-			case "n":
-			case "N":
-			case "no":
-				do {
-					log.info("Enter your group id : ");
-					id = scanner.nextLine();
-				} while (id.isEmpty() ? true : !getUser(id));
-				break loop;
-			case "y":
-			case "Y":
-			case "yes":
-				if (!createUser()) {
-					log.error("Problem with the server: user creation failed");
-					System.exit(1);
-				}
-				break loop;
-			default:
-				break;
+				case "":
+				case "n":
+				case "N":
+				case "no":
+					do {
+						log.info("Enter your group id : ");
+						id = scanner.nextLine();
+					} while (id.isEmpty() ? true : !getUser(id));
+					break loop;
+				case "y":
+				case "Y":
+				case "yes":
+					if (!createUser()) {
+						log.error("Problem with the server: user creation failed");
+						System.exit(1);
+					}
+					break loop;
+				default:
 			}
 		}
 		log.info("\n");
-	}
-
-	public boolean getUser(String id) {
-		// Request
-		try {
-			restTemplate.exchange("/" + id, HttpMethod.GET, null, ApiJsonResponse.class);
-			this.id = id;
-			log.info("Welcome back " + id);
-			return true;
-		} catch (HttpClientErrorException | HttpServerErrorException e) {
-			log.error(e.getStatusCode() + " -- " + e.getStatusText());
-			return false;
-		} catch (RestClientException e) {
-			log.debug(e.getMessage());
-			log.info(PROBLEM_WITH_THE_COMMUNICATION_BETWEEN_CLIENT_AND_SERVER);
-			return false;
-		}
-	}
-
-	public boolean createUser() {
-		// Request
-		try {
-			ResponseEntity<ApiJsonResponse> response = restTemplate.exchange("/", HttpMethod.PUT, null,
-					ApiJsonResponse.class);
-			id = response.getBody().getUserId();
-			log.info("Your new group id is " + id);
-			return true;
-		} catch (HttpClientErrorException | HttpServerErrorException e) {
-			log.error(e.getStatusCode() + " -- " + e.getStatusText());
-			return false;
-		} catch (RestClientException e) {
-			log.debug(e.getMessage());
-			return false;
-		}
 	}
 
 	/**
@@ -156,12 +117,15 @@ public class Commands {
 	 *            path to model to send
 	 */
 	@ShellMethod(value = "Launch a calculation from a model")
-	public boolean launchCalculation(File model) {
+	public String launchCalculation(File model) {
 		// Parameter validation
-		String jsonContentRead = getFileContent(model);
-		if (jsonContentRead == null) {
-			return false;
+		String jsonContentRead;
+		try {
+			jsonContentRead = FileUtils.readFile(model);
+		} catch (IOException | IllegalArgumentException e ) {
+			return e.getMessage();
 		}
+		
 		// Request
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
@@ -171,15 +135,12 @@ public class Commands {
 			ResponseEntity<ApiJsonResponse> response = restTemplate.exchange("/" + id + CALCULATIONS, HttpMethod.PUT,
 					request, ApiJsonResponse.class);
 			int cid = response.getBody().getCid();
-			log.info("Calculation '" + cid + "' launched");
-			return true;
+			return "Calculation '" + cid + "' launched";
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
-			log.error(e.getStatusCode() + " -- " + e.getStatusText());
-			return false;
+			 return e.getStatusCode() + " -- " + e.getStatusText();
 		} catch (RestClientException e) {
 			log.debug(e.getMessage());
-			log.error(PROBLEM_WITH_THE_COMMUNICATION_BETWEEN_CLIENT_AND_SERVER);
-			return false;
+			return PROBLEM_WITH_THE_COMMUNICATION_BETWEEN_CLIENT_AND_SERVER;
 		}
 
 	}
@@ -191,19 +152,16 @@ public class Commands {
 	 *            id of the calculation
 	 */
 	@ShellMethod(value = "Stop a calculation")
-	public boolean stopCalculation(int cid) {
+	public String stopCalculation(int cid) {
 		// Request
 		try {
 			restTemplate.exchange("/" + id + CALCULATIONS + cid, HttpMethod.POST, null, ApiJsonResponse.class);
-			log.info("Calculation '" + cid + "' stopped");
-			return true;
+			return "Calculation '" + cid + "' stopped";
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
-			log.error(e.getStatusCode() + " -- " + e.getStatusText());
-			return false;
+			return e.getStatusCode() + " -- " + e.getStatusText();
 		} catch (RestClientException e) {
 			log.debug(e.getMessage());
-			log.error(PROBLEM_WITH_THE_COMMUNICATION_BETWEEN_CLIENT_AND_SERVER);
-			return false;
+			return PROBLEM_WITH_THE_COMMUNICATION_BETWEEN_CLIENT_AND_SERVER;
 		}
 	}
 
@@ -213,24 +171,18 @@ public class Commands {
 	 * @param cid
 	 *            id of the calculation
 	 */
-	@ShellMethod(value = "Remove a calculation") // TODO : TU
-	public boolean removeCalculation(int calculationID) {
+	@ShellMethod(value = "Remove a calculation")
+	public String removeCalculation(int cid) {
 		// Request
-
-		ResponseEntity<ApiJsonResponse> response = null;
 		try {
-			response = restTemplate.exchange("/" + id + CALCULATIONS + calculationID, HttpMethod.DELETE, null,
-					ApiJsonResponse.class);
+			restTemplate.exchange("/" + id + CALCULATIONS + cid, HttpMethod.DELETE, null, ApiJsonResponse.class);
+			return "Calculation " + cid + " has been deleted.";
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
-			log.error(e.getStatusCode() + " -- " + e.getStatusText());
-			return false;
+			return e.getStatusCode() + " -- " + e.getStatusText();
 		} catch (RestClientException e) {
 			log.debug(e.getMessage());
-			log.error(PROBLEM_WITH_THE_COMMUNICATION_BETWEEN_CLIENT_AND_SERVER);
-			return false;
+			return PROBLEM_WITH_THE_COMMUNICATION_BETWEEN_CLIENT_AND_SERVER;
 		}
-		log.info("Calculation " + calculationID + " has been deleted.");
-		return true;
 	}
 
 	/**
@@ -242,86 +194,78 @@ public class Commands {
 	 *            path of the generated image
 	 * @param force
 	 *            if set, overwrite if dst already exists
-	 * @param html
-	 *            if set, write the result in .html file
 	 */
 	@ShellMethod(value = "Get the result of a calculation")
-	public boolean resultCalculation(int cid, File dst, @ShellOption(arity = 0, defaultValue = "false") boolean force,
-			@ShellOption(arity = 0, defaultValue = "false") boolean html) {
+	public String resultCalculation(int cid, File dst, @ShellOption(arity = 0, defaultValue = "false") boolean force) {
 
 		// Parameter validation
 		Path path = dst.toPath();
-		if (dst.isDirectory() && !html) {
-			path = Paths.get(dst.toPath().toString() + File.separator + this.id + "_" + cid + ".png");
-		} else if (dst.isDirectory() && html) {
-			path = Paths.get(dst.toPath().toString() + File.separator + this.id + "_" + cid + ".html");
+		if (dst.isDirectory()) {
+			path = Paths.get(dst.toPath().toString() + File.separator + this.id + "_" + cid);
 		}
 		if (path.toFile().exists() && !force) {
-			log.error("A file already exists, use --force to overwrite.");
-			return false;
+			return "A file already exists, use --force to overwrite.";
 		}
 
 		// Request
 		ResponseEntity<ApiJsonResponse> response = null;
 		try {
-			if (html) {
-				response = restTemplate.exchange("/" + id + CALCULATIONS + cid+"/html", HttpMethod.GET, null,
-						ApiJsonResponse.class);
+			response = restTemplate.exchange("/" + id + CALCULATIONS + cid, HttpMethod.GET, null,
+					ApiJsonResponse.class);
 
-				String base64html = response.getBody().getBase64img();
-				if (!FileService.decodeAndSaveHtml(base64html, path.toAbsolutePath().toString())) {
-					return false;
-				}
-				log.info("The html of the result is downloaded at " + dst);
-			} else { // Writing the image
-				response = restTemplate.exchange("/" + id + CALCULATIONS + cid, HttpMethod.GET, null,
-						ApiJsonResponse.class);
-				String base64img = response.getBody().getBase64img();
-				if (!FileService.decodeAndSaveImage(base64img, path.toAbsolutePath().toString())) {
-					return false;
-				}
-				log.info("The image of the result is downloaded at " + dst);
+			// Writing the image
+
+			String base64img = response.getBody().getBase64img();
+			try {
+				FileUtils.saveImageFromBase64(base64img, path.toAbsolutePath().toString());
+			} catch (IOException e) {
+				// IOException or NoSuchFileException
+				return e.getMessage();
 			}
+			return "The image of the result is downloaded at " + dst;
+		} catch (HttpClientErrorException | HttpServerErrorException e) {
+			return e.getStatusCode() + " -- " + e.getStatusText();
+		} catch (RestClientException e) {
+			log.debug(e.getMessage());
+			return PROBLEM_WITH_THE_COMMUNICATION_BETWEEN_CLIENT_AND_SERVER;
+		}
+	}
+
+	/* UTILS */
+
+	private boolean getUser(String id) {
+		// Request
+		try {
+			restTemplate.exchange("/" + id, HttpMethod.GET, null, ApiJsonResponse.class);
+			this.id = id;
+			log.info("Welcome back " + id);
 			return true;
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
 			log.error(e.getStatusCode() + " -- " + e.getStatusText());
 			return false;
 		} catch (RestClientException e) {
 			log.debug(e.getMessage());
-			log.error(PROBLEM_WITH_THE_COMMUNICATION_BETWEEN_CLIENT_AND_SERVER);
+			log.info(PROBLEM_WITH_THE_COMMUNICATION_BETWEEN_CLIENT_AND_SERVER);
 			return false;
 		}
 	}
 
-	/**
-	 * Launch the calculation of a snapshot
-	 * 
-	 * @param id
-	 *            id of the calculation
-	 * @param iter
-	 *            id of the snapshot
-	 * @param loops
-	 *            number of loops to calculate
-	 */
-	@ShellMethod(value = "Launch a snapshot of a calculation")
-	public boolean launchSnapshot(int cid, int sid, int loops) {
-		log.info(NOT_IMPLEMENTED_BLOCK_ON_CLI_SIDE);
-		return false;
+	private boolean createUser() {
+		// Request
+		try {
+			ResponseEntity<ApiJsonResponse> response = restTemplate.exchange("/", HttpMethod.PUT, null,
+					ApiJsonResponse.class);
+			id = response.getBody().getUserId();
+			log.info("Your new group id is " + id);
+			return true;
+		} catch (HttpClientErrorException | HttpServerErrorException e) {
+			log.error(e.getStatusCode() + " -- " + e.getStatusText());
+			return false;
+		} catch (RestClientException e) {
+			log.debug(e.getMessage());
+			return false;
+		}
 	}
-
-	/**
-	 * Remove a snapshot
-	 * 
-	 * @param id
-	 * @param iter
-	 */
-	@ShellMethod(value = "Remove snapshot")
-	public boolean removeSnapshot(int id, int iter) {
-		log.info(NOT_IMPLEMENTED_BLOCK_ON_CLI_SIDE);
-		return false;
-	}
-
-	/* UTILS */
 
 	private TableBuilder fillTable(List<Calculation> list) {
 		String[][] data = new String[list.size() + 1][tableFields.length];
@@ -343,25 +287,5 @@ public class Commands {
 			data[i + 1][7] = String.valueOf(c.getMaxIteration());
 		}
 		return builder;
-	}
-
-	String getFileContent(File model) {
-
-		Path jsonPath = model.toPath();
-		if (!jsonPath.toFile().exists()) {
-			log.error("The path does not exist. Try again.");
-			return null;
-		}
-		if (jsonPath.toFile().isDirectory()) {
-			log.error(jsonPath + " is a directory. Try again.");
-			return null;
-		}
-
-		try {
-			return new String(Files.readAllBytes(jsonPath));
-		} catch (IOException e) {
-			log.error("Error while reading " + model);
-			return null;
-		}
 	}
 }

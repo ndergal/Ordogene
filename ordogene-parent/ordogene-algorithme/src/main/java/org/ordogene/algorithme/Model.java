@@ -2,7 +2,6 @@ package org.ordogene.algorithme;
 
 import static java.util.Objects.requireNonNull;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -14,11 +13,10 @@ import org.ordogene.algorithme.models.Environment;
 import org.ordogene.algorithme.models.Fitness;
 import org.ordogene.algorithme.models.Input;
 import org.ordogene.algorithme.util.ActionSelector;
-import org.ordogene.file.JSONModel;
+import org.ordogene.file.models.JSONModel;
 import org.ordogene.file.models.Relation;
 
-public class Model implements Serializable {
-	private static final long serialVersionUID = 1L;
+public class Model {
 	
 	private static final String CURRENT_TIME_CANNOT_BE_NEGATIVE = "The current time cannot be negative";
 	private final String name;
@@ -62,9 +60,6 @@ public class Model implements Serializable {
 	}
 	
 	public boolean hasWorkableAction(Environment currentEnvironment, int currentTime) {
-		if(currentTime < 0) {
-			throw new IllegalArgumentException(CURRENT_TIME_CANNOT_BE_NEGATIVE);
-		}
 		return actions.stream()
 				.anyMatch(a -> this.workable(a, currentEnvironment, currentTime));
 	}
@@ -145,6 +140,8 @@ public class Model implements Serializable {
 					break;
 				case p :
 					environmentEntity.putInPending(quantityToRemoved);
+					break;
+				default:
 					break;
 			}
 		}

@@ -8,17 +8,21 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
+
 public class Const {
+	private final static Logger log = LoggerFactory.getLogger(Const.class);
 
 	private static Map<String, String> resourcesMap;
 
 	 
 	public static boolean loadConfig(String configFilePath) {
-
-		System.out.println("Loading " + configFilePath);
 
 		Map<String, String> tmpResourcesMap;
 
@@ -28,27 +32,26 @@ public class Const {
 			});
 
 		} catch (IOException e1) {
-			// e1.printStackTrace();
-			System.err.println("Error : the configuration file is missing or invalid. The application will fail.");
+			log.error("Error : the configuration file is missing or invalid. The application will fail.");
 			tmpResourcesMap = new HashMap<>();
 			return false;
 		}
 		if (!tmpResourcesMap.isEmpty()) {
-			System.out.println("Configuraiton well loaded !");
+			log.info("Configuraiton well loaded !");
 		} else {
-			System.err.println("Configuraiton not loaded....");
+			log.error("Configuraiton not loaded....");
 			return false;
 		}
 		resourcesMap = tmpResourcesMap;
 		String appliPath = resourcesMap.get("ApplicationPath");
 		if (appliPath == null) {
-			System.err.println("Error : 'ApplicationPath' is missing the config file.");
+			log.error("Error : 'ApplicationPath' is missing the config file.");
 		} else {
 			try {
 				Files.createDirectories(Paths.get(appliPath));
 			} catch (IOException e) {
-				System.err.println("Error while creating the directory " + appliPath);
-				e.printStackTrace();
+				log.error("Error while creating the directory " + appliPath);
+				log.debug(Arrays.toString(e.getStackTrace()));
 			}
 		}
 		return true;
@@ -56,7 +59,7 @@ public class Const {
 	
 	public static Map<String, String> getConst() {
 		if(resourcesMap==null || resourcesMap.size()==0) {
-			System.err.println("No configuration loaded.");
+			log.error("No configuration loaded.");
 			return new HashMap<>();
 		}
 		return Collections.unmodifiableMap(resourcesMap);

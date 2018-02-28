@@ -1,18 +1,16 @@
 package org.ordogene.algorithme.jenetics;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 
 import org.ordogene.algorithme.Model;
 import org.ordogene.algorithme.master.ThreadHandler;
-import org.ordogene.file.FileService;
+import org.ordogene.file.FileUtils;
 import org.ordogene.file.models.Type;
 import org.ordogene.file.utils.Calculation;
-import org.ordogene.file.utils.Const;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +23,7 @@ import io.jenetics.engine.EvolutionResult;
 
 public class CalculationHandler {
 	private final Logger logger = LoggerFactory.getLogger(CalculationHandler.class);
-	
+
 	private final int POPULATION_SIZE = 100;
 	private final double CHANCE_TO_STOP_SCHEDULE_CREATION = 0.002;
 
@@ -43,6 +41,8 @@ public class CalculationHandler {
 	}
 
 	public void launchCalculation() {
+
+		FileUtils.createCalculationDirectory(Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationId, model.getName())));
 
 		Engine<ActionGene, Long> engine = Engine
 				.builder(this::fitness, Genotype.of(Schedule.of(model, CHANCE_TO_STOP_SCHEDULE_CREATION), 1))
@@ -91,7 +91,7 @@ public class CalculationHandler {
 				interupted = true;
 				Thread.currentThread().interrupt();
 			}
-			
+
 			long currentTime = System.currentTimeMillis();
 			if (lastSave + 60_000 < currentTime) {
 				lastSave = currentTime;
@@ -104,39 +104,32 @@ public class CalculationHandler {
 		Calculation tmpCalc = new Calculation();
 
 		if (best != null) {
+			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, calculationId,
+					model.getName(), best.getFitness());
 
 			ActionGene[][] actionGeneArray = Drawer.buildStringActionMatrix(best);
 			String htmlTableHeader = Drawer.buildHtmlTableHeader("Time :", actionGeneArray);
-			Path destPng = Paths.get(Const.getConst().get("ApplicationPath") + File.separator + userId + File.separator
-					+ tmpCalc.getId() + "_" + model.getName() + File.separatorChar + "result.png");
-			Path htmlDest = Paths.get(Const.getConst().get("ApplicationPath") + File.separator + userId + File.separator
-					+ tmpCalc.getId() + "_" + model.getName() + File.separatorChar + "result.html");
 
- 
-			String htmlArray = Drawer.htmlTableBuilder(model.getName(), htmlTableHeader, 60.0, "px", actionGeneArray, false);
-			System.out.print("try to save : " + destPng.toString() + " and " + htmlDest.toString() + " ... ");
-			boolean saveSuccess = FileService.saveHtmlAndPng(htmlArray, destPng, htmlDest);
-			if (saveSuccess) {
-				System.out.println(" Success ");
+			String htmlArray = Drawer.htmlTableBuilder(model.getName(), htmlTableHeader, 60.0, "px", actionGeneArray,
+					false);
+			logger.info("try to save : pngFile and htmlFile ... ");
+			if (FileUtils.saveResult(htmlArray, Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationId, model.getName())))) {
+				logger.info(" Success ");
 			} else {
-				System.out.println(" Fail ");
+				logger.info(" Fail ");
 			}
-			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, calculationId, model.getName(),
-					best.getFitness());
 		} else {
-			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, calculationId, model.getName(),
-					0);
+			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, calculationId,
+					model.getName(), 0);
 		}
 
 		// Save the information
 		try {
-			String calculationSaveDest = Const.getConst().get("ApplicationPath") + File.separator + userId
-					+ File.separator + tmpCalc.getId() + "_" + model.getName() + File.separatorChar + "state.json";
-			FileService.writeInFile(tmpCalc, Paths.get(calculationSaveDest));
-			System.out.println(tmpCalc + " saved in " + calculationSaveDest);
+			FileUtils.writeJsonInFile(tmpCalc, userId, tmpCalc.getId(), tmpCalc.getName());
+			logger.info(tmpCalc + " saved");
 		} catch (IOException e) {
-			e.printStackTrace();
-			System.err.println(tmpCalc + " not saved.");
+			logger.debug(Arrays.toString(e.getStackTrace()));
+			logger.error(tmpCalc + " not saved.");
 		}
 	}
 

@@ -13,6 +13,7 @@ import javax.xml.bind.UnmarshalException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.ordogene.file.models.JSONModel;
 import org.ordogene.file.parser.Parser;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -35,7 +36,6 @@ public class JSONModelTest {
 	public void shouldIAE_if_a_snap_value_negatif() throws JsonParseException, JsonMappingException, IOException,
 			InstantiationException, IllegalAccessException, UnmarshalException, URISyntaxException {
 
-		//System.out.println(location);
 		Parser.parseJsonFile(Paths.get(JSONModelTest.class.getClassLoader().getResource("testJson/test1.json").toURI()), JSONModel.class);
 	}
 

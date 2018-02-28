@@ -18,8 +18,8 @@ import org.ordogene.algorithme.models.Entity;
 import org.ordogene.algorithme.models.Environment;
 import org.ordogene.algorithme.models.Fitness;
 import org.ordogene.algorithme.models.Input;
-import org.ordogene.file.JSONModel;
 import org.ordogene.file.models.JSONFitness;
+import org.ordogene.file.models.JSONModel;
 import org.ordogene.file.models.Relation;
 import org.ordogene.file.models.Type;
 

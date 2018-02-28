@@ -58,7 +58,6 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 		while (model.hasWorkableAction(envAfterEnd, timeAtEnd)) {
 
 			// Select a action
-			//System.out.println("Time :" + currentTime);
 			Action action = model.getWorkableAction(envAfterEnd, timeAtEnd);
 			if(action != null) {
 				

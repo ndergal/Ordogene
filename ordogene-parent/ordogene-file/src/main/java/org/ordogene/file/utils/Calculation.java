@@ -7,6 +7,7 @@ import org.ordogene.file.parser.Validable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Calculation implements Validable {
+	
 	/**
 	 * 
 	 */

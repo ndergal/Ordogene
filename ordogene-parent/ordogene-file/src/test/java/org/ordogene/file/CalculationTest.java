@@ -3,8 +3,6 @@ package org.ordogene.file;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Date;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.ordogene.file.utils.Calculation;
@@ -22,22 +20,27 @@ public class CalculationTest {
 		Calculation c = new Calculation();
 		int id = 000354;
 		long ts = System.currentTimeMillis();
-		String uid = "seigneur yvain";
-		Date now = new Date(ts);
 		int fitness = 35;
 		int iter = 1324325;
+		int iterMax = 1324326;
 		int lastIter = 124444;
-		boolean run = true;
+		String name = "calculation test";
 		c.setId(id);
  		c.setFitnessSaved(fitness);
 		c.setLastIterationSaved(lastIter);
-		c.setMaxIteration(iter);
+		c.setMaxIteration(iterMax);
 		c.setStartTimestamp(ts);
+		c.setIterationNumber(iter);
+		c.setName(name);
+		c.setRunning(true);
 		assertTrue(ts == (c.getStartTimestamp()));
 		assertEquals(id, c.getId());
 		assertEquals(lastIter, c.getLastIterationSaved());
-		assertEquals(iter, c.getMaxIteration());
+		assertEquals(iterMax, c.getMaxIteration());
 		assertEquals(fitness, c.getFitnessSaved());
+		assertEquals(name, c.getName());
+		assertEquals(iter, c.getIterationNumber());
+		assertTrue(c.isRunning());
 
 	}
 }

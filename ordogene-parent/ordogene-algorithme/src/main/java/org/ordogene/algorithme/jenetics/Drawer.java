@@ -5,18 +5,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import org.ordogene.algorithme.models.Action;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
 import io.jenetics.Phenotype;
 
 public class Drawer {
+	private final static Logger log = LoggerFactory.getLogger(Drawer.class);
 
 	static String buildHtmlTableHeader(String prefix, Object[][] content) {
 		int nbCol = 0;
@@ -68,17 +70,7 @@ public class Drawer {
 		}
 
 		// remove all "-1" useless cells
-
 		final int realMaxSizef = realMaxSize;
-		//
-		// for (int i = 0; i < indexedList.size(); i++) {
-		// int[] intArray = indexedList.get(i);
-		// System.out.println("intArray before = " + intArray.length);
-		// int[] truncatedArray = new int[realMaxSizef];
-		// System.arraycopy(intArray, 0, truncatedArray, 0, realMaxSizef);
-		// indexedList.set(i, truncatedArray);
-		// System.out.println("truncatedArray after = " + truncatedArray.length);
-		// }
 		List<ActionGene[]> actionReplacedList = new ArrayList<>();
 		indexedList.forEach(intArray -> {
 			int[] truncatedArray = new int[realMaxSizef];
@@ -90,10 +82,6 @@ public class Drawer {
 
 		ActionGene[][] res = new ActionGene[actionReplacedList.size()][];
 		res = actionReplacedList.toArray(res);
-
-		System.out.println();
-		print2DArray(res);
-		System.out.println();
 
 		return res;
 
@@ -126,14 +114,6 @@ public class Drawer {
 			}
 		}
 		return -1;
-	}
-
-	private static void print2DArray(Object[][] mat) {
-
-		for (Object[] row : mat) {
-			System.out.println(Arrays.toString(row));
-		}
-
 	}
 
 	private static Color randomLightColorGenerator() {
@@ -202,7 +182,7 @@ public class Drawer {
 
 		String res = sb.toString() + sbTr.toString();
 		if (display) {
-			System.out.println(res);
+			log.info(res);
 			JOptionPane.showMessageDialog(null, new JLabel(res));
 		}
 		return res;

@@ -13,7 +13,7 @@ import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.ordogene.algorithme.Model;
 import org.ordogene.algorithme.master.ThreadHandler;
-import org.ordogene.file.JSONModel;
+import org.ordogene.file.models.JSONModel;
 import org.ordogene.file.parser.Parser;
 import org.ordogene.file.utils.Const;
 

@@ -1,6 +1,5 @@
 package org.ordogene.algorithme.models;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -9,8 +8,7 @@ import org.ordogene.file.models.JSONFitness;
 import org.ordogene.file.models.Relation;
 import org.ordogene.file.models.Type;
 
-public class Fitness implements Serializable {
-	private static final long serialVersionUID = 1L;
+public class Fitness {
 	
 	private final Type type;
 	private Long value;

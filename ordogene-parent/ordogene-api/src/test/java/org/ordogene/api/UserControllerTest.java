@@ -54,7 +54,7 @@ public class UserControllerTest {
 
 	@Test
 	public void createRandomUserOk() throws Exception {
-		MvcResult result = mvc.perform(put("/").accept(MediaType.APPLICATION_JSON_UTF8)).andExpect(status().isOk())
+		mvc.perform(put("/").accept(MediaType.APPLICATION_JSON_UTF8)).andExpect(status().isOk())
 				.andReturn();
 	}
 
@@ -179,7 +179,7 @@ public class UserControllerTest {
 		if (Files.exists(usrTestPath)) {
 			FileSystemUtils.deleteRecursively(usrTestPath.toFile());
 		}
-		MvcResult res = mvc.perform(MockMvcRequestBuilders.get("/" + username).accept(MediaType.APPLICATION_JSON))
+		mvc.perform(MockMvcRequestBuilders.get("/" + username).accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isNotFound()).andReturn();
 	}
 

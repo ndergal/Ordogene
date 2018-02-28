@@ -1,4 +1,4 @@
-package org.ordogene.file;
+package org.ordogene.file.models;
 
 import java.util.HashSet;
 import java.util.List;
@@ -6,11 +6,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.ordogene.file.models.JSONAction;
-import org.ordogene.file.models.JSONEntity;
-import org.ordogene.file.models.JSONFitness;
-import org.ordogene.file.models.JSONInput;
-import org.ordogene.file.models.JSONOperand;
 import org.ordogene.file.parser.Validable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;

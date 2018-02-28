@@ -7,15 +7,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
-import org.codehaus.plexus.util.FileUtils;
 import org.ordogene.file.utils.Calculation;
 import org.ordogene.file.utils.Const;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class CalculationHandler {
+public class CalculationManager {
+	private final static Logger log = LoggerFactory.getLogger(CalculationManager.class);
 
-	List<Calculation> getCalculations(String username) {
+	public List<Calculation> getCalculations(String username) {
 		List<Calculation> res = new ArrayList<>();
 		if (username == null || username.equals("")) {
 			return res;
@@ -36,19 +39,21 @@ public class CalculationHandler {
 					return;
 				}
 				currenCalculation.setName(idAndName[1]);
-				// currenCalculation.set
 				res.add(currenCalculation);
 			});
 
 		} catch (IOException e) {
-			System.err.println("Error while browsing the path " + userPath.toString());
+			log.error("Error while browsing the path " + userPath.toString());
 			e.printStackTrace();
 		}
 
 		return res;
 	}
+	
+	// TODO createDirectories
+	// new File("/path/directory").mkdirs();
 
-	boolean removeCalculation(String username, int calculationID, String calculationName) {
+	public boolean removeCalculation(String username, int calculationID, String calculationName) {
 		if (username == null || username.equals("")) {
 			return false;
 		}
@@ -59,7 +64,10 @@ public class CalculationHandler {
 			return false;
 		}
 		try {
-			FileUtils.deleteDirectory(todelete);
+			Files.walk(todelete.toPath())
+		    .sorted(Comparator.reverseOrder())
+		    .map(Path::toFile)
+		    .forEach(File::delete);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
