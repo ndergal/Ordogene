@@ -1,9 +1,11 @@
 package org.ordogene.file;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -78,6 +80,14 @@ public class FileUtils {
 		return Base64.getEncoder().encodeToString(imageData);
 	}
 
+	public static String encodeHtml(String userId, int cid, String calName) throws IOException, FileNotFoundException {
+		Objects.requireNonNull(userId);
+		Objects.requireNonNull(calName);
+		Path pathSrcImg = Paths.get(getCalculationHtmlPath(userId, cid, calName));
+		byte[] imageData = Files.readAllBytes(pathSrcImg);
+		return Base64.getEncoder().encodeToString(imageData);
+	}
+
 	public static void saveImageFromBase64(String base64Img, String pathDstImg)
 			throws IOException, FileNotFoundException {
 		Objects.requireNonNull(base64Img);
@@ -134,6 +144,40 @@ public class FileUtils {
 		}
 	}
 
+	public static boolean decodeAndSaveImage(String base64Img, String pathDstImg) {
+		Objects.requireNonNull(base64Img);
+		Objects.requireNonNull(pathDstImg);
+		byte[] imageData = Base64.getDecoder().decode(base64Img);
+		try (FileOutputStream imageFile = new FileOutputStream(pathDstImg)) {
+			imageFile.write(imageData);
+			return true;
+		} catch (FileNotFoundException e) {
+			System.err.println("Destination path is not a file : " + e);
+			return false;
+		} catch (IOException e) {
+			System.err.println("cannot write to the path : " + e);
+			return false;
+		}
+	}
+
+	public static boolean decodeAndSaveHtml(String base64Html, String pathDstHtml) {
+		Objects.requireNonNull(base64Html);
+		Objects.requireNonNull(pathDstHtml);
+		Path destPath = Paths.get(Objects.requireNonNull(pathDstHtml));
+		try (BufferedWriter writer = Files.newBufferedWriter(destPath, Charset.forName("UTF-8"))) {
+			byte[] decodedBytes = Base64.getDecoder().decode(base64Html);
+			String decodedStr = new String(decodedBytes);
+			writer.write(decodedStr);
+			return true;
+		} catch (FileNotFoundException e) {
+			System.err.println("Destination path is not a file : " + e);
+			return false;
+		} catch (IOException e) {
+			System.err.println("cannot write to the path : " + e);
+			return false;
+		}
+	}
+
 	private static String getCalculationPngPath(String userId, int cid, String calName) {
 		return getCalculationDirectoryPath(userId, cid, calName) + File.separator + "result.png";
 	}
@@ -147,7 +191,7 @@ public class FileUtils {
 	}
 
 	private static String getCalculationDirectoryPath(String userId, int cid, String cName) {
-		return Const.getConst().get("ApplicationPath") + File.separatorChar + userId
-				+ File.separatorChar + "" + cid + "_" + cName;
+		return Const.getConst().get("ApplicationPath") + File.separatorChar + userId + File.separatorChar + "" + cid
+				+ "_" + cName;
 	}
 }
