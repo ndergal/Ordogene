@@ -13,6 +13,7 @@ import javax.xml.bind.UnmarshalException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.ordogene.file.models.JSONModel;
 import org.ordogene.file.parser.Parser;
 
 import com.fasterxml.jackson.core.JsonParseException;

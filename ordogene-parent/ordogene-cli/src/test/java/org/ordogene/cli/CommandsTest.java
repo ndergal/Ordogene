@@ -1,10 +1,8 @@
 package org.ordogene.cli;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -13,9 +11,6 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-
-import javax.swing.filechooser.FileSystemView;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -51,66 +46,6 @@ public class CommandsTest {
 		 * System.setIn(in);
 		 */
 		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetUserClientException() {
-		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
-				.thenThrow(HttpClientErrorException.class);
-		assertFalse(commands.getUser("tartampion"));
-	}
-
-	@Test
-	public void testGetUserServerException() {
-		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
-				.thenThrow(HttpServerErrorException.class);
-		assertFalse(commands.getUser("tartampion"));
-	}
-
-	@Test
-	public void testGetUserRestException() {
-		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
-				.thenThrow(RestClientException.class);
-		assertFalse(commands.getUser("tartampion"));
-	}
-
-	@Test
-	public void testGetUser() {
-		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
-				.thenReturn(new ResponseEntity<ApiJsonResponse>(HttpStatus.OK));
-		assertTrue(commands.getUser("tartampion"));
-	}
-
-	@Test
-	public void testCreateUserRestException() {
-		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
-				.thenThrow(RestClientException.class);
-		assertFalse(commands.createUser());
-	}
-
-	@Test
-	public void testCreateUserClientException() {
-		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
-				.thenThrow(HttpClientErrorException.class);
-		assertFalse(commands.createUser());
-	}
-
-	@Test
-	public void testCreateUserServerException() {
-		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
-				.thenThrow(HttpServerErrorException.class);
-		assertFalse(commands.createUser());
-	}
-
-	@Test
-	public void testCreateUser() {
-		ResponseEntity<ApiJsonResponse> response = mock(ResponseEntity.class);
-		ApiJsonResponse ajr = mock(ApiJsonResponse.class);
-		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
-				.thenReturn(response);
-		when(response.getBody()).thenReturn(ajr);
-		when(ajr.getUserId()).thenReturn("tartampion");
-		assertTrue(commands.createUser());
 	}
 
 	@Test
@@ -173,17 +108,19 @@ public class CommandsTest {
 
 	@Test
 	public void testLaunchCalculationServerException() {
+		HttpServerErrorException e = new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "test status text");
 		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
-				.thenThrow(HttpServerErrorException.class);
-		assertFalse(commands.launchCalculation(
+				.thenThrow(e);
+		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value() + " -- test status text", commands.launchCalculation(
 				new File("../ordogene-api/src/test/resources/OrdogeneCalculationExamples/fitness1.json")));
 	}
 
 	@Test
 	public void testLaunchCalculationClientException() {
+		HttpClientErrorException e = new HttpClientErrorException(HttpStatus.BAD_REQUEST, "test status text");
 		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
-				.thenThrow(HttpClientErrorException.class);
-		assertFalse(commands.launchCalculation(
+				.thenThrow(e);
+		assertEquals(HttpStatus.BAD_REQUEST.value() + " -- test status text", commands.launchCalculation(
 				new File("../ordogene-api/src/test/resources/OrdogeneCalculationExamples/fitness1.json")));
 	}
 
@@ -191,7 +128,7 @@ public class CommandsTest {
 	public void testLaunchCalculationRestException() {
 		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
 				.thenThrow(RestClientException.class);
-		assertFalse(commands.launchCalculation(
+		assertEquals("Problem with the communication between client and server", commands.launchCalculation(
 				new File("../ordogene-api/src/test/resources/OrdogeneCalculationExamples/fitness1.json")));
 	}
 
@@ -203,29 +140,31 @@ public class CommandsTest {
 				.thenReturn(re);
 		when(re.getBody()).thenReturn(ajr);
 		when(ajr.getCid()).thenReturn(666);
-		assertTrue(commands.launchCalculation(
+		assertEquals("Calculation '666' launched", commands.launchCalculation(
 				new File("../ordogene-api/src/test/resources/OrdogeneCalculationExamples/fitness1.json")));
 	}
 
 	@Test
 	public void testStopCalculationServerException() {
+		HttpServerErrorException e = new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "test status text");
 		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
-				.thenThrow(HttpServerErrorException.class);
-		assertFalse(commands.stopCalculation(666));
+				.thenThrow(e);
+		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value() + " -- test status text", commands.stopCalculation(666));
 	}
 
 	@Test
 	public void testStopCalculationClientException() {
+		HttpClientErrorException e = new HttpClientErrorException(HttpStatus.BAD_REQUEST, "test status text");
 		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
 				.thenThrow(HttpClientErrorException.class);
-		assertFalse(commands.stopCalculation(666));
+		assertEquals(HttpStatus.BAD_REQUEST.value() + " -- test status text", commands.stopCalculation(666));
 	}
 
 	@Test
 	public void testStopCalculationRestException() {
 		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
 				.thenThrow(RestClientException.class);
-		assertFalse(commands.stopCalculation(666));
+		assertEquals("Problem with the communication between client and server", commands.stopCalculation(666));
 	}
 
 	@Test
@@ -233,23 +172,25 @@ public class CommandsTest {
 		ResponseEntity<ApiJsonResponse> re = mock(ResponseEntity.class);
 		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
 				.thenReturn(re);
-		assertTrue(commands.stopCalculation(666));
+		assertEquals("Calculation '666' stopped", commands.stopCalculation(666));
 	}
 
 	@Test
 	public void testResultCalculationServerException() {
+		HttpServerErrorException e = new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "test status text");
 		String dst = "/tmp/result.png";
 		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
 				.thenThrow(HttpServerErrorException.class);
-		assertFalse(commands.resultCalculation(666, new File(dst), true));
+		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value() + " -- test status text", commands.resultCalculation(666, new File(dst), true));
 	}
 
 	@Test
 	public void testResultCalculationClientException() {
+		HttpClientErrorException e = new HttpClientErrorException(HttpStatus.BAD_REQUEST, "test status text");
 		String dst = "/tmp/result.png";
 		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
 				.thenThrow(HttpClientErrorException.class);
-		assertFalse(commands.resultCalculation(666, new File(dst), true));
+		assertEquals(HttpStatus.BAD_REQUEST.value() + " -- test status text", commands.resultCalculation(666, new File(dst), true));
 	}
 
 	@Test
@@ -257,7 +198,7 @@ public class CommandsTest {
 		String dst = "/tmp/result.png";
 		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
 				.thenThrow(RestClientException.class);
-		assertFalse(commands.resultCalculation(666, new File(dst), true));
+		assertEquals("Problem with the communication between client and server", commands.resultCalculation(666, new File(dst), true));
 	}
 
 	@Test
@@ -270,38 +211,38 @@ public class CommandsTest {
 				.thenReturn(re);
 		when(re.getBody()).thenReturn(ajr);
 		when(ajr.getBase64img()).thenReturn(base64img);
-		assertTrue(commands.resultCalculation(666, new File(dst), true));
+		assertEquals("The image of the result is downloaded at " + dst, commands.resultCalculation(666, new File(dst), true));
+	}
+	
+	@Test
+	public void testRemoveCalculationServerException() {
+		HttpServerErrorException e = new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "test status text");
+		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
+		.thenThrow(e);
+
+		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value() + " -- test status text", commands.removeCalculation(0));
+	}
+	
+	@Test
+	public void testRemoveCalculationClientException() {
+		HttpClientErrorException e = new HttpClientErrorException(HttpStatus.BAD_REQUEST, "test status text");
+		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
+		.thenThrow(e);
+
+		assertEquals(HttpStatus.BAD_REQUEST.value() + " -- test status text", commands.removeCalculation(0));
+	}
+	
+	@Test
+	public void testRemoveCalculationRestException() {
+		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
+		.thenThrow(
+				RestClientException.class);
+
+		assertEquals("Problem with the communication between client and server", commands.removeCalculation(0));
 	}
 
 	@Test
-	public void getFileContentFolderTest() {
-		String folderPath = System.getProperty("user.home");
-		if (folderPath == null) {
-			folderPath = FileSystemView.getFileSystemView().getHomeDirectory().toString();
-		}
-		if (folderPath == null) {
-			folderPath = File.listRoots()[0].getAbsolutePath();
-		}
-		File f = new File(folderPath);
-		assertNull(commands.getFileContent(f));
-
-	}
-
-	@Test
-	public void getFileContentNullTest() {
-
-		int randomNum = ThreadLocalRandom.current().nextInt();
-		File shouldntExist = new File(System.getProperty("user.home") + File.separator + randomNum);
-		while (shouldntExist.exists()) {
-			randomNum = ThreadLocalRandom.current().nextInt();
-			shouldntExist = new File(System.getProperty("user.home") + File.separator + randomNum);
-		}
-		assertNull(commands.getFileContent(shouldntExist));
-
-	}
-
-	@Test
-	public void testRemoveCalculationWithoutExceptions() {
+	public void testRemoveCalculation() {
 		ResponseEntity<ApiJsonResponse> re = mock(ResponseEntity.class);
 		ApiJsonResponse ajr = mock(ApiJsonResponse.class);
 		
@@ -312,22 +253,7 @@ public class CommandsTest {
 				any(HttpEntity.class), 
 				any(Class.class))).thenReturn(re);
 		
-		assertThat(commands.removeCalculation(0)).isTrue();
-	}
-	
-	@Test
-	public void remove_calculation_should_return_false_on_exception() {
-		when(restTemplate.exchange(anyString(), 
-				any(HttpMethod.class), 
-				any(HttpEntity.class), 
-				any(Class.class)))
-		.thenThrow(HttpClientErrorException.class, 
-				HttpServerErrorException.class,
-				RestClientException.class);
-
-		assertThat(commands.removeCalculation(0)).isFalse();
-		assertThat(commands.removeCalculation(0)).isFalse();
-		assertThat(commands.removeCalculation(0)).isFalse();
+		assertEquals("Calculation '0' has been deleted.", commands.removeCalculation(0));
 	}
 
 }

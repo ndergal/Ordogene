@@ -2,16 +2,14 @@ package org.ordogene.file;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
-import java.util.stream.Stream;
 
 import org.ordogene.file.utils.Const;
 
-public class UserHandler {
+public class UserManager {
 
 	boolean checkUserExists(String username) {
 		if (username == null || username.isEmpty()) {
@@ -43,22 +41,23 @@ public class UserHandler {
 	}
 
 	boolean removeUser(String username) {
-		if (username == null || username.isEmpty()) {
+		if (username == null || username.equals("")) {
 			return false;
-		} else {
-
-			Path rootPath = Paths.get(Const.getConst().get("ApplicationPath") + File.separatorChar + username);
-
-			try (Stream<Path> paths = Files.walk(rootPath, FileVisitOption.FOLLOW_LINKS)) {
-				System.out.println("Deleting :");
-				paths.sorted(Comparator.reverseOrder()).map(Path::toFile).peek(System.out::println)
-						.forEach(File::delete);
-				return true;
-			} catch (IOException e) {
-				System.err.println("Error while deleting " + rootPath.toString());
-				e.printStackTrace();
-				return false;
-			}
 		}
+
+		File todelete = new File(Const.getConst().get("ApplicationPath") + File.separatorChar + username);
+		if(!todelete.exists()) {
+			return false;
+		}
+		try {
+			Files.walk(todelete.toPath())
+		    .sorted(Comparator.reverseOrder())
+		    .map(Path::toFile)
+		    .forEach(File::delete);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
 	}
 }

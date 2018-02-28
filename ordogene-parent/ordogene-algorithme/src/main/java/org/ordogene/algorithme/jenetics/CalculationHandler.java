@@ -2,14 +2,12 @@ package org.ordogene.algorithme.jenetics;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Date;
 import java.util.Iterator;
 
 import org.ordogene.algorithme.Model;
 import org.ordogene.algorithme.master.ThreadHandler;
-import org.ordogene.file.FileService;
+import org.ordogene.file.FileUtils;
 import org.ordogene.file.models.Type;
 import org.ordogene.file.utils.Calculation;
 import org.ordogene.file.utils.Const;
@@ -104,25 +102,19 @@ public class CalculationHandler {
 		Calculation tmpCalc = new Calculation();
 
 		if (best != null) {
+			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, calculationId, model.getName(),
+					best.getFitness());
 
 			ActionGene[][] actionGeneArray = Drawer.buildStringActionMatrix(best);
 			String htmlTableHeader = Drawer.buildHtmlTableHeader("Time :", actionGeneArray);
-			Path destPng = Paths.get(Const.getConst().get("ApplicationPath") + File.separator + userId + File.separator
-					+ tmpCalc.getId() + "_" + model.getName() + File.separatorChar + "result.png");
-			Path htmlDest = Paths.get(Const.getConst().get("ApplicationPath") + File.separator + userId + File.separator
-					+ tmpCalc.getId() + "_" + model.getName() + File.separatorChar + "result.html");
-
  
 			String htmlArray = Drawer.htmlTableBuilder(model.getName(), htmlTableHeader, 60.0, "px", actionGeneArray, false);
-			System.out.print("try to save : " + destPng.toString() + " and " + htmlDest.toString() + " ... ");
-			boolean saveSuccess = FileService.saveHtmlAndPng(htmlArray, destPng, htmlDest);
-			if (saveSuccess) {
+			System.out.print("try to save : pngFile and htmlFile ... ");
+			if (FileUtils.saveResult(htmlArray, userId, tmpCalc.getId(), tmpCalc.getName())) {
 				System.out.println(" Success ");
 			} else {
 				System.out.println(" Fail ");
 			}
-			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, calculationId, model.getName(),
-					best.getFitness());
 		} else {
 			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, calculationId, model.getName(),
 					0);
@@ -132,7 +124,7 @@ public class CalculationHandler {
 		try {
 			String calculationSaveDest = Const.getConst().get("ApplicationPath") + File.separator + userId
 					+ File.separator + tmpCalc.getId() + "_" + model.getName() + File.separatorChar + "state.json";
-			FileService.writeInFile(tmpCalc, Paths.get(calculationSaveDest));
+			FileUtils.writeJsonInFile(tmpCalc, userId, tmpCalc.getId(), tmpCalc.getName());
 			System.out.println(tmpCalc + " saved in " + calculationSaveDest);
 		} catch (IOException e) {
 			e.printStackTrace();

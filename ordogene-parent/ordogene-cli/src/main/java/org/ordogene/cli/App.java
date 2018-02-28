@@ -39,12 +39,8 @@ public class App {
 	@Bean
 	public RestTemplate myRestTemplate(RestTemplateBuilder builder) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
 		TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
-
-		SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy)
-				.build();
-
+		SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
 		SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
-
 		CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(csf).build();
 
 		HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();

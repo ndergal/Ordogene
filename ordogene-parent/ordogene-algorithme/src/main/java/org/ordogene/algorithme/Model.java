@@ -14,7 +14,7 @@ import org.ordogene.algorithme.models.Environment;
 import org.ordogene.algorithme.models.Fitness;
 import org.ordogene.algorithme.models.Input;
 import org.ordogene.algorithme.util.ActionSelector;
-import org.ordogene.file.JSONModel;
+import org.ordogene.file.models.JSONModel;
 import org.ordogene.file.models.Relation;
 
 public class Model implements Serializable {

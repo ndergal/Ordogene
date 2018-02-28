@@ -2,8 +2,6 @@ package org.ordogene.algorithme.master;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
 import java.util.HashMap;
@@ -14,7 +12,8 @@ import javax.xml.bind.UnmarshalException;
 
 import org.ordogene.algorithme.Model;
 import org.ordogene.algorithme.jenetics.CalculationHandler;
-import org.ordogene.file.JSONModel;
+import org.ordogene.file.FileUtils;
+import org.ordogene.file.models.JSONModel;
 import org.ordogene.file.parser.Parser;
 import org.ordogene.file.utils.Calculation;
 import org.ordogene.file.utils.Const;
@@ -57,10 +56,10 @@ public class Master {
 
 		String toHash = jsonString + (new Date()).toString();
 		int calculationId = toHash.hashCode();
-
-		Path calculationPath = Paths.get(Const.getConst().get("ApplicationPath") + File.separatorChar + idUser
-				+ File.separatorChar + "" + calculationId + "_" + model.getName());
-		Files.createDirectories(calculationPath);
+		
+		if(!FileUtils.createCalculationDirectory(idUser, calculationId, model.getName())) {
+			System.err.println("Error while creating the calculation folder...");
+		}
 
 		ThreadHandler th = new ThreadHandler();
 

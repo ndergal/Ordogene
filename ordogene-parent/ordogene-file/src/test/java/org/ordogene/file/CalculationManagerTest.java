@@ -23,7 +23,7 @@ import org.ordogene.file.utils.Const;
 
 /**
  */
-public class CalculationHandlerTest {
+public class CalculationManagerTest {
 
 	public class CopyFileVisitor extends SimpleFileVisitor<Path> {
 		private final Path targetPath;
@@ -57,7 +57,7 @@ public class CalculationHandlerTest {
 		Const.loadConfig("./src/test/resources/ordogene.conf.json");
 		// copy fake calculation folder :
 		Path sourcePath = (Paths
-				.get(CalculationHandlerTest.class.getClassLoader().getResource("-624472280_dummy-calc-test").toURI()));
+				.get(CalculationManagerTest.class.getClassLoader().getResource("-624472280_dummy-calc-test").toURI()));
 		Path destinationPath = Paths.get(Const.getConst().get("ApplicationPath") + File.separator + testerName
 				+ File.separator + "-624472280_dummy-calc-test");
 
@@ -80,7 +80,7 @@ public class CalculationHandlerTest {
 
 	@Test
 	public void calculationGet() {
-		CalculationHandler ch = new CalculationHandler();
+		CalculationManager ch = new CalculationManager();
 		List<Calculation> calcs = ch.getCalculations(testerName);
 		boolean b = false;
 		for (Calculation c : calcs) {

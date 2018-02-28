@@ -1,7 +1,6 @@
 package org.ordogene.api;
 
 import java.util.Arrays;
-import java.util.HashMap;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
@@ -10,13 +9,10 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.ordogene.algorithme.master.Master;
 import org.ordogene.api.utils.CustomArgsParser;
-import org.ordogene.file.FileService;
 import org.ordogene.file.utils.Const;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
@@ -24,10 +20,7 @@ import org.springframework.context.annotation.Bean;
 
 public class Application {
 
-	private final static Master algoMaster;
-	static {
-		algoMaster = new Master();
-	}
+	private final static Master algoMaster = new Master();
 
 	public static void main(String[] args) {
 
@@ -89,7 +82,6 @@ public class Application {
 	@Bean
 	public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
 		return args -> {
-
 			System.out.println("Let's inspect the beans provided by Spring Boot:");
 
 			String[] beanNames = ctx.getBeanDefinitionNames();
@@ -99,11 +91,6 @@ public class Application {
 			}
 
 		};
-	}
-
-	@Bean
-	public FileService buildFileService() {
-		return new FileService();
 	}
 
 	@Bean
