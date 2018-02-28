@@ -108,7 +108,7 @@ public class CalculationHandler {
 					model.getName(), best.getFitness());
 
 			ActionGene[][] actionGeneArray = Drawer.buildStringActionMatrix(best);
-			String htmlTableHeader = Drawer.buildHtmlTableHeader("Time :", actionGeneArray);
+			String htmlTableHeader = Drawer.buildHtmlTableHeader("", actionGeneArray);
 
 			String htmlArray = Drawer.htmlTableBuilder(model.getName(), htmlTableHeader, 60.0, "px", actionGeneArray,
 					false);
