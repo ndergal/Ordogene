@@ -88,7 +88,7 @@ public class CalculationController {
 					HttpStatus.BAD_REQUEST);
 		} else {
 			Calculation calcToDelete = optCalc.get();
-			if (fs.removeUserCalculation(userId, calcToDelete)) {
+			if (FileUtils.removeUserCalculation(userId,calcToDelete.getId(),calcToDelete.getName())) {
 				return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(userId, calculationId, null, null, null),
 						HttpStatus.OK);
 			} else {
@@ -126,7 +126,7 @@ public class CalculationController {
 				} else {
 					return new ResponseEntity<ApiJsonResponse>(
 							new ApiJsonResponse(userId, calculationId, "The calcul is not running.", null, null),
-							HttpStatus.NOT_FOUND);
+							HttpStatus.BAD_REQUEST);
 				}
 			} else {
 				return new ResponseEntity<ApiJsonResponse>(
@@ -214,7 +214,7 @@ public class CalculationController {
 			}
 			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(userId, 0,
 					"calculation " + calculationid + " does not exist for user " + userId, null, null),
-					HttpStatus.NOT_FOUND);
+					HttpStatus.FORBIDDEN);
 		}
 	}
 
@@ -247,7 +247,7 @@ public class CalculationController {
 			}
 			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(userId, 0,
 					"calculation " + calculationid + " does not exist for user " + userId, null, null),
-					HttpStatus.NOT_FOUND);
+					HttpStatus.FORBIDDEN);
 		}
 	}
 }
