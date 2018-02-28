@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import javax.xml.bind.UnmarshalException;
@@ -93,18 +92,13 @@ public class CalculationController {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.calculationIDNotExist(calculationId),
 					HttpStatus.BAD_REQUEST);
 		} else {
-			try {
-				Calculation calcToDelete = optCalc.get();
-				if (fs.removeUserCalculation(userId, calcToDelete)) {
-					return new ResponseEntity<ApiJsonResponse>(
-							new ApiJsonResponse(userId, calculationId, null, null, null), HttpStatus.OK);
-				} else {
-					return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.InternalServerError(),
-							HttpStatus.INTERNAL_SERVER_ERROR);
-				}
-			} catch (NoSuchElementException e) {
-				return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.calculationIDNotExist(calculationId),
-						HttpStatus.BAD_REQUEST);
+			Calculation calcToDelete = optCalc.get();
+			if (fs.removeUserCalculation(userId, calcToDelete)) {
+				return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(userId, calculationId, null, null, null),
+						HttpStatus.OK);
+			} else {
+				return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.InternalServerError(),
+						HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 
@@ -235,7 +229,8 @@ public class CalculationController {
 
 	@RequestMapping(value = "/{id}/calculations/{calculationid}/html")
 	@ResponseBody
-	public ResponseEntity<ApiJsonResponse> getCalculationHtml(@PathVariable String id, @PathVariable int calculationid) {
+	public ResponseEntity<ApiJsonResponse> getCalculationHtml(@PathVariable String id,
+			@PathVariable int calculationid) {
 
 		if (id == null || "".equals(id)) {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
