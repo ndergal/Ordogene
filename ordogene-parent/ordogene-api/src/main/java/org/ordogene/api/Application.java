@@ -48,28 +48,27 @@ public class Application {
 		if (optPort == null || optPort.isEmpty()) {
 			hasPort = false;
 		}
-		System.out.println(optPort);
-		int portParameterInt = -1;
+ 		int portParameterInt = -1;
 		if (hasPort) {
 			try {
 				portParameterInt = Integer.parseInt(optPort);
 				if (portParameterInt > 65535 || portParameterInt < 1) {
-					System.err.println("Ordogene Server : The port parameter must be a positive number below 65535.");
+					log.error("Ordogene Server : The port parameter must be a positive number below 65535.");
 					return;
 				}
 			} catch (NumberFormatException e) {
-				System.err.println("Ordogene Server : The port parameter must be a positive number below 65535.");
+				log.error("Ordogene Server : The port parameter must be a positive number below 65535.");
 				return;
 			}
 		}
 		if (Const.loadConfig(configFilePath)) {
 			if (!hasPort) {
-				System.out.println("Launch Ordogene server on default port.");
+				log.info("Launch Ordogene server on default port.");
 				SpringApplication.run(Application.class, args);
 				// --server.port=8081
 			} else {
 				String[] newArgs = new String[args.length + 1];
-				System.out.println("Launch Ordogene server on port " + portParameterInt + ".");
+				log.info("Launch Ordogene server on port " + portParameterInt + ".");
 				System.arraycopy(args, 0, newArgs, 0, args.length);
 				newArgs[args.length] = "--server.port=" + portParameterInt;
 				SpringApplication.run(Application.class, newArgs);
