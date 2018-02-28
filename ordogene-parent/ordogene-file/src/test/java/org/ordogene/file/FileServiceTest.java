@@ -26,7 +26,8 @@ public class FileServiceTest {
 
 	@Before
 	public void init() throws URISyntaxException {
- 		String configFileLocation = FileServiceTest.class.getClassLoader().getResource("ordogene.conf.json").toURI().toString();
+		String configFileLocation = FileServiceTest.class.getClassLoader().getResource("ordogene.conf.json").toURI()
+				.toString();
 		if (configFileLocation.startsWith("file:")) {
 			configFileLocation = configFileLocation.substring(5);
 
@@ -94,7 +95,6 @@ public class FileServiceTest {
 		if (fs.userExist(user))
 			fs.removeUser(user);
 
-
 		int calcID = -1234567;
 		String calcName = "Test";
 
@@ -132,36 +132,46 @@ public class FileServiceTest {
 	}
 
 	@Test
-	public void testEncodeAndDecode() throws IOException {
-		String ref = FileService.encodeB64File(Paths.get("../ordogene-file/test-image/doge_test.png"));
-		FileService.decodeAndSaveImage(ref, "../ordogene-file/test-image/result.png");
-		String end = FileService.encodeB64File(Paths.get("../ordogene-file/test-image/result.png"));
+	public void testEncodeAndDecode() throws IOException, URISyntaxException {
+		Path path1 = Paths.get(FileServiceTest.class.getClassLoader().getResource("./test-image/doge_test.png").toURI());
+		Path path2 = Paths.get(FileServiceTest.class.getClassLoader().getResource("./test-image/result.png").toURI());
+
+		String ref = FileService.encodeB64File(path1);
+		FileService.decodeAndSaveImage(ref, path2.toString());
+		String end = FileService.encodeB64File(path2);
 		assertEquals(ref, end);
 	}
 
 	@Test
-	public void testDecodeWithFolder() throws IOException {
-		String ref = FileService.encodeB64File(Paths.get("../ordogene-file/test-image/doge_test.png"));
-		assertFalse(FileService.decodeAndSaveImage(ref, "../ordogene-file/test-image/"));
+	public void testDecodeWithFolder() throws IOException, URISyntaxException {
+		Path path1 = Paths.get(FileServiceTest.class.getClassLoader().getResource("./test-image/doge_test.png").toURI());
+		Path path2 = Paths.get(FileServiceTest.class.getClassLoader().getResource("./test-image/").toURI());
+
+		String ref = FileService.encodeB64File(path1);
+		assertFalse(FileService.decodeAndSaveImage(ref, path2.toString()));
 	}
 
 	@Test
-	public void testDecodePng() throws IOException {
-		String ref = FileService.encodeB64File(Paths.get("../ordogene-file/test-image/doge_test.png"));
-		assertTrue(FileService.decodeAndSaveImage(ref, "../ordogene-file/test-image/result.png"));
+	public void testDecodePng() throws IOException, URISyntaxException {
+		Path path1 = Paths.get(FileServiceTest.class.getClassLoader().getResource("./test-image/doge_test.png").toURI());
+		Path path2 = Paths.get(FileServiceTest.class.getClassLoader().getResource("./test-image/result.png").toURI());
+		String ref = FileService.encodeB64File(path1);
+		assertTrue(FileService.decodeAndSaveImage(ref, path2.toString()));
 	}
-	
+
 	@Test
-	public void testDecodeHtml() throws IOException {
-		Path path1=Paths.get("../ordogene-file/test-html/result.html");
-		Path path2=Paths.get("../ordogene-file/test-html/result2.html");
+	public void testDecodeHtml() throws IOException, URISyntaxException {
+		Path path1 = Paths.get(FileServiceTest.class.getClassLoader().getResource("./test-html/result.html").toURI());
+		Path path2 = Paths.get(FileServiceTest.class.getClassLoader().getResource("./test-html/result2.html").toURI());
 		String ref = FileService.encodeB64File(path1);
 		assertTrue(FileService.decodeAndSaveHtml(ref, path2.toString()));
 		assertEquals(new String(Files.readAllBytes(path1)), new String(Files.readAllBytes(path2)));
 	}
 
 	@Test(expected = IOException.class)
-	public void testEncodeWithFolder() throws IOException {
-		FileService.encodeB64File(Paths.get("../ordogene-file/test-image/"));
+	public void testEncodeWithFolder() throws IOException, URISyntaxException {
+		Path path1 = Paths.get(FileServiceTest.class.getClassLoader().getResource("test-image/").toURI());
+
+		FileService.encodeB64File(path1);
 	}
 }
