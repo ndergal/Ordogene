@@ -2,19 +2,16 @@ package org.ordogene.api;
 
 import java.util.Arrays;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import org.ordogene.algorithme.master.Master;
-import org.ordogene.api.utils.CustomArgsParser;
 import org.ordogene.file.utils.Const;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.SimpleCommandLinePropertySource;
 
 @SpringBootApplication
 
@@ -22,57 +19,53 @@ public class Application {
 
 	private final static Master algoMaster = new Master();
 
+	private static final Logger log = LoggerFactory.getLogger(Application.class);
+
 	public static void main(String[] args) {
 
-		Options options = new Options();
-
-		Option config = new Option("conf", "config", true, "input file path");
-		config.setRequired(true);
-		options.addOption(config);
-
-		Option port = new Option("port", "port", true, "port to launch the server");
-		port.setRequired(false);
-		options.addOption(port);
-
-		HelpFormatter formatter = new HelpFormatter();
-		CommandLine cmd;
-		boolean ignoreUnknowArg = true;
-		try {
-			cmd = new CustomArgsParser(ignoreUnknowArg).parse(options, args);
-		} catch (ParseException e) {
-			System.out.println(e.getMessage());
-			String jarName = new java.io.File(
-					Application.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
-			formatter.printHelp("java -jar " + jarName, options);
+		SimpleCommandLinePropertySource ps = new SimpleCommandLinePropertySource(args);
+		if (!ps.containsProperty("config")) {
+			log.error("Missing argument --config=<configuration_file_location>");
+			return;
+		}
+		String configFilePath = (String) ps.getProperty("config");
+		if (configFilePath == null || configFilePath.isEmpty()) {
+			log.error("<configuration_file_location> parameter is empty");
 			return;
 		}
 
-		String configFilePath = cmd.getOptionValue("config");
-		String optionalPort = cmd.getOptionValue("port");
-		boolean hasPort = (optionalPort != null);
-		int portParameterInt = -1;
+		String optPort = null;
+		boolean hasPort = true;
+		if (ps.containsProperty("port")) {
+			optPort = (String) ps.getProperty("port");
+		}
+
+		if (optPort == null || optPort.isEmpty()) {
+			hasPort = false;
+		}
+ 		int portParameterInt = -1;
 		if (hasPort) {
 			try {
-				portParameterInt = Integer.parseInt(optionalPort);
+				portParameterInt = Integer.parseInt(optPort);
 				if (portParameterInt > 65535 || portParameterInt < 1) {
-					System.err.println("Ordogene Server : The port parameter must be a positive number below 65535.");
+					log.error("Ordogene Server : The port parameter must be a positive number below 65535.");
 					return;
 				}
 			} catch (NumberFormatException e) {
-				System.err.println("Ordogene Server : The port parameter must be a positive number below 65535.");
+				log.error("Ordogene Server : The port parameter must be a positive number below 65535.");
 				return;
 			}
 		}
 		if (Const.loadConfig(configFilePath)) {
 			if (!hasPort) {
-				System.out.println("Launch Ordogene server on default port.");
+				log.info("Launch Ordogene server on default port.");
 				SpringApplication.run(Application.class, args);
 				// --server.port=8081
 			} else {
-				String[] newArgs = new String[args.length+1];
-				System.out.println("Launch Ordogene server on port "+portParameterInt+".");
+				String[] newArgs = new String[args.length + 1];
+				log.info("Launch Ordogene server on port " + portParameterInt + ".");
 				System.arraycopy(args, 0, newArgs, 0, args.length);
-				newArgs[args.length] = "--server.port="+portParameterInt;
+				newArgs[args.length] = "--server.port=" + portParameterInt;
 				SpringApplication.run(Application.class, newArgs);
 
 			}
@@ -82,14 +75,7 @@ public class Application {
 	@Bean
 	public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
 		return args -> {
-			System.out.println("Let's inspect the beans provided by Spring Boot:");
-
-			String[] beanNames = ctx.getBeanDefinitionNames();
-			Arrays.sort(beanNames);
-			for (String beanName : beanNames) {
-				System.out.println(beanName);
-			}
-
+			ctx.getBeanDefinitionNames();
 		};
 	}
 
@@ -97,9 +83,4 @@ public class Application {
 	public Master buildMasterAlgo() {
 		return algoMaster;
 	}
-
-	/*
-	 * @Bean public CalculationHandler getCalculationHandler() { return
-	 * calculationHandler; }
-	 */
 }
