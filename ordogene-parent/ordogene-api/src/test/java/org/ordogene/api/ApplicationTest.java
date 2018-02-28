@@ -4,7 +4,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-
+ 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,7 +59,6 @@ public class ApplicationTest {
 		assertTrue(outContent.toString().contains("Ordogene Server : The port parameter must be a positive number below 65535."));
 		outContent.reset();
 		String[] args = {};
-		System.out.println(outContent.toString());
 		Application.main(args);
 		assertTrue(outContent.toString().contains("Missing argument --config=<configuration_file_location>"));
 
