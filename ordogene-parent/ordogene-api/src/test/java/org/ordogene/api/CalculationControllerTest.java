@@ -11,10 +11,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -37,6 +35,8 @@ import org.ordogene.file.FileUtils;
 import org.ordogene.file.utils.ApiJsonResponse;
 import org.ordogene.file.utils.Calculation;
 import org.ordogene.file.utils.Const;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -53,6 +53,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @SpringBootTest
 @AutoConfigureMockMvc
 public class CalculationControllerTest {
+	private final static Logger log = LoggerFactory.getLogger(CalculationControllerTest.class);
 
 	@Autowired
 	private MockMvc mvc;
@@ -83,16 +84,13 @@ public class CalculationControllerTest {
 		try {
 			Files.createDirectories(Paths.get(userDirectory));
 		} catch (IOException e) {
-			System.err.println("Error while creating the directory " + userDirectory);
+			log.error("Error while creating the directory " + userDirectory);
 			e.printStackTrace();
 		}
 
 		Path sourcePath = (Paths.get(
 				CalculationControllerTest.class.getClassLoader().getResource(cidTest + "_" + calNameTest).toURI()));
 		Path destinationPath = Paths.get(userDirectory + File.separator + cidTest + "_" + calNameTest);
-
-		System.out.println("Move " + sourcePath.toAbsolutePath().toString() + " in "
-				+ destinationPath.toAbsolutePath().toString());
 
 		Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
 
@@ -239,7 +237,6 @@ public class CalculationControllerTest {
 		ApiJsonResponse ajrWaited = new ApiJsonResponse("tester", 0, "Invalid JSON (Missing fields in the JSON) ", null,
 				null);
 		String errorResponse = result.getResponse().getContentAsString();
-		// System.out.println("launchCalcJsonParseExceptionTest "+errorResponse);
 		String jsonResponseWaited = mapper.writeValueAsString(ajrWaited);
 		assertEquals(jsonResponseWaited, errorResponse);
 	}
@@ -307,15 +304,10 @@ public class CalculationControllerTest {
 
 	@Test
 	public void getCalculationSuccess() throws Exception {
-		final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-		// to don't print it in the shell
-		System.setOut(new PrintStream(outContent));
-
 		MvcResult result = mvc.perform(put("/" + userTest + "/calculations/" + cidTest)).andExpect(status().isOk())
 				.andReturn();
 
 		String calculationGotStr = result.getResponse().getContentAsString();
-		System.setOut(System.out);
 
 		ApiJsonResponse ajrGot = mapper.readValue(calculationGotStr, ApiJsonResponse.class);
 		ApiJsonResponse ajrWaited = new ApiJsonResponse(userTest, cidTest, null, null, null);

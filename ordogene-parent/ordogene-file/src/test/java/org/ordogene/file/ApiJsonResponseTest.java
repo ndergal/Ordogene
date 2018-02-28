@@ -48,7 +48,6 @@ public class ApiJsonResponseTest {
 	public void SerializeApiJsonResponse() throws JsonProcessingException {
 		ApiJsonResponse ajr = new ApiJsonResponse("userId", 10, "Error string", Collections.emptyList(), "base64String");
 		String jsonInString = mapper.writeValueAsString(ajr);
-		// System.out.println(jsonInString);
 		assertTrue(jsonInString != null);
 	}
 

@@ -19,8 +19,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.ordogene.file.utils.Calculation;
 import org.ordogene.file.utils.Const;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MasterTest {
+	
+	private final static Logger log = LoggerFactory.getLogger(MasterTest.class);
 	
 	String JSONmodel = "{\n" + 
 			"    \"name\" : \"small_strategy_game.json\",\n" + 
@@ -116,7 +120,7 @@ public class MasterTest {
 		try {
 			Files.createDirectories(Paths.get(Const.getConst().get("ApplicationPath") + File.separator + "tester"));
 		} catch (IOException e) {
-			System.err.println("Error while creating the directory " + Const.getConst().get("ApplicationPath")
+			log.error("Error while creating the directory " + Const.getConst().get("ApplicationPath")
 					+ File.separator + "tester");
 			e.printStackTrace();
 		}
@@ -130,9 +134,7 @@ public class MasterTest {
 				.getResource("OrdogeneCalculationExamples" + File.separator + "short_path_10.json");
 		byte[] contentFileTest = Files.readAllBytes(Paths.get(urlTestFile.toURI()));
 		String jsonContentPost = new String(contentFileTest);
-		// System.out.println(jsonContentPost);
 		int res = new Master().compute("tester", jsonContentPost);
-		//System.out.println("compute res = " + res);
 		assertNotEquals(-2, res);
 	}
 	

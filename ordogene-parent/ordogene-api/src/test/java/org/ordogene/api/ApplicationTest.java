@@ -10,15 +10,19 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ordogene.file.utils.Const;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
 public class ApplicationTest {
 
+	private static final Logger log = LoggerFactory.getLogger(Application.class);
 	private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
 	private final ByteArrayOutputStream errContent = new ByteArrayOutputStream();
 	
@@ -34,16 +38,8 @@ public class ApplicationTest {
 	 System.setErr(System.err);
 	 }
 
-	/*
-	 * @Test public void out() { System.out.print("hello"); assertTrue(
-	 * outContent.toString().startsWith("Missing required option: conf")); }
-	 * 
-	 * @Test public void err() { System.err.print("hello again");
-	 * assertEquals("hello again", errContent.toString()); }
-	 */
 	@Test
 	public void mainMultipleFails() throws Exception {
-		// System.out.println("All is in one test to save Spring launch time...");
 
 		String[] args2 = { "--config=./src/test/resources/ordogene.conf.json", "--port=49155" };
 
@@ -57,13 +53,11 @@ public class ApplicationTest {
 
 		Application.main(args4);
 
-		assertTrue(errContent.toString()
-				.startsWith("Ordogene Server : The port parameter must be a positive number below 65535."));
-
+		assertTrue(outContent.toString().contains("Ordogene Server : The port parameter must be a positive number below 65535."));
+		outContent.reset();
 		Application.main(args3);
-		assertTrue(errContent.toString()
-				.startsWith("Ordogene Server : The port parameter must be a positive number below 65535."));
-
+		assertTrue(outContent.toString().contains("Ordogene Server : The port parameter must be a positive number below 65535."));
+		outContent.reset();
 		String[] args = {};
 		System.out.println(outContent.toString());
 		Application.main(args);

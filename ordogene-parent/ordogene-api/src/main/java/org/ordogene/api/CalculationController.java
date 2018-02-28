@@ -1,6 +1,7 @@
 package org.ordogene.api;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -206,7 +207,7 @@ public class CalculationController {
 			if (calcul.isPresent()) {
 
 				try {
-					String base64img = FileUtils.encodeImage(userId, calcul.get().getId(), calcul.get().getName());
+					String base64img = FileUtils.encodeFile(Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationid, calcul.get().getName())).resolve("result.png"));
 					return new ResponseEntity<ApiJsonResponse>(
 							new ApiJsonResponse(userId, calculationid, null, null, base64img), HttpStatus.OK);
 				} catch (IOException e) {
@@ -238,7 +239,7 @@ public class CalculationController {
 			if (calcul.isPresent()) {
 
 				try {
-					String b64html = FileUtils.encodeHtml(userId, calculationid, calcul.get().getName());
+					String b64html = FileUtils.encodeFile(Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationid, calcul.get().getName())).resolve("result.html"));
 					return new ResponseEntity<ApiJsonResponse>(
 							new ApiJsonResponse(userId, calculationid, null, null, b64html), HttpStatus.OK);
 				} catch (IOException e) {

@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import gui.ava.html.image.generator.HtmlImageGenerator;
 
 public class FileUtils {
-
+	
 	private final static String ALPHA_NUM = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 	private final static UserManager uh = new UserManager();
@@ -72,19 +72,9 @@ public class FileUtils {
 
 	}
 
-	public static String encodeImage(String userId, int cid, String calName) throws IOException, FileNotFoundException {
-		Objects.requireNonNull(userId);
-		Objects.requireNonNull(calName);
-		Path pathSrcImg = Paths.get(getCalculationPngPath(userId, cid, calName));
-		byte[] imageData = Files.readAllBytes(pathSrcImg);
-		return Base64.getEncoder().encodeToString(imageData);
-	}
-
-	public static String encodeHtml(String userId, int cid, String calName) throws IOException, FileNotFoundException {
-		Objects.requireNonNull(userId);
-		Objects.requireNonNull(calName);
-		Path pathSrcImg = Paths.get(getCalculationHtmlPath(userId, cid, calName));
-		byte[] imageData = Files.readAllBytes(pathSrcImg);
+	public static String encodeFile(Path path) throws IOException {
+		Objects.requireNonNull(path);
+		byte[] imageData = Files.readAllBytes(path);
 		return Base64.getEncoder().encodeToString(imageData);
 	}
 
@@ -102,12 +92,11 @@ public class FileUtils {
 		}
 	}
 
-	public static boolean saveResult(String html, String userId, int cid, String calName) {
-		Path pngPath = Paths.get(getCalculationPngPath(userId, cid, calName));
-		Path htmlPath = Paths.get(getCalculationHtmlPath(userId, cid, calName));
+	public static boolean saveResult(String html, Path directory) {
+		Path pngPath = directory.resolve("result.png");
+		Path htmlPath = directory.resolve("result.html");
 		try {
-			Files.createDirectories(pngPath.getParent());
-			Files.createDirectories(htmlPath.getParent());
+			Files.createDirectories(directory);
 			if (htmlPath != null) {
 				Files.write(htmlPath, html.getBytes(StandardCharsets.UTF_8));
 			}
@@ -134,63 +123,35 @@ public class FileUtils {
 		return new String(Files.readAllBytes(jsonPath));
 	}
 
-	public static boolean createCalculationDirectory(String userId, int cId, String cName) {
-		Path calculationPath = Paths.get(getCalculationDirectoryPath(userId, cId, cName));
+	public static boolean createCalculationDirectory(Path directory) {
 		try {
-			Files.createDirectories(calculationPath);
+			Files.createDirectories(directory);
 			return true;
 		} catch (IOException e) {
 			return false;
 		}
 	}
 
-	public static boolean decodeAndSaveImage(String base64Img, String pathDstImg) {
-		Objects.requireNonNull(base64Img);
-		Objects.requireNonNull(pathDstImg);
-		byte[] imageData = Base64.getDecoder().decode(base64Img);
-		try (FileOutputStream imageFile = new FileOutputStream(pathDstImg)) {
-			imageFile.write(imageData);
-			return true;
-		} catch (FileNotFoundException e) {
-			System.err.println("Destination path is not a file : " + e);
-			return false;
-		} catch (IOException e) {
-			System.err.println("cannot write to the path : " + e);
-			return false;
-		}
-	}
-
-	public static boolean decodeAndSaveHtml(String base64Html, String pathDstHtml) {
+	public static void saveHtmlFromBase64(String base64Html, String pathDstHtml) throws IOException {
 		Objects.requireNonNull(base64Html);
 		Objects.requireNonNull(pathDstHtml);
-		Path destPath = Paths.get(Objects.requireNonNull(pathDstHtml));
-		try (BufferedWriter writer = Files.newBufferedWriter(destPath, Charset.forName("UTF-8"))) {
+		Path path = Paths.get(pathDstHtml);
+		try (BufferedWriter writer = Files.newBufferedWriter(path, Charset.forName("UTF-8"))) {
 			byte[] decodedBytes = Base64.getDecoder().decode(base64Html);
 			String decodedStr = new String(decodedBytes);
 			writer.write(decodedStr);
-			return true;
 		} catch (FileNotFoundException e) {
-			System.err.println("Destination path is not a file : " + e);
-			return false;
+			throw new FileNotFoundException("Destination path is not a file : " + e);
 		} catch (IOException e) {
-			System.err.println("cannot write to the path : " + e);
-			return false;
+			throw new IOException("cannot write to the path : " + e);
 		}
 	}
 
-	private static String getCalculationPngPath(String userId, int cid, String calName) {
-		return getCalculationDirectoryPath(userId, cid, calName) + File.separator + "result.png";
-	}
-
-	private static String getCalculationHtmlPath(String userId, int cid, String calName) {
-		return getCalculationDirectoryPath(userId, cid, calName) + File.separator + "result.html";
-	}
-
-	private static String getCalculationStatePath(String userId, int cid, String calName) {
+	public static String getCalculationStatePath(String userId, int cid, String calName) {
 		return getCalculationDirectoryPath(userId, cid, calName) + File.separator + "state.json";
 	}
 
-	private static String getCalculationDirectoryPath(String userId, int cid, String cName) {
+	public static String getCalculationDirectoryPath(String userId, int cid, String cName) {
 		return Const.getConst().get("ApplicationPath") + File.separatorChar + userId + File.separatorChar + "" + cid
 				+ "_" + cName;
 	}

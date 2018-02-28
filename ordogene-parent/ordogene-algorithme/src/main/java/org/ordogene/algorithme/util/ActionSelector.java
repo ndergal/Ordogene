@@ -1,6 +1,5 @@
 package org.ordogene.algorithme.util;
 
-import java.io.Serializable;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,8 +11,7 @@ import org.ordogene.algorithme.models.Action;
 
 import io.jenetics.util.RandomRegistry;
 
-public class ActionSelector implements Serializable {
-	private static final long serialVersionUID = 1L;
+public class ActionSelector {
 	
 	private Random random = RandomRegistry.getRandom();
 	

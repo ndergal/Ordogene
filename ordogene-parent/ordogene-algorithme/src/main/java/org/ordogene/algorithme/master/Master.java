@@ -1,6 +1,5 @@
 package org.ordogene.algorithme.master;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Date;
@@ -16,12 +15,14 @@ import org.ordogene.file.FileUtils;
 import org.ordogene.file.models.JSONModel;
 import org.ordogene.file.parser.Parser;
 import org.ordogene.file.utils.Calculation;
-import org.ordogene.file.utils.Const;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
 public class Master {
+	private static final Logger log = LoggerFactory.getLogger(Master.class);
 	private static final int DEFAULT_THREAD = 10;
 	private final int maxThread;
 	private int currentThread;
@@ -56,10 +57,6 @@ public class Master {
 
 		String toHash = jsonString + (new Date()).toString();
 		int calculationId = toHash.hashCode();
-		
-		if(!FileUtils.createCalculationDirectory(idUser, calculationId, model.getName())) {
-			System.err.println("Error while creating the calculation folder...");
-		}
 
 		ThreadHandler th = new ThreadHandler();
 
@@ -98,7 +95,7 @@ public class Master {
 				// Format: epoch_iterationNumber_lastIterationSaved_maxIteration_fitness
 				String response = th.masterFromThread();
 				if(response == null) {
-					System.err.println("The calculation does not respond at the request");
+					log.error("The calculation does not respond at the request");
 					return;
 				}
 				String[] state = response.split("_");
@@ -115,17 +112,18 @@ public class Master {
 			}
 		} else {
 			try {
-				String pathName = Const.getConst().get("ApplicationPath") + File.separator + userId + File.separator
-						+ cal.getId() + "_" + cal.getName() + File.separatorChar + "state.json";
+				String pathName = FileUtils.getCalculationStatePath(userId, cal.getId(), cal.getName());
 				Calculation tmpCal = (Calculation) Parser.parseJsonFile(Paths.get(pathName), Calculation.class);
-				cal.setStartTimestamp(tmpCal.getStartTimestamp());
-				cal.setIterationNumber(tmpCal.getIterationNumber());
-				cal.setLastIterationSaved(tmpCal.getLastIterationSaved());
-				cal.setMaxIteration(tmpCal.getMaxIteration());
-				cal.setFitnessSaved(tmpCal.getFitnessSaved());
+				cal.setCalculation(tmpCal.getStartTimestamp(), 
+						tmpCal.getIterationNumber(), 
+						tmpCal.getLastIterationSaved(), 
+						tmpCal.getMaxIteration(), 
+						cal.getId(), 
+						cal.getName(), 
+						tmpCal.getFitnessSaved());
 				cal.setRunning(false);
 			} catch (IllegalAccessException | UnmarshalException | IOException e) {
-				System.err.println("Problem to read the calculation ");
+				log.error("Problem to read the calculation ");
 			}
 		}
 	}

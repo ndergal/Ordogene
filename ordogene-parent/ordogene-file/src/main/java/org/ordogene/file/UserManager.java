@@ -8,8 +8,13 @@ import java.nio.file.Paths;
 import java.util.Comparator;
 
 import org.ordogene.file.utils.Const;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import edu.emory.mathcs.backport.java.util.Arrays;
 
 public class UserManager {
+	private final static Logger log = LoggerFactory.getLogger(UserManager.class);
 
 	boolean checkUserExists(String username) {
 		if (username == null || username.isEmpty()) {
@@ -29,11 +34,11 @@ public class UserManager {
 				return false;
 			}
 			try {
-				System.out.println("Create new user " + username);
+				log.info("Create new user " + username);
 				Files.createDirectories(newUserPath);
 			} catch (IOException e) {
-				System.err.println("... failed :");
-				e.printStackTrace();
+				log.error("... failed :");
+				log.debug(Arrays.toString(e.getStackTrace()));
 				return false;
 			}
 			return (Files.exists(Paths.get(Const.getConst().get("ApplicationPath") + File.separatorChar + username)));

@@ -12,8 +12,11 @@ import java.util.List;
 
 import org.ordogene.file.utils.Calculation;
 import org.ordogene.file.utils.Const;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CalculationManager {
+	private final static Logger log = LoggerFactory.getLogger(CalculationManager.class);
 
 	public List<Calculation> getCalculations(String username) {
 		List<Calculation> res = new ArrayList<>();
@@ -40,7 +43,7 @@ public class CalculationManager {
 			});
 
 		} catch (IOException e) {
-			System.err.println("Error while browsing the path " + userPath.toString());
+			log.error("Error while browsing the path " + userPath.toString());
 			e.printStackTrace();
 		}
 

@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
@@ -72,7 +73,6 @@ public class FileUtilsTest {
 
 		if (!Files.exists(newCalcPath)) {
 			Files.createDirectories(newCalcPath);
-			System.out.println("Create fake calculation for " + user);
 		}
 		Files.write(newCalcStatePath, Arrays.asList("Coucou", "Les copains"), Charset.forName("UTF-8"));
 		Calculation c = new Calculation();
@@ -115,28 +115,47 @@ public class FileUtilsTest {
 		assertEquals(size, ruid.length());
 	}
 
-//	@Test
-//	public void testEncodeAndDecode() throws IOException {
-//		String ref = FileUtils.encodeImage(Paths.get("../ordogene-file/test-image/doge_test.png"));
-//		FileUtils.saveImageFromBase64(ref, "../ordogene-file/test-image/result.png");
-//		String end = FileUtils.encodeImage(Paths.get("../ordogene-file/test-image/result.png"));
-//		assertEquals(ref, end);
-//	}
-//
-//	@Test
-//	public void testDecodeWithFolder() throws IOException {
-//		String ref = FileUtils.encodeImage(Paths.get("../ordogene-file/test-image/doge_test.png"));
-//		assertFalse(FileUtils.saveImageFromBase64(ref, "../ordogene-file/test-image/"));
-//	}
-//
-//	@Test
-//	public void testDecode() throws IOException {
-//		String ref = FileUtils.encodeImage(Paths.get("../ordogene-file/test-image/doge_test.png"));
-//		assertTrue(FileUtils.saveImageFromBase64(ref, "../ordogene-file/test-image/result.png"));
-//	}
-//
-//	@Test(expected = IOException.class)
-//	public void testEncodeWithFolder() throws IOException {
-//		FileUtils.encodeImage(Paths.get("../ordogene-file/test-image/"));
-//	}
+	@Test
+	public void testEncodeAndDecode() throws IOException, URISyntaxException {
+		Path path1 = Paths.get(FileUtilsTest.class.getClassLoader().getResource("./test-image/doge_test.png").toURI());
+		Path path2 = Paths.get(FileUtilsTest.class.getClassLoader().getResource("./test-image/result.png").toURI());
+
+		String ref = FileUtils.encodeFile(path1);
+		FileUtils.saveImageFromBase64(ref, path2.toString());
+		String end = FileUtils.encodeFile(path2);
+		assertEquals(ref, end);
+	}
+
+	@Test(expected=FileNotFoundException.class)
+	public void testDecodeWithFolder() throws URISyntaxException, IOException {
+		Path path1 = Paths.get(FileUtilsTest.class.getClassLoader().getResource("./test-image/doge_test.png").toURI());
+		Path path2 = Paths.get(FileUtilsTest.class.getClassLoader().getResource("./test-image/").toURI());
+
+		String ref = FileUtils.encodeFile(path1);
+		FileUtils.saveImageFromBase64(ref, path2.toString());
+	}
+
+	@Test
+	public void testDecodePng() throws IOException, URISyntaxException {
+		Path path1 = Paths.get(FileUtilsTest.class.getClassLoader().getResource("./test-image/doge_test.png").toURI());
+		Path path2 = Paths.get(FileUtilsTest.class.getClassLoader().getResource("./test-image/result.png").toURI());
+		String ref = FileUtils.encodeFile(path1);
+		FileUtils.saveImageFromBase64(ref, path2.toString());
+	}
+
+	@Test
+	public void testDecodeHtml() throws IOException, URISyntaxException {
+		Path path1 = Paths.get(FileUtilsTest.class.getClassLoader().getResource("./test-html/result.html").toURI());
+		Path path2 = Paths.get(FileUtilsTest.class.getClassLoader().getResource("./test-html/result2.html").toURI());
+		String ref = FileUtils.encodeFile(path1);
+		FileUtils.saveHtmlFromBase64(ref, path2.toString());
+		assertEquals(new String(Files.readAllBytes(path1)), new String(Files.readAllBytes(path2)));
+	}
+
+	@Test(expected = IOException.class)
+	public void testEncodeWithFolder() throws IOException, URISyntaxException {
+		Path path1 = Paths.get(FileUtilsTest.class.getClassLoader().getResource("test-image/").toURI());
+
+		FileUtils.encodeFile(path1);
+	}
 }

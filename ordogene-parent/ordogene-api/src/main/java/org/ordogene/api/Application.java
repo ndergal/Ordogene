@@ -1,7 +1,5 @@
 package org.ordogene.api;
 
-import java.util.Arrays;
-
 import org.ordogene.algorithme.master.Master;
 import org.ordogene.file.utils.Const;
 import org.slf4j.Logger;

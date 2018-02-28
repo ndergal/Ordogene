@@ -36,7 +36,6 @@ public class JSONModelTest {
 	public void shouldIAE_if_a_snap_value_negatif() throws JsonParseException, JsonMappingException, IOException,
 			InstantiationException, IllegalAccessException, UnmarshalException, URISyntaxException {
 
-		//System.out.println(location);
 		Parser.parseJsonFile(Paths.get(JSONModelTest.class.getClassLoader().getResource("testJson/test1.json").toURI()), JSONModel.class);
 	}
 
