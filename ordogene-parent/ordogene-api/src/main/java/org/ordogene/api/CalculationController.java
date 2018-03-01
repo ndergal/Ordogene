@@ -215,11 +215,11 @@ public class CalculationController {
 			}
 			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(userId, 0,
 					"calculation " + calculationid + " does not exist for user " + userId, null, null),
-					HttpStatus.FORBIDDEN);
+					HttpStatus.NOT_FOUND);
 		}
 	}
 
-	@RequestMapping(value = "/{userId}/calculations/{calculationid}/html")
+	@RequestMapping(value = "/{userId}/calculations/{calculationid}/html", method = RequestMethod.GET)
 	@ResponseBody
 
 	public ResponseEntity<ApiJsonResponse> getCalculationHtml(@PathVariable String userId, @PathVariable int calculationid) {
@@ -248,7 +248,7 @@ public class CalculationController {
 			}
 			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(userId, 0,
 					"calculation " + calculationid + " does not exist for user " + userId, null, null),
-					HttpStatus.FORBIDDEN);
+					HttpStatus.NOT_FOUND);
 		}
 	}
 }

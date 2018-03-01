@@ -460,7 +460,7 @@ public class CalculationControllerTest {
 		when(master.interruptCalculation(cidTest)).thenReturn(false);
 
 		ResponseEntity<ApiJsonResponse> expected = new ResponseEntity<ApiJsonResponse>(
-				new ApiJsonResponse(userTest, cidTest, "The calcul is not running.", null, null), HttpStatus.NOT_FOUND);
+				new ApiJsonResponse(userTest, cidTest, "The calcul is not running.", null, null), HttpStatus.BAD_REQUEST);
 
 		assertEquals(expected, cc.stopCalculation(userTest, cidTest));
 	}
