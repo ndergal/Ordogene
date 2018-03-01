@@ -128,7 +128,23 @@ public class Drawer {
 		// content
 		StringBuilder sbTr = new StringBuilder();
 		StringBuilder sb = new StringBuilder();
-		sb.append("<html><body><h2>").append(title).append("</h2><table border=1>");
+		sb.append("<html><header><style>");
+		sb.append("html, body {\n" + 
+				"  font-family: \"Lucida Console\", Monaco, monospace;\n" + 
+				"}\n" + 
+				"table {\n" + 
+				"  border-collapse: collapse;\n" + 
+				"}\n" + 
+				"thead {\n" + 
+				"  border-bottom: 1px solid black;\n" + 
+				"}\n" + 
+				"td, th {\n" + 
+				"  padding: 8px 12px;\n" + 
+				"}\n" + 
+				"th {\n" + 
+				"  text-align: left;\n" + 
+				"}");
+		sb.append("</style></header><body><h2>").append(title).append("</h2><table><thead>");
 		int nbColsMax = 0;
 		for (ActionGene[] row : toPrintData) {
 			sbTr.append("<tr>");
@@ -179,6 +195,7 @@ public class Drawer {
 
 		// header
 		sb.append(header);
+		sb.append("</thead>");
 
 		String res = sb.toString() + sbTr.toString();
 		if (display) {
