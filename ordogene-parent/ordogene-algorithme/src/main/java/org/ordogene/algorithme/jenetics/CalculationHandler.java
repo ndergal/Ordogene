@@ -23,8 +23,8 @@ import io.jenetics.engine.EvolutionResult;
 
 public class CalculationHandler {
 	private final Logger logger = LoggerFactory.getLogger(CalculationHandler.class);
-
-	private final int POPULATION_SIZE = 100;
+	
+	private final int POPULATION_SIZE = 10000;
 	private final double CHANCE_TO_STOP_SCHEDULE_CREATION = 0.002;
 
 	private final Date currentDate = new Date();
@@ -61,13 +61,13 @@ public class CalculationHandler {
 		boolean interupted = false;
 		// The best element of the population (to draw it later)
 		Phenotype<ActionGene, Long> best = null;
+		Calculation tmpCalc = new Calculation();
 		long lastSave = System.currentTimeMillis();
 		long lastSavedIteration = 0;
 
 		while (itEngine.hasNext() && iteration < maxIteration && !interupted) {
 			// Get the next generation
 			EvolutionResult<ActionGene, Long> generation = itEngine.next();
-			// Get it on statistic module
 
 			// Get the best member
 			best = generation.getBestPhenotype();
@@ -94,14 +94,29 @@ public class CalculationHandler {
 
 			long currentTime = System.currentTimeMillis();
 			if (lastSave + 60_000 < currentTime) {
+				tmpCalc = new Calculation();
+				
 				lastSave = currentTime;
 				lastSavedIteration = generation.getGeneration();
-				Drawer.buildStringActionMatrix(best);
+				tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, calculationId,
+						model.getName(), best.getFitness());
+
+				ActionGene[][] actionGeneArray = Drawer.buildStringActionMatrix(best);
+				String htmlTableHeader = Drawer.buildHtmlTableHeader("", actionGeneArray);
+
+				String htmlArray = Drawer.htmlTableBuilder(model.getName(), htmlTableHeader, 60.0, "px", actionGeneArray,
+						false);
+				logger.info("try to save : pngFile and htmlFile ... ");
+				if (FileUtils.saveResult(htmlArray, Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationId, model.getName())))) {
+					logger.info(" Success ");
+				} else {
+					logger.info(" Fail ");
+				}
 			}
 		}
 
 		// Create a calculation information to saved it on disk
-		Calculation tmpCalc = new Calculation();
+		tmpCalc = new Calculation();
 
 		if (best != null) {
 			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, calculationId,
@@ -110,7 +125,7 @@ public class CalculationHandler {
 			ActionGene[][] actionGeneArray = Drawer.buildStringActionMatrix(best);
 			String htmlTableHeader = Drawer.buildHtmlTableHeader("", actionGeneArray);
 
-			String htmlArray = Drawer.htmlTableBuilder(model.getName(), htmlTableHeader, 60.0, "px", actionGeneArray,
+			String htmlArray = Drawer.htmlTableBuilder(model.getName(), htmlTableHeader, actionGeneArray,
 					false);
 			logger.info("try to save : pngFile and htmlFile ... ");
 			if (FileUtils.saveResult(htmlArray, Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationId, model.getName())))) {
@@ -169,7 +184,7 @@ public class CalculationHandler {
 		long startFitness = model.getFitness().evalEnv(model.getStartEnvironment());
 		long transformationFitness = ind.stream().flatMap(c -> c.stream())
 				.mapToLong(ag -> model.getFitness().eval(ag.getAllele())).sum();
-		return startFitness + transformationFitness;
+		return startFitness + transformationFitness - ((Schedule) ind.getChromosome()).getDuration();
 	}
 
 }

@@ -19,26 +19,31 @@ import io.jenetics.util.RandomRegistry;
 public class Schedule extends AbstractChromosome<ActionGene> {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(Schedule.class);
 
 	private final Model model;
+	private final long duration;
 
-	public Schedule(ISeq<ActionGene> seq, Model model) {
+	public Schedule(ISeq<ActionGene> seq, Model model, long duration) {
 		super(seq);
 		this.model = model;
+		this.duration = duration;
 	}
 
 	@Override
 	public Chromosome<ActionGene> newInstance() {
-		return new Schedule(_genes, model);
+		// jenetics parallelise un maximum de tâches, comme nous utilisons un unique model pour tous les individus
+		// il faut bloquer sont accès lors de la création d'un individu pour éviter les états incohérents du model
+		synchronized (model) {
+			return of(model, 0.001);
+		}	
 	}
 
 	@Override
 	public Chromosome<ActionGene> newInstance(ISeq<ActionGene> genes) {
-		return new Schedule(genes, model);
+		return new Schedule(genes, model, duration); // TODO mauvaise duration, à remplacer par la duration calculée
 	}
-
 
 	public static Schedule of(Model model, double probaToStop) {
 		logger.debug("\n\nNEW SCHEDULE");
@@ -59,30 +64,30 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 
 			// Select a action
 			Action action = model.getWorkableAction(envAfterEnd, timeAtEnd);
-			if(action != null) {
-				
+			if (action != null) {
+
 				// Parallele start
-				if(model.workable(action, envAfterStart, timeAtStart)) {
+				if (model.workable(action, envAfterStart, timeAtStart)) {
 					// Create ActionGene and add it on seq
 					ActionGene actionGene = ActionGene.of(action, timeAtStart);
 					seq.add(actionGene);
 
-					//Change StartEnvironment
+					// Change StartEnvironment
 					model.startAction(action, envAfterStart, timeAtStart);
-					
+
 				} else {
-				// start After
+					// start After
 					ActionGene actionGene = ActionGene.of(action, timeAtEnd);
 					seq.add(actionGene);
-					
+
 					// Change startTime
 					timeAtStart = timeAtEnd;
-					
+
 					// Change StartEnvironment
 					envAfterStart = envAfterEnd;
 					model.startAction(action, envAfterStart, timeAtStart);
 				}
-				
+
 				// Calcul actionEndTime
 				int actionEndTime = timeAtStart + action.getTime();
 				// Add action in map to end it later
@@ -93,36 +98,40 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 				}
 				actions.add(action);
 			}
-			
-			if(timeAtEnd == timeAtStart || action == null) {
+
+			if (timeAtEnd == timeAtStart || action == null) {
 				// Remove action which ended in previous startTime
 				map.remove(timeAtEnd);
-				if(map.isEmpty()) {
+				if (map.isEmpty()) {
 					break;
 				}
 			}
-			
+
 			// Change timeAtEnd
 			timeAtEnd = map.firstKey();
-			
+
 			// Change EndEnvironment
 			envAfterEnd = envAfterStart.copy();
-			for(Action a : map.get(timeAtEnd)) {
+			for (Action a : map.get(timeAtEnd)) {
 				model.endAction(envAfterEnd, a);
 			}
-			
+
 			double randomValue = RandomRegistry.getRandom().nextDouble();
-			if(randomValue < probaToStop) {
+			if (randomValue < probaToStop) {
 				break;
 			}
-			
-		}
-		return new Schedule(ISeq.of(seq), model);
-	}
 
+		}
+		return new Schedule(ISeq.of(seq), model, timeAtEnd);
+
+	}
 
 	public Model getModel() {
 		return model;
+	}
+
+	public long getDuration() {
+		return duration;
 	}
 
 }
