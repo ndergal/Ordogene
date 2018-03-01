@@ -28,8 +28,8 @@ public class MasterTest {
 	
 	String JSONmodel = "{\n" + 
 			"    \"name\" : \"small_strategy_game.json\",\n" + 
-			"    \"slots\" : 300,\n" + 
-			"    \"exec_time\" : 5,\n" + 
+			"    \"slots\" : 2,\n" + 
+			"    \"exec_time\" : 1,\n" + 
 			"    \"environment\" : [\n" + 
 			"	{\"name\" : \"Nexus\", \"quantity\" : 1},\n" + 
 			"	{\"name\" : \"Peon\", \"quantity\" : 1},\n" + 
@@ -214,7 +214,7 @@ public class MasterTest {
 		int calculationId = m.compute(userIdTest, JSONmodel);
 		
 		//TODO change by something else?
-		Thread.sleep(10000); //wait end of calculation
+		Thread.sleep(5000); //wait end of calculation
 		
 		Calculation toTest = new Calculation();
 		toTest.setId(calculationId);
