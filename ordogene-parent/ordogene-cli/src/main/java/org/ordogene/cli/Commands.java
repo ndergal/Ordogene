@@ -176,7 +176,7 @@ public class Commands {
 		// Request
 		try {
 			restTemplate.exchange("/" + id + CALCULATIONS + cid, HttpMethod.DELETE, null, ApiJsonResponse.class);
-			return "Calculation " + cid + " has been deleted.";
+			return "Calculation '" + cid + "' has been deleted.";
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
 			return e.getStatusCode() + " -- " + e.getStatusText();
 		} catch (RestClientException e) {

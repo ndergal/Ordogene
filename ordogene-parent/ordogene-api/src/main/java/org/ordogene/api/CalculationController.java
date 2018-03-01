@@ -1,9 +1,9 @@
 package org.ordogene.api;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import javax.xml.bind.UnmarshalException;
@@ -88,18 +88,14 @@ public class CalculationController {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.calculationIDNotExist(calculationId),
 					HttpStatus.BAD_REQUEST);
 		} else {
-			try {
-				Calculation calcToDelete = optCalc.get();
-				if (FileUtils.removeUserCalculation(userId, calcToDelete.getId(), calcToDelete.getName())) {
-					return new ResponseEntity<ApiJsonResponse>(
-							new ApiJsonResponse(userId, calculationId, null, null, null), HttpStatus.OK);
-				} else {
-					return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.InternalServerError(),
-							HttpStatus.INTERNAL_SERVER_ERROR);
-				}
-			} catch (NoSuchElementException e) {
-				return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.calculationIDNotExist(calculationId),
-						HttpStatus.BAD_REQUEST);
+			Calculation calcToDelete = optCalc.get();
+			if (FileUtils.removeUserCalculation(userId,calcToDelete.getId(),calcToDelete.getName())) {
+				return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(userId, calculationId, null, null, null),
+						HttpStatus.OK);
+			} else {
+				return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.InternalServerError(),
+						HttpStatus.INTERNAL_SERVER_ERROR);
+
 			}
 		}
 
@@ -131,7 +127,7 @@ public class CalculationController {
 				} else {
 					return new ResponseEntity<ApiJsonResponse>(
 							new ApiJsonResponse(userId, calculationId, "The calcul is not running.", null, null),
-							HttpStatus.NOT_FOUND);
+							HttpStatus.BAD_REQUEST);
 				}
 			} else {
 				return new ResponseEntity<ApiJsonResponse>(
@@ -191,7 +187,7 @@ public class CalculationController {
 		}
 	}
 
-	@RequestMapping(value = "/{userId}/calculations/{calculationid}")
+	@RequestMapping(value = "/{userId}/calculations/{calculationid}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<ApiJsonResponse> getCalculationPng(@PathVariable String userId, @PathVariable int calculationid) {
 
@@ -207,7 +203,7 @@ public class CalculationController {
 			if (calcul.isPresent()) {
 
 				try {
-					String base64img = FileUtils.encodeFile(Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationid, calcul.get().getName())).resolve("result.png"));
+					String base64img = FileUtils.encodeFile(Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationid, calcul.get().getName()) + File.separator + "result.png"));
 					return new ResponseEntity<ApiJsonResponse>(
 							new ApiJsonResponse(userId, calculationid, null, null, base64img), HttpStatus.OK);
 				} catch (IOException e) {
@@ -239,7 +235,7 @@ public class CalculationController {
 			if (calcul.isPresent()) {
 
 				try {
-					String b64html = FileUtils.encodeFile(Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationid, calcul.get().getName())).resolve("result.html"));
+					String b64html = FileUtils.encodeFile(Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationid, calcul.get().getName()) + File.separator + "result.html"));
 					return new ResponseEntity<ApiJsonResponse>(
 							new ApiJsonResponse(userId, calculationid, null, null, b64html), HttpStatus.OK);
 				} catch (IOException e) {

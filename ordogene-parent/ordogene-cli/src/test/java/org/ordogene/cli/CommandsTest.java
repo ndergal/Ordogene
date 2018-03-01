@@ -156,7 +156,7 @@ public class CommandsTest {
 	public void testStopCalculationClientException() {
 		HttpClientErrorException e = new HttpClientErrorException(HttpStatus.BAD_REQUEST, "test status text");
 		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
-				.thenThrow(HttpClientErrorException.class);
+				.thenThrow(e);
 		assertEquals(HttpStatus.BAD_REQUEST.value() + " -- test status text", commands.stopCalculation(666));
 	}
 
@@ -180,7 +180,7 @@ public class CommandsTest {
 		HttpServerErrorException e = new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "test status text");
 		String dst = "/tmp/result.png";
 		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
-				.thenThrow(HttpServerErrorException.class);
+				.thenThrow(e);
 		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value() + " -- test status text", commands.resultCalculation(666, new File(dst), true));
 	}
 
@@ -189,7 +189,7 @@ public class CommandsTest {
 		HttpClientErrorException e = new HttpClientErrorException(HttpStatus.BAD_REQUEST, "test status text");
 		String dst = "/tmp/result.png";
 		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
-				.thenThrow(HttpClientErrorException.class);
+				.thenThrow(e);
 		assertEquals(HttpStatus.BAD_REQUEST.value() + " -- test status text", commands.resultCalculation(666, new File(dst), true));
 	}
 
