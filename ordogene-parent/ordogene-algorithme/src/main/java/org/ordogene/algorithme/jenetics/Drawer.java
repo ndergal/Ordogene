@@ -122,7 +122,7 @@ public class Drawer {
 		return new Color(rgb);
 	}
 
-	static String htmlTableBuilder(String title, String header, double cellSize, String unit,
+	static String htmlTableBuilder(String title, String header,
 			ActionGene[][] toPrintData, boolean display) {
 		Map<Action, Color> colorAction = new HashMap<>();
 		StringBuilder sb = new StringBuilder();
@@ -136,18 +136,22 @@ public class Drawer {
 				"  border-collapse: collapse;\n" + 
 				"}\n" + 
 				"thead {\n" + 
-				"  border-bottom: 1px solid black;\n" + 
+				"  border-bottom: 1px solid #2D2D2D;\n" + 
 				"}\n" + 
 				"td, th {\n" + 
 				"  padding: 8px 12px;\n" + 
 				"}\n" + 
 				"th {\n" + 
 				"  text-align: left;\n" + 
+				"  border-left: 1px dotted #2D2D2D;\n" + 
 				"}\n" + 
-				"td {\n" + 
-				"  #border: 1px solid #AAAAAA;\n" + 
+				"td:empty {\n" + 
+				"  border: 1px dotted #CCCCCC;\n" + 
 				"}\n" + 
-				"td:hover {\n" + 
+				"td:not(:empty) {\n" + 
+				"  border: 1px solid #2D2D2D;\n" + 
+				"}\n" + 
+				"td:not(:empty):hover {\n" + 
 				"  box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);\n" + 
 				"}");
 		sb.append("</style>");
@@ -177,7 +181,6 @@ public class Drawer {
 				//TD
 				sb.append("<td style='");
 				sb.append("background-color: ").append(htmlRgb).append(";");
-				//sb.append("width:").append(cellSize).append(unit).append(";");
 				sb.append("'");
 				//TD LENGTH
 				int currentActionDuration = 1;
@@ -188,6 +191,7 @@ public class Drawer {
 					sb.append(" colspan=" + currentActionDuration);
 				}
 				//END TD LENGTH
+				sb.append(" title=\"").append(currentActionDuration).append("\"");
 				sb.append(">");
 				if (row[i] != null) {
 					sb.append(row[i].getAllele().getName());
