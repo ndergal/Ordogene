@@ -136,18 +136,22 @@ public class Drawer {
 				"  border-collapse: collapse;\n" + 
 				"}\n" + 
 				"thead {\n" + 
-				"  border-bottom: 1px solid black;\n" + 
+				"  border-bottom: 1px solid #2D2D2D;\n" + 
 				"}\n" + 
 				"td, th {\n" + 
 				"  padding: 8px 12px;\n" + 
 				"}\n" + 
 				"th {\n" + 
 				"  text-align: left;\n" + 
+				"  border-left: 1px dotted #2D2D2D;\n" + 
 				"}\n" + 
-				"td {\n" + 
-				"  #border: 1px solid #AAAAAA;\n" + 
+				"td:empty {\n" + 
+				"  border: 1px dotted #CCCCCC;\n" + 
 				"}\n" + 
-				"td:hover {\n" + 
+				"td:not(:empty) {\n" + 
+				"  border: 1px solid #2D2D2D;\n" + 
+				"}\n" + 
+				"td:not(:empty):hover {\n" + 
 				"  box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);\n" + 
 				"}");
 		sb.append("</style>");
