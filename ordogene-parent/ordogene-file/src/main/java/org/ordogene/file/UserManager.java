@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
+import java.util.stream.Stream;
 
 import org.ordogene.file.utils.Const;
 import org.slf4j.Logger;
@@ -54,9 +55,8 @@ public class UserManager {
 		if(!todelete.exists()) {
 			return false;
 		}
-		try {
-			Files.walk(todelete.toPath())
-		    .sorted(Comparator.reverseOrder())
+		try(Stream<Path> paths = Files.walk(todelete.toPath())) {
+		    paths.sorted(Comparator.reverseOrder())
 		    .map(Path::toFile)
 		    .forEach(File::delete);
 		} catch (IOException e) {

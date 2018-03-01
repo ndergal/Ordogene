@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.ordogene.file.utils.Calculation;
 import org.ordogene.file.utils.Const;
@@ -63,9 +64,8 @@ public class CalculationManager {
 		if(!todelete.exists()) {
 			return false;
 		}
-		try {
-			Files.walk(todelete.toPath())
-		    .sorted(Comparator.reverseOrder())
+		try(Stream<Path> paths = Files.walk(todelete.toPath())) {
+		    paths.sorted(Comparator.reverseOrder())
 		    .map(Path::toFile)
 		    .forEach(File::delete);
 		} catch (IOException e) {
