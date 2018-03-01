@@ -122,7 +122,7 @@ public class Drawer {
 		return new Color(rgb);
 	}
 
-	static String htmlTableBuilder(String title, String header, double cellSize, String unit,
+	static String htmlTableBuilder(String title, String header,
 			ActionGene[][] toPrintData, boolean display) {
 		Map<Action, Color> colorAction = new HashMap<>();
 		StringBuilder sb = new StringBuilder();
@@ -181,7 +181,6 @@ public class Drawer {
 				//TD
 				sb.append("<td style='");
 				sb.append("background-color: ").append(htmlRgb).append(";");
-				//sb.append("width:").append(cellSize).append(unit).append(";");
 				sb.append("'");
 				//TD LENGTH
 				int currentActionDuration = 1;
@@ -192,6 +191,7 @@ public class Drawer {
 					sb.append(" colspan=" + currentActionDuration);
 				}
 				//END TD LENGTH
+				sb.append(" title=\"").append(currentActionDuration).append("\"");
 				sb.append(">");
 				if (row[i] != null) {
 					sb.append(row[i].getAllele().getName());
