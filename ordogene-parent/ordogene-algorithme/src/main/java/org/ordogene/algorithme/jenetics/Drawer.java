@@ -125,10 +125,10 @@ public class Drawer {
 	static String htmlTableBuilder(String title, String header, double cellSize, String unit,
 			ActionGene[][] toPrintData, boolean display) {
 		Map<Action, Color> colorAction = new HashMap<>();
-		// content
-		StringBuilder sbTr = new StringBuilder();
 		StringBuilder sb = new StringBuilder();
-		sb.append("<html><header><style>");
+		
+		sb.append("<html><header>");
+		sb.append("<style>");
 		sb.append("html, body {\n" + 
 				"  font-family: \"Lucida Console\", Monaco, monospace;\n" + 
 				"}\n" + 
@@ -143,13 +143,23 @@ public class Drawer {
 				"}\n" + 
 				"th {\n" + 
 				"  text-align: left;\n" + 
+				"}\n" + 
+				"td {\n" + 
+				"  #border: 1px solid #AAAAAA;\n" + 
+				"}\n" + 
+				"td:hover {\n" + 
+				"  box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);\n" + 
 				"}");
-		sb.append("</style></header><body><h2>").append(title).append("</h2><table><thead>");
-		int nbColsMax = 0;
+		sb.append("</style>");
+		sb.append("</header><body>");
+		sb.append("<h2>").append(title).append("</h2>");
+		sb.append("<table>");
+		sb.append("<thead>").append(header).append("</thead>");
+		sb.append("<tbody>");
 		for (ActionGene[] row : toPrintData) {
-			sbTr.append("<tr>");
+			sb.append("<tr>");
 			for (int i = 0; i < row.length; i++) {
-				// handle colors
+				//COLOR
 				Color currentActionColor = null;
 				if (row[i] != null) {
 					currentActionColor = colorAction.get(row[i].getAllele());
@@ -162,49 +172,44 @@ public class Drawer {
 				}
 				String htmlRgb = "rgb(" + currentActionColor.getRed() + ',' + currentActionColor.getGreen() + ','
 						+ currentActionColor.getBlue() + ')';
-				// write data in large or small td
+				//END COLOR
+				
+				//TD
+				sb.append("<td style='");
+				sb.append("background-color: ").append(htmlRgb).append(";");
+				//sb.append("width:").append(cellSize).append(unit).append(";");
+				sb.append("'");
+				//TD LENGTH
 				int currentActionDuration = 1;
-				int nbCols = 0;
-				if (row[i] != null && row[i].getAllele() != null) {
+				if (row[i] != null/* && row[i].getAllele() != null*/) {
 					currentActionDuration = row[i].getAllele().getTime();
 				}
-				nbCols += currentActionDuration;
 				if (currentActionDuration > 1) {
-					sbTr.append("<td style='background-color: ").append(htmlRgb).append("; width:").append(cellSize)
-							.append(unit).append("' colspan=" + currentActionDuration + ">");
-					if (row[i] != null) {
-						sbTr.append(row[i].getAllele().getName());
-					}
-					sbTr.append("</td>");
-					i = i + currentActionDuration - 1;
-				} else {
-					sbTr.append("<td style='background-color: ").append(htmlRgb).append("; width:").append(cellSize)
-							.append(unit).append("'>");
-					if (row[i] != null) {
-						sbTr.append(row[i].getAllele().getName());
-					}
-					sbTr.append("</td>");
+					sb.append(" colspan=" + currentActionDuration);
 				}
-				if (nbCols > nbColsMax) {
-					nbColsMax = nbCols;
+				//END TD LENGTH
+				sb.append(">");
+				if (row[i] != null) {
+					sb.append(row[i].getAllele().getName());
+				}
+				sb.append("</td>");
+				//END TD
+				
+				//GOTO END ACTION
+				if(currentActionDuration > 1) {
+					i = i + currentActionDuration - 1;
 				}
 			}
-			sbTr.append("</tr>");
+			sb.append("</tr>");
 		}
-		sbTr.append("</table>");
+		sb.append("</tbody></table>");
 
-		// header
-		sb.append(header);
-		sb.append("</thead>");
-
-		String res = sb.toString() + sbTr.toString();
+		String res = sb.toString();
 		if (display) {
 			log.info(res);
 			JOptionPane.showMessageDialog(null, new JLabel(res));
 		}
 		return res;
-
-		// JOptionPane.showMessageDialog(null, html);
 	}
 
 }
