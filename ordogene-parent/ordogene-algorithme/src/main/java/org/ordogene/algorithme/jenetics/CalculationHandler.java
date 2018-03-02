@@ -136,7 +136,7 @@ public class CalculationHandler {
 		String htmlTableHeader = Drawer.buildHtmlTableHeader("", actionGeneArray);
 
 		String htmlArray = Drawer.htmlTableBuilder(model.getName(), htmlTableHeader, actionGeneArray,
-				false);
+				model, false);
 		logger.info("try to save : pngFile and htmlFile ... ");
 		if (FileUtils.saveResult(htmlArray, Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationId, model.getName())))) {
 			logger.info(" Success ");

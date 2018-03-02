@@ -43,7 +43,10 @@ public class Schedule implements Chromosome<ActionGene> {
 
 	@Override
 	public Chromosome<ActionGene> newInstance(ISeq<ActionGene> genes) {
-		return new Schedule(genes, model, model.calculEndEnvironment(genes), duration); // TODO mauvaise duration, à remplacer par la duration calculée
+		long duration = genes.stream()
+								.mapToLong(ag -> ag.getStartTime() + ag.getAllele().getTime())
+								.max().getAsLong();
+		return new Schedule(genes, model, model.calculEndEnvironment(genes), duration);
 	}
 
 	public Environment getEndEnv() {
