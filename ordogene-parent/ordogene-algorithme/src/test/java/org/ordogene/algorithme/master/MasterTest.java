@@ -99,7 +99,6 @@ public class MasterTest {
 			"    \"fitness\" : {\n" + 
 			"	\"type\" : \"max\",\n" + 
 			"	\"operands\" : [\n" + 
-			"	    {\"name\" : \"Gold\", \"coef\" : 1},\n" + 
 			"	    {\"name\" : \"Peon\", \"coef\" : 1},\n" + 
 			"	    {\"name\" : \"Knight\", \"coef\" : 20}\n" + 
 			"	]\n" + 
@@ -204,7 +203,6 @@ public class MasterTest {
 		assertNotEquals(0, toTest.getIterationNumber());
 		assertNotEquals(0, toTest.getMaxIteration());
 		assertNotEquals(0, toTest.getStartTimestamp());
-		assertNotEquals(0, toTest.getFitnessSaved());
 		assertTrue(toTest.isRunning());
 	}
 	
@@ -226,7 +224,6 @@ public class MasterTest {
 		assertNotEquals(0, toTest.getIterationNumber());
 		assertNotEquals(0, toTest.getMaxIteration());
 		assertNotEquals(0, toTest.getStartTimestamp());
-		assertNotEquals(0, toTest.getFitnessSaved());
 		assertFalse(toTest.isRunning());
 	}
 	
@@ -245,7 +242,6 @@ public class MasterTest {
 		assertEquals(0, toTest.getIterationNumber());
 		assertEquals(0, toTest.getMaxIteration());
 		assertEquals(0, toTest.getStartTimestamp());
-		assertEquals(0, toTest.getFitnessSaved());
 		assertFalse(toTest.isRunning());
 	}
 	
