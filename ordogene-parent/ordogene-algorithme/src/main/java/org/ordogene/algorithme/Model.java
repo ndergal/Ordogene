@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.ordogene.algorithme.jenetics.ActionGene;
 import org.ordogene.algorithme.models.Action;
 import org.ordogene.algorithme.models.Entity;
 import org.ordogene.algorithme.models.Environment;
@@ -15,6 +16,8 @@ import org.ordogene.algorithme.models.Input;
 import org.ordogene.algorithme.util.ActionSelector;
 import org.ordogene.file.models.JSONModel;
 import org.ordogene.file.models.Relation;
+
+import io.jenetics.util.ISeq;
 
 public class Model {
 	
@@ -197,4 +200,15 @@ public class Model {
 		return execTime;
 	}
 
+	public Environment calculEndEnvironment(ISeq<ActionGene> genes) {
+		Environment result = startEnvironment.copy();
+		
+		for(ActionGene ag : genes) {
+			startAction(ag.getAllele(), result, ag.getStartTime());
+			endAction(result, ag.getAllele());
+		}
+		
+		return result;
+	}
+	
 }

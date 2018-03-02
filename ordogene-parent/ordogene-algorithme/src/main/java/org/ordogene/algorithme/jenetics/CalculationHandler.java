@@ -24,7 +24,7 @@ import io.jenetics.engine.EvolutionResult;
 public class CalculationHandler {
 	private final Logger logger = LoggerFactory.getLogger(CalculationHandler.class);
 	
-	private final int POPULATION_SIZE = 10000;
+	private final int POPULATION_SIZE = 100;
 	private final double CHANCE_TO_STOP_SCHEDULE_CREATION = 0.002;
 
 	private final Date currentDate = new Date();
@@ -61,7 +61,6 @@ public class CalculationHandler {
 		boolean interupted = false;
 		// The best element of the population (to draw it later)
 		Phenotype<ActionGene, Long> best = null;
-		Calculation tmpCalc = new Calculation();
 		long lastSave = System.currentTimeMillis();
 		long lastSavedIteration = 0;
 
@@ -78,13 +77,13 @@ public class CalculationHandler {
 			// Block to read master commands
 			try {
 				// Get the message
-				String str = th.threadFromMaster();
+				String cmd = th.threadFromMaster();
 				// If the message is state, give informations
-				if (str != null && str.equals("state")) {
+				if (cmd != null && cmd.equals("state")) {
 					String msg = constructStateString(iteration, maxIteration, lastSavedIteration, best.getFitness());
 					th.threadToMaster(msg.toString());
 					// If the message is interrupt, stop the loop
-				} else if (str != null && str.equals("interrupt")) {
+				} else if (cmd != null && cmd.equals("interrupt")) {
 					interupted = true;
 				}
 			} catch (InterruptedException e) {
@@ -94,57 +93,54 @@ public class CalculationHandler {
 
 			long currentTime = System.currentTimeMillis();
 			if (lastSave + 60_000 < currentTime) {
-				tmpCalc = new Calculation();
+				Calculation tmpCalc = new Calculation();
 				
 				lastSave = currentTime;
 				lastSavedIteration = generation.getGeneration();
 				tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, calculationId,
 						model.getName(), best.getFitness());
 
-				ActionGene[][] actionGeneArray = Drawer.buildStringActionMatrix(best);
-				String htmlTableHeader = Drawer.buildHtmlTableHeader("", actionGeneArray);
-
-				String htmlArray = Drawer.htmlTableBuilder(model.getName(), htmlTableHeader, actionGeneArray,
-						false);
-				logger.info("try to save : pngFile and htmlFile ... ");
-				if (FileUtils.saveResult(htmlArray, Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationId, model.getName())))) {
-					logger.info(" Success ");
-				} else {
-					logger.info(" Fail ");
-				}
+				saveBest(best);
 			}
 		}
 
 		// Create a calculation information to saved it on disk
-		tmpCalc = new Calculation();
-
+		Calculation tmpCalc = new Calculation();
 		if (best != null) {
 			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, calculationId,
 					model.getName(), best.getFitness());
 
-			ActionGene[][] actionGeneArray = Drawer.buildStringActionMatrix(best);
-			String htmlTableHeader = Drawer.buildHtmlTableHeader("", actionGeneArray);
-
-			String htmlArray = Drawer.htmlTableBuilder(model.getName(), htmlTableHeader, actionGeneArray,
-					false);
-			logger.info("try to save : pngFile and htmlFile ... ");
-			if (FileUtils.saveResult(htmlArray, Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationId, model.getName())))) {
-				logger.info(" Success ");
-			} else {
-				logger.info(" Fail ");
-			}
+			saveBest(best);
 		} else {
 			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, calculationId,
 					model.getName(), 0);
 		}
 
 		// Save the information
+		saveState(tmpCalc);
+	}
+
+	private void saveState(Calculation tmpCalc) {
 		try {
 			FileUtils.writeJsonInFile(tmpCalc, userId, tmpCalc.getId(), tmpCalc.getName());
 			logger.info(tmpCalc + " saved");
 		} catch (IOException e) {
 			logger.debug(Arrays.toString(e.getStackTrace()));
 			logger.error(tmpCalc + " not saved.");
+		}
+	}
+
+	private void saveBest(Phenotype<ActionGene, Long> best) {
+		ActionGene[][] actionGeneArray = Drawer.buildStringActionMatrix(best);
+		String htmlTableHeader = Drawer.buildHtmlTableHeader("", actionGeneArray);
+
+		String htmlArray = Drawer.htmlTableBuilder(model.getName(), htmlTableHeader, actionGeneArray,
+				false);
+		logger.info("try to save : pngFile and htmlFile ... ");
+		if (FileUtils.saveResult(htmlArray, Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationId, model.getName())))) {
+			logger.info(" Success ");
+		} else {
+			logger.info(" Fail ");
 		}
 	}
 
