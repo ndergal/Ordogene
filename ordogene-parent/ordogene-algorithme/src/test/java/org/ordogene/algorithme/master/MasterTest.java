@@ -29,7 +29,7 @@ public class MasterTest {
 	String JSONmodel = "{\n" + 
 			"    \"name\" : \"small_strategy_game.json\",\n" + 
 			"    \"slots\" : 2,\n" + 
-			"    \"exec_time\" : 1,\n" + 
+			"    \"exec_time\" : 5,\n" + 
 			"    \"environment\" : [\n" + 
 			"	{\"name\" : \"Nexus\", \"quantity\" : 1},\n" + 
 			"	{\"name\" : \"Peon\", \"quantity\" : 1},\n" + 
@@ -99,6 +99,7 @@ public class MasterTest {
 			"    \"fitness\" : {\n" + 
 			"	\"type\" : \"max\",\n" + 
 			"	\"operands\" : [\n" + 
+			"	    {\"name\" : \"Gold\", \"coef\" : 1},\n" + 
 			"	    {\"name\" : \"Peon\", \"coef\" : 1},\n" + 
 			"	    {\"name\" : \"Knight\", \"coef\" : 20}\n" + 
 			"	]\n" + 
@@ -196,7 +197,7 @@ public class MasterTest {
 		
 		Calculation toTest = new Calculation();
 		toTest.setId(calculationId);
-		toTest.setName("c100");
+		toTest.setName("small_strategy_game.json");
 		
 		m.updateCalculation(toTest, userIdTest);
 		
