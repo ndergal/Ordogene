@@ -1,6 +1,7 @@
 package org.ordogene.algorithme.jenetics;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -11,23 +12,23 @@ import org.ordogene.algorithme.models.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.jenetics.AbstractChromosome;
 import io.jenetics.Chromosome;
 import io.jenetics.util.ISeq;
 import io.jenetics.util.RandomRegistry;
 
-public class Schedule extends AbstractChromosome<ActionGene> {
-
-	private static final long serialVersionUID = 1L;
+public class Schedule implements Chromosome<ActionGene> {
 
 	private static final Logger logger = LoggerFactory.getLogger(Schedule.class);
 
+	private final ISeq<ActionGene> seq;
 	private final Model model;
+	private final Environment endEnv;
 	private final long duration;
 
-	public Schedule(ISeq<ActionGene> seq, Model model, long duration) {
-		super(seq);
+	public Schedule(ISeq<ActionGene> seq, Model model, Environment endEnv, long duration) {
+		this.seq = seq;
 		this.model = model;
+		this.endEnv = endEnv;
 		this.duration = duration;
 	}
 
@@ -37,12 +38,16 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 		// il faut bloquer sont accès lors de la création d'un individu pour éviter les états incohérents du model
 		synchronized (model) {
 			return of(model, 0.001);
-		}	
+		}
 	}
 
 	@Override
 	public Chromosome<ActionGene> newInstance(ISeq<ActionGene> genes) {
-		return new Schedule(genes, model, duration); // TODO mauvaise duration, à remplacer par la duration calculée
+		return new Schedule(genes, model, model.calculEndEnvironment(genes), duration); // TODO mauvaise duration, à remplacer par la duration calculée
+	}
+
+	public Environment getEndEnv() {
+		return endEnv;
 	}
 
 	public static Schedule of(Model model, double probaToStop) {
@@ -122,7 +127,7 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 			}
 
 		}
-		return new Schedule(ISeq.of(seq), model, timeAtEnd);
+		return new Schedule(ISeq.of(seq), model, envAfterEnd, timeAtEnd);
 
 	}
 
@@ -132,6 +137,31 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 
 	public long getDuration() {
 		return duration;
+	}
+
+	@Override
+	public boolean isValid() {
+		return seq.stream().allMatch(ActionGene::isValid);
+	}
+
+	@Override
+	public Iterator<ActionGene> iterator() {
+		return seq.iterator();
+	}
+
+	@Override
+	public ActionGene getGene(int index) {
+		return seq.get(index);
+	}
+
+	@Override
+	public int length() {
+		return seq.length();
+	}
+
+	@Override
+	public ISeq<ActionGene> toSeq() {
+		return seq;
 	}
 
 }

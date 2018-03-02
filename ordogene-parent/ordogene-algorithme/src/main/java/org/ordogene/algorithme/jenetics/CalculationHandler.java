@@ -24,7 +24,7 @@ import io.jenetics.engine.EvolutionResult;
 public class CalculationHandler {
 	private final Logger logger = LoggerFactory.getLogger(CalculationHandler.class);
 	
-	private final int POPULATION_SIZE = 10000;
+	private final int POPULATION_SIZE = 100;
 	private final double CHANCE_TO_STOP_SCHEDULE_CREATION = 0.002;
 
 	private final Date currentDate = new Date();
@@ -101,17 +101,7 @@ public class CalculationHandler {
 				tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, calculationId,
 						model.getName(), best.getFitness());
 
-				ActionGene[][] actionGeneArray = Drawer.buildStringActionMatrix(best);
-				String htmlTableHeader = Drawer.buildHtmlTableHeader("", actionGeneArray);
-
-				String htmlArray = Drawer.htmlTableBuilder(model.getName(), htmlTableHeader, actionGeneArray,
-						false);
-				logger.info("try to save : pngFile and htmlFile ... ");
-				if (FileUtils.saveResult(htmlArray, Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationId, model.getName())))) {
-					logger.info(" Success ");
-				} else {
-					logger.info(" Fail ");
-				}
+				saveBest(best);
 			}
 		}
 
@@ -122,29 +112,38 @@ public class CalculationHandler {
 			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, calculationId,
 					model.getName(), best.getFitness());
 
-			ActionGene[][] actionGeneArray = Drawer.buildStringActionMatrix(best);
-			String htmlTableHeader = Drawer.buildHtmlTableHeader("", actionGeneArray);
+			saveBest(best);
 
-			String htmlArray = Drawer.htmlTableBuilder(model.getName(), htmlTableHeader, actionGeneArray,
-					false);
-			logger.info("try to save : pngFile and htmlFile ... ");
-			if (FileUtils.saveResult(htmlArray, Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationId, model.getName())))) {
-				logger.info(" Success ");
-			} else {
-				logger.info(" Fail ");
-			}
 		} else {
 			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, calculationId,
 					model.getName(), 0);
 		}
 
 		// Save the information
+		saveState(tmpCalc);
+	}
+
+	private void saveState(Calculation tmpCalc) {
 		try {
 			FileUtils.writeJsonInFile(tmpCalc, userId, tmpCalc.getId(), tmpCalc.getName());
 			logger.info(tmpCalc + " saved");
 		} catch (IOException e) {
 			logger.debug(Arrays.toString(e.getStackTrace()));
 			logger.error(tmpCalc + " not saved.");
+		}
+	}
+
+	private void saveBest(Phenotype<ActionGene, Long> best) {
+		ActionGene[][] actionGeneArray = Drawer.buildStringActionMatrix(best);
+		String htmlTableHeader = Drawer.buildHtmlTableHeader("", actionGeneArray);
+
+		String htmlArray = Drawer.htmlTableBuilder(model.getName(), htmlTableHeader, actionGeneArray,
+				false);
+		logger.info("try to save : pngFile and htmlFile ... ");
+		if (FileUtils.saveResult(htmlArray, Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationId, model.getName())))) {
+			logger.info(" Success ");
+		} else {
+			logger.info(" Fail ");
 		}
 	}
 
