@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
@@ -57,24 +58,24 @@ public class Commands {
 			Scanner scanner = new Scanner(System.in);
 			String choice = scanner.nextLine();
 			switch (choice) {
-				case "":
-				case "n":
-				case "N":
-				case "no":
-					do {
-						log.info("Enter your group id : ");
-						id = scanner.nextLine();
-					} while (id.isEmpty() ? true : !getUser(id));
-					break loop;
-				case "y":
-				case "Y":
-				case "yes":
-					if (!createUser()) {
-						log.error("Problem with the server: user creation failed");
-						System.exit(1);
-					}
-					break loop;
-				default:
+			case "":
+			case "n":
+			case "N":
+			case "no":
+				do {
+					log.info("Enter your group id : ");
+					id = scanner.nextLine();
+				} while (id.isEmpty() ? true : !getUser(id));
+				break loop;
+			case "y":
+			case "Y":
+			case "yes":
+				if (!createUser()) {
+					log.error("Problem with the server: user creation failed");
+					System.exit(1);
+				}
+				break loop;
+			default:
 			}
 		}
 		log.info("\n");
@@ -122,10 +123,10 @@ public class Commands {
 		String jsonContentRead;
 		try {
 			jsonContentRead = FileUtils.readFile(model);
-		} catch (IOException | IllegalArgumentException e ) {
+		} catch (IOException | IllegalArgumentException e) {
 			return e.getMessage();
 		}
-		
+
 		// Request
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
@@ -137,7 +138,7 @@ public class Commands {
 			int cid = response.getBody().getCid();
 			return "Calculation '" + cid + "' launched";
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
-			 return e.getStatusCode() + " -- " + e.getStatusText();
+			return e.getStatusCode() + " -- " + e.getStatusText();
 		} catch (RestClientException e) {
 			log.debug(e.getMessage());
 			return PROBLEM_WITH_THE_COMMUNICATION_BETWEEN_CLIENT_AND_SERVER;
@@ -231,6 +232,35 @@ public class Commands {
 		}
 	}
 
+	/**
+	 * Open a file with the default launcher for it"
+	 * 
+	 * @param file
+	 *            file to open
+	 */
+	@ShellMethod(value = "Open a file", key = { "xdg-open", "start", "open" })
+	public boolean xdgOpen(File file) {
+		Runtime currentRuntime = Runtime.getRuntime();
+		String absolutePath = file.getAbsolutePath();
+		String cmd = absolutePath;
+		if (isLinux()) {
+			cmd = (String.format("xdg-open %s", absolutePath));
+		} else if (isMac()) {
+			cmd = (String.format("open %s", absolutePath));
+		} else if (isWindows() && isWindows9X()) {
+			cmd = (String.format("command.com /C start %s", absolutePath));
+		} else if (isWindows()) {
+			cmd = (String.format("cmd /c start %s", absolutePath));
+		}
+		try {
+			currentRuntime.exec(cmd);
+			return true;
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			return false;
+		}
+	}
+
 	/* UTILS */
 
 	private boolean getUser(String id) {
@@ -287,5 +317,25 @@ public class Commands {
 			data[i + 1][7] = String.valueOf(c.getMaxIteration());
 		}
 		return builder;
+	}
+
+	private static boolean isWindows() {
+		String os = System.getProperty("os.name").toLowerCase();
+		return os.indexOf("windows") != -1 || os.indexOf("nt") != -1;
+	}
+
+	private static boolean isMac() {
+		String os = System.getProperty("os.name").toLowerCase();
+		return os.indexOf("mac") != -1;
+	}
+
+	private static boolean isLinux() {
+		String os = System.getProperty("os.name").toLowerCase();
+		return os.indexOf("linux") != -1;
+	}
+
+	private static boolean isWindows9X() {
+		String os = System.getProperty("os.name").toLowerCase();
+		return os.equals("windows 95") || os.equals("windows 98");
 	}
 }
