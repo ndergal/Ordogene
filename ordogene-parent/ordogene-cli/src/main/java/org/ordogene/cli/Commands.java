@@ -197,11 +197,14 @@ public class Commands {
 	 *            if set, overwrite if dst already exists
 	 */
 	@ShellMethod(value = "Get the result of a calculation")
-	public String resultCalculation(int cid, File dst, @ShellOption(arity = 0, defaultValue = "false") boolean force) {
+	public String resultCalculation(int cid, File dst, @ShellOption(arity = 0, defaultValue = "false") boolean force,
+			@ShellOption(arity = 0, defaultValue = "false") boolean html) {
 
 		// Parameter validation
 		Path path = dst.toPath();
-		if (dst.isDirectory()) {
+		if (dst.isDirectory() && html) {
+			path = Paths.get(dst.toPath().toString() + File.separator + this.id + "_" + cid + ".html");
+		} else if (dst.isDirectory() && !html) {
 			path = Paths.get(dst.toPath().toString() + File.separator + this.id + "_" + cid + ".png");
 		}
 		if (path.toFile().exists() && !force) {
@@ -216,14 +219,20 @@ public class Commands {
 
 			// Writing the image
 
-			String base64img = response.getBody().getBase64img();
+			String base64 = response.getBody().getBase64img();
 			try {
-				FileUtils.saveImageFromBase64(base64img, path.toAbsolutePath().toString());
+				if (html) {
+					FileUtils.saveHtmlFromBase64(base64, path.toAbsolutePath().toString());
+					return "The html of the result is downloaded at " + dst;
+
+				} else {
+					FileUtils.saveImageFromBase64(base64, path.toAbsolutePath().toString());
+					return "The image of the result is downloaded at " + dst;
+				}
 			} catch (IOException e) {
 				// IOException or NoSuchFileException
 				return e.getMessage();
 			}
-			return "The image of the result is downloaded at " + dst;
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
 			return e.getStatusCode() + " -- " + e.getStatusText();
 		} catch (RestClientException e) {
