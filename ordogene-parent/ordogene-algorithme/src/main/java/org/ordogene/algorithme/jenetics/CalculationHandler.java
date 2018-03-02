@@ -100,21 +100,7 @@ public class CalculationHandler {
 				tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, calculationId,
 						model.getName(), best.getFitness());
 
-<<<<<<< HEAD
 				saveBest(best);
-=======
-				ActionGene[][] actionGeneArray = Drawer.buildStringActionMatrix(best);
-				String htmlTableHeader = Drawer.buildHtmlTableHeader("", actionGeneArray);
-
-				String htmlArray = Drawer.htmlTableBuilder(model.getName(), htmlTableHeader, actionGeneArray, model,
-						false);
-				logger.info("try to save : pngFile and htmlFile ... ");
-				if (FileUtils.saveResult(htmlArray, Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationId, model.getName())))) {
-					logger.info(" Success ");
-				} else {
-					logger.info(" Fail ");
-				}
->>>>>>> branch 'dev' of https://ThibaultGIRARD@bitbucket.org/darwinners/ordogene.git
 			}
 		}
 
@@ -124,21 +110,7 @@ public class CalculationHandler {
 			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, calculationId,
 					model.getName(), best.getFitness());
 
-<<<<<<< HEAD
 			saveBest(best);
-=======
-			ActionGene[][] actionGeneArray = Drawer.buildStringActionMatrix(best);
-			String htmlTableHeader = Drawer.buildHtmlTableHeader("", actionGeneArray);
-
-			String htmlArray = Drawer.htmlTableBuilder(model.getName(), htmlTableHeader, actionGeneArray, model, 
-					false);
-			logger.info("try to save : pngFile and htmlFile ... ");
-			if (FileUtils.saveResult(htmlArray, Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationId, model.getName())))) {
-				logger.info(" Success ");
-			} else {
-				logger.info(" Fail ");
-			}
->>>>>>> branch 'dev' of https://ThibaultGIRARD@bitbucket.org/darwinners/ordogene.git
 		} else {
 			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, calculationId,
 					model.getName(), 0);
@@ -163,7 +135,7 @@ public class CalculationHandler {
 		String htmlTableHeader = Drawer.buildHtmlTableHeader("", actionGeneArray);
 
 		String htmlArray = Drawer.htmlTableBuilder(model.getName(), htmlTableHeader, actionGeneArray,
-				false);
+				model, false);
 		logger.info("try to save : pngFile and htmlFile ... ");
 		if (FileUtils.saveResult(htmlArray, Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationId, model.getName())))) {
 			logger.info(" Success ");

@@ -201,7 +201,7 @@ public class Commands {
 		// Parameter validation
 		Path path = dst.toPath();
 		if (dst.isDirectory()) {
-			path = Paths.get(dst.toPath().toString() + File.separator + this.id + "_" + cid);
+			path = Paths.get(dst.toPath().toString() + File.separator + this.id + "_" + cid + ".png");
 		}
 		if (path.toFile().exists() && !force) {
 			return "A file already exists, use --force to overwrite.";
