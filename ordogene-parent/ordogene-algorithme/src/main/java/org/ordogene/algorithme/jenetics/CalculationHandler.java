@@ -24,7 +24,7 @@ import io.jenetics.engine.EvolutionResult;
 public class CalculationHandler {
 	private final Logger logger = LoggerFactory.getLogger(CalculationHandler.class);
 	
-	private final int POPULATION_SIZE = 10000;
+	private final int POPULATION_SIZE = 100;
 	private final double CHANCE_TO_STOP_SCHEDULE_CREATION = 0.002;
 
 	private final Date currentDate = new Date();
@@ -104,7 +104,7 @@ public class CalculationHandler {
 				ActionGene[][] actionGeneArray = Drawer.buildStringActionMatrix(best);
 				String htmlTableHeader = Drawer.buildHtmlTableHeader("", actionGeneArray);
 
-				String htmlArray = Drawer.htmlTableBuilder(model.getName(), htmlTableHeader, actionGeneArray,
+				String htmlArray = Drawer.htmlTableBuilder(model.getName(), htmlTableHeader, actionGeneArray, model,
 						false);
 				logger.info("try to save : pngFile and htmlFile ... ");
 				if (FileUtils.saveResult(htmlArray, Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationId, model.getName())))) {
@@ -125,7 +125,7 @@ public class CalculationHandler {
 			ActionGene[][] actionGeneArray = Drawer.buildStringActionMatrix(best);
 			String htmlTableHeader = Drawer.buildHtmlTableHeader("", actionGeneArray);
 
-			String htmlArray = Drawer.htmlTableBuilder(model.getName(), htmlTableHeader, actionGeneArray,
+			String htmlArray = Drawer.htmlTableBuilder(model.getName(), htmlTableHeader, actionGeneArray, model, 
 					false);
 			logger.info("try to save : pngFile and htmlFile ... ");
 			if (FileUtils.saveResult(htmlArray, Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationId, model.getName())))) {
