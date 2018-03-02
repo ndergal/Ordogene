@@ -10,7 +10,9 @@ import java.util.stream.Collectors;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
+import org.ordogene.algorithme.Model;
 import org.ordogene.algorithme.models.Action;
+import org.ordogene.algorithme.models.Entity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -123,7 +125,7 @@ public class Drawer {
 	}
 
 	static String htmlTableBuilder(String title, String header,
-			ActionGene[][] toPrintData, boolean display) {
+			ActionGene[][] toPrintData, Model model, boolean display) {
 		Map<Action, Color> colorAction = new HashMap<>();
 		StringBuilder sb = new StringBuilder();
 		
@@ -157,6 +159,12 @@ public class Drawer {
 		sb.append("</style>");
 		sb.append("</header><body>");
 		sb.append("<h2>").append(title).append("</h2>");
+		sb.append("<p>Start environment :</p>");
+		sb.append("<ul>");
+		for(Entity entity : model.getStartEnvironment().getEntities()) {
+			sb.append("<li>").append(entity.getQuantity()).append(" x ").append(entity.getName()).append("</li>");
+		}
+		sb.append("</ul>");
 		sb.append("<table>");
 		sb.append("<thead>").append(header).append("</thead>");
 		sb.append("<tbody>");

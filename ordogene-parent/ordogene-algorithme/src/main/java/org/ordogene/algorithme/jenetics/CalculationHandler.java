@@ -61,7 +61,6 @@ public class CalculationHandler {
 		boolean interupted = false;
 		// The best element of the population (to draw it later)
 		Phenotype<ActionGene, Long> best = null;
-		Calculation tmpCalc = new Calculation();
 		long lastSave = System.currentTimeMillis();
 		long lastSavedIteration = 0;
 
@@ -78,13 +77,13 @@ public class CalculationHandler {
 			// Block to read master commands
 			try {
 				// Get the message
-				String str = th.threadFromMaster();
+				String cmd = th.threadFromMaster();
 				// If the message is state, give informations
-				if (str != null && str.equals("state")) {
+				if (cmd != null && cmd.equals("state")) {
 					String msg = constructStateString(iteration, maxIteration, lastSavedIteration, best.getFitness());
 					th.threadToMaster(msg.toString());
 					// If the message is interrupt, stop the loop
-				} else if (str != null && str.equals("interrupt")) {
+				} else if (cmd != null && cmd.equals("interrupt")) {
 					interupted = true;
 				}
 			} catch (InterruptedException e) {
@@ -94,7 +93,7 @@ public class CalculationHandler {
 
 			long currentTime = System.currentTimeMillis();
 			if (lastSave + 60_000 < currentTime) {
-				tmpCalc = new Calculation();
+				Calculation tmpCalc = new Calculation();
 				
 				lastSave = currentTime;
 				lastSavedIteration = generation.getGeneration();
@@ -106,8 +105,7 @@ public class CalculationHandler {
 		}
 
 		// Create a calculation information to saved it on disk
-		tmpCalc = new Calculation();
-
+		Calculation tmpCalc = new Calculation();
 		if (best != null) {
 			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, calculationId,
 					model.getName(), best.getFitness());
