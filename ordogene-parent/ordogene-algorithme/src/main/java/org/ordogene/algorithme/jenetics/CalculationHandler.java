@@ -111,7 +111,6 @@ public class CalculationHandler {
 					model.getName(), best.getFitness());
 
 			saveBest(best);
-
 		} else {
 			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, calculationId,
 					model.getName(), 0);
