@@ -38,12 +38,15 @@ public class Schedule implements Chromosome<ActionGene> {
 		// il faut bloquer sont accès lors de la création d'un individu pour éviter les états incohérents du model
 		synchronized (model) {
 			return of(model, 0.001);
-		}	
+		}
 	}
 
 	@Override
 	public Chromosome<ActionGene> newInstance(ISeq<ActionGene> genes) {
-		return new Schedule(genes, model, model.calculEndEnvironment(genes), duration); // TODO mauvaise duration, à remplacer par la duration calculée
+		long duration = genes.stream()
+								.mapToLong(ag -> ag.getStartTime() + ag.getAllele().getTime())
+								.max().getAsLong();
+		return new Schedule(genes, model, model.calculEndEnvironment(genes), duration);
 	}
 
 	public Environment getEndEnv() {
