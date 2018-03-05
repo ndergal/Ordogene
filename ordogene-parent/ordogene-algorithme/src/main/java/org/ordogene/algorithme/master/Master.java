@@ -99,13 +99,7 @@ public class Master {
 					return;
 				}
 				String[] state = response.split("_");
-				try {
-					cal.setCalculation(Long.valueOf(state[0]), Integer.valueOf(state[1]), Integer.valueOf(state[2]),
-							Integer.valueOf(state[3]), cal.getId(), cal.getName(), Integer.valueOf(state[4]));
-				} catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-					throw new InternalError("Problem with calculation format informations");
-				}
-				cal.setRunning(true);
+				updateCalculWithState(cal, state);
 			} catch (InterruptedException e) {
 				// Master will be closed
 				Thread.currentThread().interrupt();
@@ -128,7 +122,16 @@ public class Master {
 		}
 	}
 
-	// TODO connection with Thread
+	private void updateCalculWithState(Calculation cal, String[] state) throws InternalError {
+		try {
+			cal.setCalculation(Long.valueOf(state[0]), Integer.valueOf(state[1]), Integer.valueOf(state[2]),
+					Integer.valueOf(state[3]), cal.getId(), cal.getName(), Integer.valueOf(state[4]));
+		} catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+			throw new InternalError("Problem with calculation format informations");
+		}
+		cal.setRunning(true);
+	}
+
 	public boolean interruptCalculation(int calculationId) {
 		ThreadHandler th = threadMap.get(calculationId);
 		if (th != null) {
