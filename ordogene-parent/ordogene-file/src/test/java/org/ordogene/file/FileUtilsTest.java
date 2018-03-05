@@ -108,14 +108,6 @@ public class FileUtilsTest {
 	}
 
 	@Test
-	public void getRandomUid() {
-		int size = 89;
-		String ruid = FileUtils.generateRandomUserId(size);
-		assertFalse(ruid == null);
-		assertEquals(size, ruid.length());
-	}
-
-	@Test
 	public void testEncodeAndDecode() throws IOException, URISyntaxException {
 		Path path1 = Paths.get(FileUtilsTest.class.getClassLoader().getResource("./test-image/doge_test.png").toURI());
 		Path path2 = Paths.get(FileUtilsTest.class.getClassLoader().getResource("./test-image/result.png").toURI());
