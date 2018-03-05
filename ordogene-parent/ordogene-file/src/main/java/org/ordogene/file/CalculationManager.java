@@ -25,7 +25,7 @@ public class CalculationManager {
 			return res;
 		}
 		Path userPath = Paths.get(Const.getConst().get("ApplicationPath") + File.separatorChar + username);
-		try (DirectoryStream<Path> userPathStream = Files.newDirectoryStream(userPath, p -> Files.isDirectory(p))) {
+		try (DirectoryStream<Path> userPathStream = Files.newDirectoryStream(userPath, p -> p.toFile().isDirectory())) {
 
 			userPathStream.forEach(p -> {
 				Calculation currenCalculation = new Calculation();
@@ -50,9 +50,6 @@ public class CalculationManager {
 
 		return res;
 	}
-	
-	// TODO createDirectories
-	// new File("/path/directory").mkdirs();
 
 	public boolean removeCalculation(String username, int calculationID, String calculationName) {
 		if (username == null || username.equals("")) {
