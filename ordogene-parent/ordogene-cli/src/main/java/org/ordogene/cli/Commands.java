@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
@@ -220,19 +219,18 @@ public class Commands {
 			// Writing the image
 
 			String base64 = response.getBody().getBase64img();
-			try {
-				if (html) {
-					FileUtils.saveHtmlFromBase64(base64, path.toAbsolutePath().toString());
-					return "The html of the result is downloaded at " + dst;
+			if (html) {
+				FileUtils.saveHtmlFromBase64(base64, path.toAbsolutePath().toString());
+				return "The html of the result is downloaded at " + dst;
 
-				} else {
-					FileUtils.saveImageFromBase64(base64, path.toAbsolutePath().toString());
-					return "The image of the result is downloaded at " + dst;
-				}
-			} catch (IOException e) {
-				// IOException or NoSuchFileException
-				return e.getMessage();
+			} else {
+				FileUtils.saveImageFromBase64(base64, path.toAbsolutePath().toString());
+				return "The image of the result is downloaded at " + dst;
 			}
+			
+		} catch (IOException e) {
+			// IOException or NoSuchFileException
+			return e.getMessage();
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
 			return e.getStatusCode() + " -- " + e.getStatusText();
 		} catch (RestClientException e) {
@@ -277,7 +275,7 @@ public class Commands {
 		try {
 			restTemplate.exchange("/" + id, HttpMethod.GET, null, ApiJsonResponse.class);
 			this.id = id;
-			log.info("Welcome back " + id);
+			log.info("Welcome back {}", id);
 			return true;
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
 			log.error(e.getStatusCode() + " -- " + e.getStatusText());
@@ -295,7 +293,7 @@ public class Commands {
 			ResponseEntity<ApiJsonResponse> response = restTemplate.exchange("/", HttpMethod.PUT, null,
 					ApiJsonResponse.class);
 			id = response.getBody().getUserId();
-			log.info("Your new group id is " + id);
+			log.info("Your new group id is {}", id);
 			return true;
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
 			log.error(e.getStatusCode() + " -- " + e.getStatusText());
@@ -315,7 +313,7 @@ public class Commands {
 		}
 		for (int i = 0; i < list.size(); i++) {
 			Calculation c = list.get(i);
-			log.debug(c.toString());
+			log.debug("{}", c);
 			data[i + 1][0] = String.valueOf(c.getId());
 			data[i + 1][1] = c.getName();
 			data[i + 1][2] = formater.format(new Date(c.getStartTimestamp()));

@@ -43,10 +43,10 @@ public class Schedule implements Chromosome<ActionGene> {
 
 	@Override
 	public Chromosome<ActionGene> newInstance(ISeq<ActionGene> genes) {
-		long duration = genes.stream()
+		long newDuration = genes.stream()
 								.mapToLong(ag -> ag.getStartTime() + ag.getAllele().getTime())
 								.max().getAsLong();
-		return new Schedule(genes, model, model.calculEndEnvironment(genes), duration);
+		return new Schedule(genes, model, model.calculEndEnvironment(genes), newDuration);
 	}
 
 	public Environment getEndEnv() {
@@ -99,11 +99,7 @@ public class Schedule implements Chromosome<ActionGene> {
 				// Calcul actionEndTime
 				int actionEndTime = timeAtStart + action.getTime();
 				// Add action in map to end it later
-				List<Action> actions = map.get(actionEndTime);
-				if (actions == null) {
-					actions = new ArrayList<>();
-					map.put(actionEndTime, actions);
-				}
+				List<Action> actions = map.computeIfAbsent(actionEndTime, (key) -> new ArrayList<>());
 				actions.add(action);
 			}
 

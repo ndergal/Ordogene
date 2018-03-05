@@ -13,6 +13,7 @@ import javax.swing.JOptionPane;
 import org.ordogene.algorithme.Model;
 import org.ordogene.algorithme.models.Action;
 import org.ordogene.algorithme.models.Entity;
+import org.ordogene.algorithme.models.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +22,8 @@ import io.jenetics.Phenotype;
 
 public class Drawer {
 	private final static Logger log = LoggerFactory.getLogger(Drawer.class);
+	
+	private Drawer() {}
 
 	static String buildHtmlTableHeader(String prefix, Object[][] content) {
 		int nbCol = 0;
@@ -66,9 +69,6 @@ public class Drawer {
 				realMaxSize = startTime + action.getAllele().getTime();
 			}
 			nextIndex++;
-
-			int[][] toPrintArray2 = new int[indexedList.size()][];
-			toPrintArray2 = indexedList.toArray(toPrintArray2);
 		}
 
 		// remove all "-1" useless cells
@@ -124,15 +124,17 @@ public class Drawer {
 		return new Color(rgb);
 	}
 
-	static String htmlTableBuilder(String title, String header,
-			ActionGene[][] toPrintData, Model model, boolean display) {
+	static String htmlTableBuilder(String header,
+			ActionGene[][] toPrintData, Model model, Long fitness, Environment endEnvironment, boolean display) {
 		Map<Action, Color> colorAction = new HashMap<>();
 		StringBuilder sb = new StringBuilder();
 		
-		sb.append("<html><header>");
+		sb.append("<html><head>");
+		sb.append("<meta charset=\"utf-8\"/>");
 		sb.append("<style>");
 		sb.append("html, body {\n" + 
 				"  font-family: \"Lucida Console\", Monaco, monospace;\n" + 
+				"  margin: 0;\n" + 
 				"}\n" + 
 				"table {\n" + 
 				"  border-collapse: collapse;\n" + 
@@ -155,16 +157,50 @@ public class Drawer {
 				"}\n" + 
 				"td:not(:empty):hover {\n" + 
 				"  box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);\n" + 
+				"}\n" + 
+				"h2 {\n" + 
+				"  padding: 10px 20px 10px 20px;\n" + 
+				"  background: white;\n" + 
+				"  position: fixed;\n" + 
+				"  top: 0;\n" + 
+				"  width: 100%;\n" + 
+				"  z-index: 2;\n" + 
+				"  box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);\n" + 
+				"}\n" + 
+				".header {\n" + 
+				"  padding: 10px 20px 10px 20px;\n" + 
+				"  background: white;\n" + 
+				"  position: fixed;\n" + 
+				"  top: 48px;\n" + 
+				"  height: 100%;\n" + 
+				"  overflow-y: auto;\n" + 
+				"  width: 220px;\n" + 
+				"  z-index: 1;\n" + 
+				"  box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);\n" + 
+				"}\n" + 
+				"table {\n" + 
+				"  position: absolute;\n" + 
+				"  left: 260px;\n" + 
+				"  top: 48px;\n" + 
 				"}");
 		sb.append("</style>");
-		sb.append("</header><body>");
-		sb.append("<h2>").append(title).append("</h2>");
-		sb.append("<p>Start environment :</p>");
+		sb.append("</head><body>");
+		sb.append("<h2>Ordogène : ").append(model.getName()).append("</h2>");
+		sb.append("<div class=\"header\">");
+		sb.append("<div class=\"startEnv\"><p>Start environment :</p>");
 		sb.append("<ul>");
 		for(Entity entity : model.getStartEnvironment().getEntities()) {
 			sb.append("<li>").append(entity.getQuantity()).append(" x ").append(entity.getName()).append("</li>");
 		}
-		sb.append("</ul>");
+		sb.append("</ul></div>");
+		sb.append("<div class=\"endEnv\"><p>End environment :</p>");
+		sb.append("<ul>");
+		for(Entity entity : endEnvironment.getEntities()) {
+			sb.append("<li>").append(entity.getQuantity()).append(" x ").append(entity.getName()).append("</li>");
+		}
+		sb.append("</ul></div>");
+		sb.append("<p>Fitness = ").append(fitness).append("</p>");
+		sb.append("</div>");
 		sb.append("<table>");
 		sb.append("<thead>").append(header).append("</thead>");
 		sb.append("<tbody>");

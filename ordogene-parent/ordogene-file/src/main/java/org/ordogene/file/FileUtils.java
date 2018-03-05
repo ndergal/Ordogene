@@ -28,6 +28,10 @@ public class FileUtils {
 
 	private final static UserManager uh = new UserManager();
 	private final static CalculationManager ch = new CalculationManager();
+	
+	private FileUtils() {
+		
+	}
 
 	public static boolean userExist(String username) {
 		return uh.checkUserExists(username);
@@ -59,7 +63,7 @@ public class FileUtils {
 
 	public static void writeJsonInFile(Object content, String userId, int cid, String calName) throws IOException {
 		Path dest = Paths.get(getCalculationStatePath(userId, cid, calName));
-		if (Files.exists(dest)) {
+		if (dest.toFile().exists()) {
 			Files.delete(dest);
 		}
 		Files.createDirectories(dest.getParent());

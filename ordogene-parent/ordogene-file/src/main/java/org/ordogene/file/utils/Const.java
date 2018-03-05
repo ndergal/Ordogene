@@ -20,6 +20,10 @@ public class Const {
 	private final static Logger log = LoggerFactory.getLogger(Const.class);
 
 	private static Map<String, String> resourcesMap;
+	
+	private Const() {
+		
+	}
 
 	 
 	public static boolean loadConfig(String configFilePath) {
