@@ -22,6 +22,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import gui.ava.html.image.generator.HtmlImageGenerator;
 
+/**
+ * Handle files for all the project : create, write in, check, remove, get path
+ * @author darwinners team
+ *
+ */
 public class FileUtils {
 
 	private final static String ALPHA_NUM = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";

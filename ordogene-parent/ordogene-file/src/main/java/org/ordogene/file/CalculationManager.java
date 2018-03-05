@@ -16,6 +16,11 @@ import org.ordogene.file.utils.Const;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Handle calculations : get as list, or remove
+ * @author darwinners team
+ *
+ */
 public class CalculationManager {
 	private final static Logger log = LoggerFactory.getLogger(CalculationManager.class);
 

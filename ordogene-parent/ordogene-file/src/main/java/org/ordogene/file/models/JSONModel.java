@@ -10,6 +10,12 @@ import org.ordogene.file.parser.Validable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+
+/**
+ * POJO
+ * @author darwinners team
+ *
+ */
 public class JSONModel implements Validable {
 	private int slots;
 	@JsonProperty("exec_time")

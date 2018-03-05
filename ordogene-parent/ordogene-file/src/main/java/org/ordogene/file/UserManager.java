@@ -14,6 +14,11 @@ import org.slf4j.LoggerFactory;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
 
+/**
+ * Handle Users : check existency, add and remove.
+ * @author darwinners team
+ *
+ */
 public class UserManager {
 	private final static Logger log = LoggerFactory.getLogger(UserManager.class);
 

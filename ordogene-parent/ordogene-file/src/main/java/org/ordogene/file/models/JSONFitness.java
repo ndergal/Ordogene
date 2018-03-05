@@ -5,6 +5,11 @@ import java.util.Objects;
 
 import org.ordogene.file.parser.Validable;
 
+/**
+ * POJO
+ * @author darwinners team
+ *
+ */
 public class JSONFitness implements Validable {
 	
 	private Type type;

@@ -10,6 +10,11 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * Class used to parse json in java object
+ * @author darwinners team
+ *
+ */
 public class Parser {
 
 	private Parser() {

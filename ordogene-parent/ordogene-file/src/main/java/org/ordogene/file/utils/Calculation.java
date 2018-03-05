@@ -9,7 +9,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class Calculation implements Validable {
 	
 	/**
-	 * 
+	 * POJO
+	 * @author darwinners team
+	 *
 	 */
 	private int id;
 	private String name;
