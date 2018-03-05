@@ -22,6 +22,8 @@ import io.jenetics.Phenotype;
 
 public class Drawer {
 	private final static Logger log = LoggerFactory.getLogger(Drawer.class);
+	
+	private Drawer() {}
 
 	static String buildHtmlTableHeader(String prefix, Object[][] content) {
 		int nbCol = 0;
