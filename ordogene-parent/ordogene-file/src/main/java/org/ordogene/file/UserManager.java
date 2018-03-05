@@ -24,7 +24,7 @@ public class UserManager {
 	 *            : name of the user to check
 	 * @return true if the user exists, false else.
 	 */
-	boolean checkUserExists(String username) {
+	public boolean checkUserExists(String username) {
 		if (username == null || username.isEmpty()) {
 			return false;
 		} else {
@@ -40,7 +40,7 @@ public class UserManager {
 	 *            : name of the user to add
 	 * @return true if the user has been added, false else.
 	 */
-	boolean createAnUser(String username) {
+	public boolean createAnUser(String username) {
 		if (username == null || username.isEmpty()) {
 			return false;
 		} else {
@@ -67,7 +67,7 @@ public class UserManager {
 	 *            : name of the user to add
 	 * @return true if the user has been added, false else.
 	 */
-	boolean removeUser(String username) {
+	public boolean removeUser(String username) {
 		if (username == null || username.equals("")) {
 			return false;
 		}

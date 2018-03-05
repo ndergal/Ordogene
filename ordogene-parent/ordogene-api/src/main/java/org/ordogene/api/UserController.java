@@ -1,5 +1,7 @@
 package org.ordogene.api;
 
+import java.security.SecureRandom;
+
 import org.ordogene.api.utils.ApiJsonResponseCreator;
 import org.ordogene.file.FileUtils;
 import org.ordogene.file.utils.ApiJsonResponse;
@@ -13,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class UserController {
+
+	private final static String ALPHA_NUM = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 	
 	/**
@@ -60,9 +64,17 @@ public class UserController {
 		int nbCharRandom = 7;
 		String randomId;
 		do {
-			randomId = FileUtils.generateRandomUserId(nbCharRandom);
+			randomId = generateRandomUserId(nbCharRandom);
 		} while (FileUtils.userExist(randomId));
 		return createUserGivenId(randomId);
+	}
+	
+	private static String generateRandomUserId(int nbChar) {
+		SecureRandom rnd = new SecureRandom();
+		StringBuilder sb = new StringBuilder(nbChar);
+		for (int i = 0; i < nbChar; i++)
+			sb.append(ALPHA_NUM.charAt(rnd.nextInt(ALPHA_NUM.length())));
+		return sb.toString();
 	}
 	
  

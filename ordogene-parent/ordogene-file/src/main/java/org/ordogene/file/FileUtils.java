@@ -93,15 +93,15 @@ public class FileUtils {
 	 * 
 	 * @param content
 	 *            : object to write in json
-	 * @param userId
+	 * @param username
 	 *            : id of the calculation owner
 	 * @param cid
 	 *            : id of the calculation to write in
 	 * @param calName
 	 *            : name of the calculation to write in
 	 */
-	public static void writeJsonInFile(Object content, String userId, int cid, String calName) throws IOException {
-		Path dest = Paths.get(getCalculationStatePath(userId, cid, calName));
+	public static void writeJsonInFile(Object content, String username, int cid, String calName) throws IOException {
+		Path dest = Paths.get(getCalculationStatePath(username, cid, calName));
 		if (dest.toFile().exists()) {
 			Files.delete(dest);
 		}
