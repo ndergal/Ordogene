@@ -17,7 +17,7 @@ import edu.emory.mathcs.backport.java.util.Arrays;
 public class UserManager {
 	private final static Logger log = LoggerFactory.getLogger(UserManager.class);
 
-	boolean checkUserExists(String username) {
+	public boolean checkUserExists(String username) {
 		if (username == null || username.isEmpty()) {
 			return false;
 		} else {
@@ -26,7 +26,7 @@ public class UserManager {
 		}
 	}
 
-	boolean createAnUser(String username) {
+	public boolean createAnUser(String username) {
 		if (username == null || username.isEmpty()) {
 			return false;
 		} else {
@@ -46,7 +46,7 @@ public class UserManager {
 		}
 	}
 
-	boolean removeUser(String username) {
+	public boolean removeUser(String username) {
 		if (username == null || username.equals("")) {
 			return false;
 		}

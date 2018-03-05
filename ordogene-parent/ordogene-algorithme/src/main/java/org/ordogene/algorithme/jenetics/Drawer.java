@@ -205,7 +205,8 @@ public class Drawer {
 		sb.append("<tbody>");
 		for (ActionGene[] row : toPrintData) {
 			sb.append("<tr>");
-			for (int i = 0; i < row.length; i++) {
+			int i = 0;
+			while( i < row.length) {
 				//COLOR
 				Color currentActionColor = null;
 				if (row[i] != null) {
@@ -244,7 +245,9 @@ public class Drawer {
 				
 				//GOTO END ACTION
 				if(currentActionDuration > 1) {
-					i = i + currentActionDuration - 1;
+					i += currentActionDuration;
+				} else {
+					i += 1;
 				}
 			}
 			sb.append("</tr>");

@@ -10,7 +10,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
@@ -23,9 +22,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import gui.ava.html.image.generator.HtmlImageGenerator;
 
 public class FileUtils {
-	
-	private final static String ALPHA_NUM = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-
 	private final static UserManager uh = new UserManager();
 	private final static CalculationManager ch = new CalculationManager();
 	
@@ -45,14 +41,6 @@ public class FileUtils {
 		return uh.removeUser(username);
 	}
 
-	public static String generateRandomUserId(int nbChar) {
-		SecureRandom rnd = new SecureRandom();
-		StringBuilder sb = new StringBuilder(nbChar);
-		for (int i = 0; i < nbChar; i++)
-			sb.append(ALPHA_NUM.charAt(rnd.nextInt(ALPHA_NUM.length())));
-		return sb.toString();
-	}
-
 	public static List<Calculation> getUserCalculations(String username) {
 		return ch.getCalculations(username);
 	}
@@ -61,8 +49,8 @@ public class FileUtils {
 		return ch.removeCalculation(username, cid, calName);
 	}
 
-	public static void writeJsonInFile(Object content, String userId, int cid, String calName) throws IOException {
-		Path dest = Paths.get(getCalculationStatePath(userId, cid, calName));
+	public static void writeJsonInFile(Object content, String username, int cid, String calName) throws IOException {
+		Path dest = Paths.get(getCalculationStatePath(username, cid, calName));
 		if (dest.toFile().exists()) {
 			Files.delete(dest);
 		}
@@ -96,11 +84,11 @@ public class FileUtils {
 		}
 	}
 
-	public static boolean saveResult(String html, Path directory) {
-		Path pngPath = directory.resolve("result.png");
-		Path htmlPath = directory.resolve("result.html");
+	public static boolean saveResult(String html, Path calculationDirectory) {
+		Path pngPath = calculationDirectory.resolve("result.png");
+		Path htmlPath = calculationDirectory.resolve("result.html");
 		try {
-			Files.createDirectories(directory);
+			Files.createDirectories(calculationDirectory);
 			if (htmlPath != null) {
 				Files.write(htmlPath, html.getBytes(StandardCharsets.UTF_8));
 			}
