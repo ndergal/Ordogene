@@ -123,10 +123,10 @@ public class CalculationHandler {
 	private void saveState(Calculation tmpCalc) {
 		try {
 			FileUtils.writeJsonInFile(tmpCalc, userId, tmpCalc.getId(), tmpCalc.getName());
-			logger.info(tmpCalc + " saved");
+			logger.info("{} saved",tmpCalc);
 		} catch (IOException e) {
 			logger.debug(Arrays.toString(e.getStackTrace()));
-			logger.error(tmpCalc + " not saved.");
+			logger.error("{} not saved",tmpCalc);
 		}
 	}
 

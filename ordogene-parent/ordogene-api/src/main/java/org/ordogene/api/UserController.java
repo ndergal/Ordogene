@@ -58,7 +58,7 @@ public class UserController {
 	@ResponseBody
 	public ResponseEntity<ApiJsonResponse> createUserRandomId() {
 		int nbCharRandom = 7;
-		String randomId = FileUtils.generateRandomUserId(nbCharRandom);
+		String randomId;
 		do {
 			randomId = FileUtils.generateRandomUserId(nbCharRandom);
 		} while (FileUtils.userExist(randomId));

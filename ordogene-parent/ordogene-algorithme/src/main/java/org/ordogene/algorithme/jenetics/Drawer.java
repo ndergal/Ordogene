@@ -66,9 +66,6 @@ public class Drawer {
 				realMaxSize = startTime + action.getAllele().getTime();
 			}
 			nextIndex++;
-
-			int[][] toPrintArray2 = new int[indexedList.size()][];
-			toPrintArray2 = indexedList.toArray(toPrintArray2);
 		}
 
 		// remove all "-1" useless cells
