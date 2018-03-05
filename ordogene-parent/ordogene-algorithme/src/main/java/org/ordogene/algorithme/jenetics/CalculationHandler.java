@@ -135,7 +135,7 @@ public class CalculationHandler {
 		String htmlTableHeader = Drawer.buildHtmlTableHeader("", actionGeneArray);
 		Schedule s = (Schedule) best.getGenotype().getChromosome();
 		String htmlArray = Drawer.htmlTableBuilder(htmlTableHeader, actionGeneArray,
-				model, s.getEndEnv(), false);
+				model, best.getFitness(), s.getEndEnv(), false);
 		logger.info("try to save : pngFile and htmlFile ... ");
 		if (FileUtils.saveResult(htmlArray, Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationId, model.getName())))) {
 			logger.info(" Success ");

@@ -125,7 +125,7 @@ public class Drawer {
 	}
 
 	static String htmlTableBuilder(String header,
-			ActionGene[][] toPrintData, Model model, Environment endEnvironment, boolean display) {
+			ActionGene[][] toPrintData, Model model, Long fitness, Environment endEnvironment, boolean display) {
 		Map<Action, Color> colorAction = new HashMap<>();
 		StringBuilder sb = new StringBuilder();
 		
@@ -199,6 +199,7 @@ public class Drawer {
 			sb.append("<li>").append(entity.getQuantity()).append(" x ").append(entity.getName()).append("</li>");
 		}
 		sb.append("</ul></div>");
+		sb.append("<p>Fitness = ").append(fitness).append("</p>");
 		sb.append("</div>");
 		sb.append("<table>");
 		sb.append("<thead>").append(header).append("</thead>");
