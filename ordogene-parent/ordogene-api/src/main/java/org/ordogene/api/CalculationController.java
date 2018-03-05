@@ -57,7 +57,7 @@ public class CalculationController {
 				try {
 					masterAlgorithme.updateCalculation(c, userId);
 				} catch (InternalError e) {
-					System.err.println("Problem with calculation format informations");
+					log.error("Problem with calculation format informations");
 					return;
 				}
 			});
