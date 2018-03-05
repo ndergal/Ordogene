@@ -11,6 +11,7 @@ import org.ordogene.algorithme.master.ThreadHandler;
 import org.ordogene.file.FileUtils;
 import org.ordogene.file.models.Type;
 import org.ordogene.file.utils.Calculation;
+import org.ordogene.file.utils.Const;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,7 +93,8 @@ public class CalculationHandler {
 			}
 
 			long currentTime = System.currentTimeMillis();
-			if (lastSave + 60_000 < currentTime) {
+			int interval = Integer.parseInt(Const.getConst().getOrDefault("ResultSaveInterval", "60")) * 1000;
+			if (lastSave + interval < currentTime) {
 				Calculation tmpCalc = new Calculation();
 				
 				lastSave = currentTime;
