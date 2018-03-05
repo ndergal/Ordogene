@@ -25,6 +25,12 @@ public class Drawer {
 	
 	private Drawer() {}
 
+	/**
+	 * Build a html table header with a prefix (and the column number) for each column
+	 * @param prefix : defined prefix 
+	 * @param content : html table content
+	 * @return
+	 */
 	static String buildHtmlTableHeader(String prefix, Object[][] content) {
 		int nbCol = 0;
 		for (Object[] aga : content) {
@@ -42,6 +48,11 @@ public class Drawer {
 		return sb.toString();
 	}
 
+	/**
+	 * Build a 2d array which contents all the ActionGene from a Phenotype<ActionGene, Long>
+	 * @param individu : Phenotype<ActionGene, Long> to convert in the 2D array
+	 * @return
+	 */
 	static ActionGene[][] buildStringActionMatrix(Phenotype<ActionGene, Long> individu) { // maxSize = model.getslot()
 		Schedule s = (Schedule) individu.getGenotype().getChromosome();
 		List<ActionGene> actions = s.stream().collect(Collectors.toList());
@@ -124,6 +135,16 @@ public class Drawer {
 		return new Color(rgb);
 	}
 
+	/**
+	 * build a html table in String format
+	 * @param header : header of the table
+	 * @param toPrintData : data (ActionGene 2D array) to put in the table
+	 * @param model : model of the corresponding individual
+	 * @param fitness : fitness of the corresponding individual
+	 * @param endEnvironment
+	 * @param display : display or not the table at the end of generation
+	 * @return
+	 */
 	static String htmlTableBuilder(String header,
 			ActionGene[][] toPrintData, Model model, Long fitness, Environment endEnvironment, boolean display) {
 		Map<Action, Color> colorAction = new HashMap<>();

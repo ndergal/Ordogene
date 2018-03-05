@@ -19,6 +19,11 @@ import org.slf4j.LoggerFactory;
 public class CalculationManager {
 	private final static Logger log = LoggerFactory.getLogger(CalculationManager.class);
 
+	/**
+	 * 
+	 * @param username 
+	 * @return return the calculation of the user specified in argument
+	 */
 	public List<Calculation> getCalculations(String username) {
 		List<Calculation> res = new ArrayList<>();
 		if (username == null || username.equals("")) {
@@ -51,6 +56,13 @@ public class CalculationManager {
 		return res;
 	}
 
+	/**
+	 * remove the calculation specified
+	 * @param username : specified calculation owner
+	 * @param calculationID : id of the calculation to delete
+	 * @param calculationName : name of the calculation to delete
+	 * @return true if success, false else.
+	 */
 	public boolean removeCalculation(String username, int calculationID, String calculationName) {
 		if (username == null || username.equals("")) {
 			return false;

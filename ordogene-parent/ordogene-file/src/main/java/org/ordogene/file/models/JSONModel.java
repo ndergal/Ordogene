@@ -26,6 +26,10 @@ public class JSONModel implements Validable {
 				&& fitness.isValid() && this.Consistency() && name != null;
 	}
 
+	/**
+	 * 
+	 * @return true if the actual model is full and coherent, false otherwise
+	 */
 	private boolean Consistency() {
 		Set<String> all = new HashSet<String>();
 		Set<String> contained = new HashSet<String>();

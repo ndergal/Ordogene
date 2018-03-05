@@ -25,6 +25,11 @@ public class Const {
 		
 	}
 
+	/**
+	 * 
+	 * @param configFilePath : path to the config file to load. The file content must be in Json format
+	 * @return true if the config file has been loaded and parsed, false otherwise.
+	 */
 	 
 	public static boolean loadConfig(String configFilePath) {
 

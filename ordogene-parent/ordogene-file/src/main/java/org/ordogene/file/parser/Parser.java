@@ -15,18 +15,52 @@ public class Parser {
 	private Parser() {
 	}
 
+	/**
+	 * 
+	 * @param jsonPath : Path of the file to parse
+	 * @param classe : class of the Object to deserialize into <- Must implements Validable.
+	 * @return parsed file in a Validable object.
+	 * @throws IOException
+	 * @throws JsonParseException
+	 * @throws JsonMappingException
+	 * @throws IllegalAccessException
+	 * @throws UnmarshalException : if all the fields are not presents in the JSON.
+	 */
 	public static Validable parseJsonFile(Path jsonPath, Class<? extends Validable> classe)
 			throws IOException, JsonParseException, JsonMappingException, IllegalAccessException, UnmarshalException {
 		byte[] jsonData = Files.readAllBytes(jsonPath);
 		return parseJsonFile(jsonData, classe);
 	}
 
+
+	/**
+	 * 
+	 * @param jsonPath : String to parse
+	 * @param classe : class of the Object to deserialize into <- Must implements Validable.
+	 * @return parsed file in a Validable object.
+	 * @throws IOException
+	 * @throws JsonParseException
+	 * @throws JsonMappingException
+	 * @throws IllegalAccessException
+	 * @throws UnmarshalException : if all the fields are not presents in the JSON.
+	 */
 	public static Validable parseJsonFile(String jsonString, Class<? extends Validable> classe)
 			throws JsonParseException, JsonMappingException, IOException, UnmarshalException {
 		byte[] jsonData = jsonString.getBytes();
 		return parseJsonFile(jsonData, classe);
 	}
 
+	/**
+	 * 
+	 * @param jsonPath : byte array to parse
+	 * @param classe : class of the Object to deserialize into <- Must implements Validable.
+	 * @return parsed file in a Validable object.
+	 * @throws IOException
+	 * @throws JsonParseException
+	 * @throws JsonMappingException
+	 * @throws IllegalAccessException
+	 * @throws UnmarshalException : if all the fields are not presents in the JSON.
+	 */
 	public static Validable parseJsonFile(byte[] jsonData, Class<? extends Validable> classe)
 			throws JsonParseException, JsonMappingException, IOException, UnmarshalException {
 		ObjectMapper objectMapper = new ObjectMapper();
