@@ -31,18 +31,18 @@ public class UserManager {
 			return false;
 		} else {
 			Path newUserPath = Paths.get(Const.getConst().get("ApplicationPath") + File.separatorChar + username);
-			if(Files.exists(newUserPath)) {
+			if(newUserPath.toFile().exists()) {
 				return false;
 			}
 			try {
-				log.info("Create new user " + username);
+				log.info("Create new user {}", username);
 				Files.createDirectories(newUserPath);
 			} catch (IOException e) {
 				log.error("... failed :");
 				log.debug(Arrays.toString(e.getStackTrace()));
 				return false;
 			}
-			return (Files.exists(Paths.get(Const.getConst().get("ApplicationPath") + File.separatorChar + username)));
+			return (Paths.get(Const.getConst().get("ApplicationPath") + File.separatorChar + username).toFile().exists());
 		}
 	}
 

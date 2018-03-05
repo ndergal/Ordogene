@@ -13,7 +13,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class Parser {
 
 	private Parser() {
-		// TODO Auto-generated constructor stub
 	}
 
 	public static Validable parseJsonFile(Path jsonPath, Class<? extends Validable> classe)

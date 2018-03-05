@@ -9,11 +9,9 @@ import java.nio.file.Paths;
 
 import javax.xml.bind.UnmarshalException;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.ordogene.file.models.JSONModel;
 import org.ordogene.file.parser.Parser;
-import org.ordogene.file.utils.Const;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
