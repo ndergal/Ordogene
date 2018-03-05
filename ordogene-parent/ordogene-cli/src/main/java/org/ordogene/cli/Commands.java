@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
@@ -57,24 +58,24 @@ public class Commands {
 			Scanner scanner = new Scanner(System.in);
 			String choice = scanner.nextLine();
 			switch (choice) {
-				case "":
-				case "n":
-				case "N":
-				case "no":
-					do {
-						log.info("Enter your group id : ");
-						id = scanner.nextLine();
-					} while (id.isEmpty() ? true : !getUser(id));
-					break loop;
-				case "y":
-				case "Y":
-				case "yes":
-					if (!createUser()) {
-						log.error("Problem with the server: user creation failed");
-						System.exit(1);
-					}
-					break loop;
-				default:
+			case "":
+			case "n":
+			case "N":
+			case "no":
+				do {
+					log.info("Enter your group id : ");
+					id = scanner.nextLine();
+				} while (id.isEmpty() ? true : !getUser(id));
+				break loop;
+			case "y":
+			case "Y":
+			case "yes":
+				if (!createUser()) {
+					log.error("Problem with the server: user creation failed");
+					System.exit(1);
+				}
+				break loop;
+			default:
 			}
 		}
 		log.info("\n");
@@ -122,10 +123,10 @@ public class Commands {
 		String jsonContentRead;
 		try {
 			jsonContentRead = FileUtils.readFile(model);
-		} catch (IOException | IllegalArgumentException e ) {
+		} catch (IOException | IllegalArgumentException e) {
 			return e.getMessage();
 		}
-		
+
 		// Request
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
@@ -137,7 +138,7 @@ public class Commands {
 			int cid = response.getBody().getCid();
 			return "Calculation '" + cid + "' launched";
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
-			 return e.getStatusCode() + " -- " + e.getStatusText();
+			return e.getStatusCode() + " -- " + e.getStatusText();
 		} catch (RestClientException e) {
 			log.debug(e.getMessage());
 			return PROBLEM_WITH_THE_COMMUNICATION_BETWEEN_CLIENT_AND_SERVER;
@@ -219,7 +220,6 @@ public class Commands {
 			// Writing the image
 
 			String base64 = response.getBody().getBase64img();
-			
 			if (html) {
 				FileUtils.saveHtmlFromBase64(base64, path.toAbsolutePath().toString());
 				return "The html of the result is downloaded at " + dst;
