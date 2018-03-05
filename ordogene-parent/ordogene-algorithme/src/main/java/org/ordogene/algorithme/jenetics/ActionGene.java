@@ -4,6 +4,11 @@ import org.ordogene.algorithme.models.Action;
 
 import io.jenetics.Gene;
 
+/**
+ * POJO : only have an action and a startTime
+ * @author darwinners team
+ *
+ */
 public class ActionGene implements Gene<Action, ActionGene> {
 
 	private final Action action;

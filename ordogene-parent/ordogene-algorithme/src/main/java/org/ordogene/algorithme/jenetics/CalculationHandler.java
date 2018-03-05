@@ -22,9 +22,16 @@ import io.jenetics.TournamentSelector;
 import io.jenetics.engine.Engine;
 import io.jenetics.engine.EvolutionResult;
 
+/**
+ * Handle one calculation per instance
+ * 
+ * @author darwinners team
+ *
+ * 
+ */
 public class CalculationHandler {
 	private final Logger logger = LoggerFactory.getLogger(CalculationHandler.class);
-	
+
 	private final int POPULATION_SIZE = 100;
 	private final double CHANCE_TO_STOP_SCHEDULE_CREATION = 0.002;
 
@@ -41,9 +48,13 @@ public class CalculationHandler {
 		this.calculationId = calculationId;
 	}
 
+	/**
+	 * launch its calculation
+	 */
 	public void launchCalculation() {
 
-		FileUtils.createCalculationDirectory(Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationId, model.getName())));
+		FileUtils.createCalculationDirectory(
+				Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationId, model.getName())));
 
 		Engine<ActionGene, Long> engine = Engine
 				.builder(this::fitness, Genotype.of(Schedule.of(model, CHANCE_TO_STOP_SCHEDULE_CREATION), 1))
@@ -96,7 +107,7 @@ public class CalculationHandler {
 			int interval = Integer.parseInt(Const.getConst().getOrDefault("ResultSaveInterval", "60")) * 1000;
 			if (lastSave + interval < currentTime) {
 				Calculation tmpCalc = new Calculation();
-				
+
 				lastSave = currentTime;
 				lastSavedIteration = generation.getGeneration();
 				tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, calculationId,
@@ -125,10 +136,10 @@ public class CalculationHandler {
 	private void saveState(Calculation tmpCalc) {
 		try {
 			FileUtils.writeJsonInFile(tmpCalc, userId, tmpCalc.getId(), tmpCalc.getName());
-			logger.info("{} saved",tmpCalc);
+			logger.info("{} saved", tmpCalc);
 		} catch (IOException e) {
 			logger.debug(Arrays.toString(e.getStackTrace()));
-			logger.error("{} not saved",tmpCalc);
+			logger.error("{} not saved", tmpCalc);
 		}
 	}
 
@@ -136,10 +147,11 @@ public class CalculationHandler {
 		ActionGene[][] actionGeneArray = Drawer.buildStringActionMatrix(best);
 		String htmlTableHeader = Drawer.buildHtmlTableHeader("", actionGeneArray);
 		Schedule s = (Schedule) best.getGenotype().getChromosome();
-		String htmlArray = Drawer.htmlTableBuilder(htmlTableHeader, actionGeneArray,
-				model, best.getFitness(), s.getEndEnv(), false);
+		String htmlArray = Drawer.htmlTableBuilder(htmlTableHeader, actionGeneArray, model, best.getFitness(),
+				s.getEndEnv(), false);
 		logger.info("try to save : pngFile and htmlFile ... ");
-		if (FileUtils.saveResult(htmlArray, Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationId, model.getName())))) {
+		if (FileUtils.saveResult(htmlArray,
+				Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationId, model.getName())))) {
 			logger.info(" Success ");
 		} else {
 			logger.info(" Fail ");
@@ -176,7 +188,7 @@ public class CalculationHandler {
 	 * Fonction de fitness de l'engine
 	 * 
 	 * @param ind
-	 * @return
+	 * @return the fitness of this calculation
 	 */
 	public Long fitness(Genotype<ActionGene> ind) {
 		long startFitness = model.getFitness().evalEnv(model.getStartEnvironment());
