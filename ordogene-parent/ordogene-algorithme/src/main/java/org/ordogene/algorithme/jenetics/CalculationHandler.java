@@ -133,9 +133,9 @@ public class CalculationHandler {
 	private void saveBest(Phenotype<ActionGene, Long> best) {
 		ActionGene[][] actionGeneArray = Drawer.buildStringActionMatrix(best);
 		String htmlTableHeader = Drawer.buildHtmlTableHeader("", actionGeneArray);
-
-		String htmlArray = Drawer.htmlTableBuilder(model.getName(), htmlTableHeader, actionGeneArray,
-				model, false);
+		Schedule s = (Schedule) best.getGenotype().getChromosome();
+		String htmlArray = Drawer.htmlTableBuilder(htmlTableHeader, actionGeneArray,
+				model, s.getEndEnv(), false);
 		logger.info("try to save : pngFile and htmlFile ... ");
 		if (FileUtils.saveResult(htmlArray, Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationId, model.getName())))) {
 			logger.info(" Success ");
