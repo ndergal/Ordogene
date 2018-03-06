@@ -16,9 +16,19 @@ import org.ordogene.file.utils.Const;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Handle calculations : get as list, or remove
+ * @author darwinners team
+ *
+ */
 public class CalculationManager {
 	private final static Logger log = LoggerFactory.getLogger(CalculationManager.class);
 
+	/**
+	 * 
+	 * @param username 
+	 * @return return the calculation of the user specified in argument
+	 */
 	public List<Calculation> getCalculations(String username) {
 		List<Calculation> res = new ArrayList<>();
 		if (username == null || username.equals("")) {
@@ -51,13 +61,20 @@ public class CalculationManager {
 		return res;
 	}
 
-	public boolean removeCalculation(String username, int calculationID, String calculationName) {
+	/**
+	 * remove the calculation specified
+	 * @param username : specified calculation owner
+	 * @param calculationID : id of the calculation to delete
+	 * @param calculationName : name of the calculation to delete
+	 * @return true if success, false else.
+	 */
+	public boolean removeCalculation(String username, int cid, String cName) {
 		if (username == null || username.equals("")) {
 			return false;
 		}
 
 		File todelete = new File(Const.getConst().get("ApplicationPath") + File.separatorChar + username
-				+ File.separatorChar + calculationID + "_" + calculationName);
+				+ File.separatorChar + cid + "_" + cName);
 		if(!todelete.exists()) {
 			return false;
 		}

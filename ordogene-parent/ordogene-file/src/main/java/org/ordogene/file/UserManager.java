@@ -14,9 +14,21 @@ import org.slf4j.LoggerFactory;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
 
+/**
+ * Handle Users : check existency, add and remove.
+ * @author darwinners team
+ *
+ */
 public class UserManager {
 	private final static Logger log = LoggerFactory.getLogger(UserManager.class);
 
+	/**
+	 * check if the given user exist on the server
+	 * 
+	 * @param username
+	 *            : name of the user to check
+	 * @return true if the user exists, false else.
+	 */
 	public boolean checkUserExists(String username) {
 		if (username == null || username.isEmpty()) {
 			return false;
@@ -26,7 +38,14 @@ public class UserManager {
 		}
 	}
 
-	public boolean createAnUser(String username) {
+	/**
+	 * add an user on the server
+	 * 
+	 * @param username
+	 *            : name of the user to add
+	 * @return true if the user has been added, false else.
+	 */
+	public boolean createUser(String username) {
 		if (username == null || username.isEmpty()) {
 			return false;
 		} else {
@@ -46,6 +65,13 @@ public class UserManager {
 		}
 	}
 
+	/**
+	 * remove an user on the server
+	 * 
+	 * @param username
+	 *            : name of the user to add
+	 * @return true if the user has been added, false else.
+	 */
 	public boolean removeUser(String username) {
 		if (username == null || username.equals("")) {
 			return false;

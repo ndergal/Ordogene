@@ -11,6 +11,7 @@ import org.ordogene.algorithme.master.ThreadHandler;
 import org.ordogene.file.FileUtils;
 import org.ordogene.file.models.Type;
 import org.ordogene.file.utils.Calculation;
+import org.ordogene.file.utils.Const;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,28 +22,38 @@ import io.jenetics.TournamentSelector;
 import io.jenetics.engine.Engine;
 import io.jenetics.engine.EvolutionResult;
 
+/**
+ * Handle one calculation per instance
+ * 
+ * @author darwinners team
+ *
+ * 
+ */
 public class CalculationHandler {
 	private final Logger logger = LoggerFactory.getLogger(CalculationHandler.class);
-	
+
 	private final int POPULATION_SIZE = 100;
 	private final double CHANCE_TO_STOP_SCHEDULE_CREATION = 0.002;
 
 	private final Date currentDate = new Date();
 	private final ThreadHandler th;
 	private final Model model;
-	private final String userId;
-	private final int calculationId;
+	private final String username;
+	private final int cid;
 
-	public CalculationHandler(ThreadHandler th, Model model, String userId, int calculationId) {
+	public CalculationHandler(ThreadHandler th, Model model, String username, int cid) {
 		this.th = th;
 		this.model = model;
-		this.userId = userId;
-		this.calculationId = calculationId;
+		this.username = username;
+		this.cid = cid;
 	}
 
+	/**
+	 * launch its calculation
+	 */
 	public void launchCalculation() {
 
-		FileUtils.createCalculationDirectory(Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationId, model.getName())));
+		FileUtils.createCalculationDirectory(Paths.get(FileUtils.getCalculationDirectoryPath(username, cid, model.getName())));
 
 		Engine<ActionGene, Long> engine = Engine
 				.builder(this::fitness, Genotype.of(Schedule.of(model, CHANCE_TO_STOP_SCHEDULE_CREATION), 1))
@@ -92,12 +103,13 @@ public class CalculationHandler {
 			}
 
 			long currentTime = System.currentTimeMillis();
-			if (lastSave + 60_000 < currentTime) {
+			int interval = Integer.parseInt(Const.getConst().getOrDefault("ResultSaveInterval", "60")) * 1000;
+			if (lastSave + interval < currentTime) {
 				Calculation tmpCalc = new Calculation();
 				
 				lastSave = currentTime;
 				lastSavedIteration = generation.getGeneration();
-				tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, calculationId,
+				tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, cid,
 						model.getName(), best.getFitness());
 
 				saveBest(best);
@@ -107,12 +119,12 @@ public class CalculationHandler {
 		// Create a calculation information to saved it on disk
 		Calculation tmpCalc = new Calculation();
 		if (best != null) {
-			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, calculationId,
+			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, cid,
 					model.getName(), best.getFitness());
 
 			saveBest(best);
 		} else {
-			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, calculationId,
+			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, cid,
 					model.getName(), 0);
 		}
 
@@ -122,11 +134,11 @@ public class CalculationHandler {
 
 	private void saveState(Calculation tmpCalc) {
 		try {
-			FileUtils.writeJsonInFile(tmpCalc, userId, tmpCalc.getId(), tmpCalc.getName());
-			logger.info("{} saved",tmpCalc);
+			FileUtils.writeJsonInFile(tmpCalc, username, tmpCalc.getId(), tmpCalc.getName());
+			logger.info("{} saved", tmpCalc);
 		} catch (IOException e) {
 			logger.debug(Arrays.toString(e.getStackTrace()));
-			logger.error("{} not saved",tmpCalc);
+			logger.error("{} not saved", tmpCalc);
 		}
 	}
 
@@ -134,10 +146,10 @@ public class CalculationHandler {
 		ActionGene[][] actionGeneArray = Drawer.buildStringActionMatrix(best);
 		String htmlTableHeader = Drawer.buildHtmlTableHeader("", actionGeneArray);
 		Schedule s = (Schedule) best.getGenotype().getChromosome();
-		String htmlArray = Drawer.htmlTableBuilder(htmlTableHeader, actionGeneArray,
-				model, best.getFitness(), s.getEndEnv(), false);
+		String htmlArray = Drawer.htmlTableBuilder(htmlTableHeader, actionGeneArray, model, best.getFitness(),
+				s.getEndEnv(), false);
 		logger.info("try to save : pngFile and htmlFile ... ");
-		if (FileUtils.saveResult(htmlArray, Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationId, model.getName())))) {
+		if (FileUtils.saveResult(htmlArray, Paths.get(FileUtils.getCalculationDirectoryPath(username, cid, model.getName())))) {
 			logger.info(" Success ");
 		} else {
 			logger.info(" Fail ");
@@ -160,7 +172,7 @@ public class CalculationHandler {
 	 * @param value
 	 * @return
 	 */
-	public Long fitnessScaler(Long value) {
+	private Long fitnessScaler(Long value) {
 		if (Type.value.equals(model.getFitness().getType())) {
 			if (value == model.getFitness().getValue()) {
 				return Long.MAX_VALUE;
@@ -176,7 +188,7 @@ public class CalculationHandler {
 	 * @param ind
 	 * @return
 	 */
-	public Long fitness(Genotype<ActionGene> ind) {
+	private Long fitness(Genotype<ActionGene> ind) {
 		long startFitness = model.getFitness().evalEnv(model.getStartEnvironment());
 		long transformationFitness = ind.stream().flatMap(c -> c.stream())
 				.mapToLong(ag -> model.getFitness().eval(ag.getAllele())).sum();
