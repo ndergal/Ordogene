@@ -215,21 +215,24 @@ public class Commands {
 		// Request
 		ResponseEntity<ApiJsonResponse> response = null;
 		try {
-			response = restTemplate.exchange("/" + id + CALCULATIONS + cid, HttpMethod.GET, null,
-					ApiJsonResponse.class);
 
-			// Writing the image
-
-			String base64 = response.getBody().getBase64img();
 			if (html) {
+				response = restTemplate.exchange("/" + id + CALCULATIONS + cid + "/html", HttpMethod.GET, null,
+						ApiJsonResponse.class);
+				// Writing the html
+				String base64 = response.getBody().getBase64img();
 				FileUtils.saveHtmlFromBase64(base64, path.toAbsolutePath().toString());
 				return "The html of the result is downloaded at " + dst;
 
 			} else {
+				response = restTemplate.exchange("/" + id + CALCULATIONS + cid, HttpMethod.GET, null,
+						ApiJsonResponse.class);
+				// Writing the image
+				String base64 = response.getBody().getBase64img();
 				FileUtils.saveImageFromBase64(base64, path.toAbsolutePath().toString());
 				return "The image of the result is downloaded at " + dst;
 			}
-			
+
 		} catch (IOException e) {
 			// IOException or NoSuchFileException
 			return e.getMessage();
