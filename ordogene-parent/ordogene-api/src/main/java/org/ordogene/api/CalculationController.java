@@ -99,6 +99,10 @@ public class CalculationController {
 					HttpStatus.BAD_REQUEST);
 		} else {
 			Calculation calcToDelete = optCalc.get();
+			if(masterAlgorithme.isRunning(calculationId)) {
+				return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.calculationIDNotExist(calculationId),
+						HttpStatus.BAD_REQUEST);
+			}
 			if (FileUtils.removeUserCalculation(userId,calcToDelete.getId(),calcToDelete.getName())) {
 				return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(userId, calculationId, null, null, null),
 						HttpStatus.OK);

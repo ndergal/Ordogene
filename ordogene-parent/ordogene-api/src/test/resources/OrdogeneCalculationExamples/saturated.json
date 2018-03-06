@@ -1,0 +1,45 @@
+{
+"name" : "saturated.json",
+"slots" : 140,
+"exec_time" : 10000,
+"environment" : [
+{"name" : "Employee", "quantity" : 0},
+{"name" : "Product", "quantity" : 0},
+{"name" : "Money", "quantity" : 0},
+{"name" : "Turnover", "quantity" : 0}
+],
+"actions" : [
+  {"name" : "Recruit", "time" : 15,
+     "input" : [
+       { "name" : "Money", "quantity" : 6000, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "Employee", "quantity" : 1}
+     ]
+  },
+  {"name" : "Build", "time" : 1,
+     "input" : [
+       { "name" : "Employee", "quantity" : 1, "relation" : "p" },
+       { "name" : "Money", "quantity" : 150, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "Product", "quantity" : 1}
+     ]
+  },
+  {"name" : "Sell", "time" : 1,
+     "input" : [
+       { "name" : "Product", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "Money", "quantity" : 450},
+       {"name" : "Turnover", "quantity" : 450}
+     ]
+  }
+],
+"fitness" : {
+"type" : "max",
+"operands" : [
+{"name" : "Turnover", "coef" : 1}
+]
+}
+}
