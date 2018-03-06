@@ -16,6 +16,7 @@ import javax.xml.bind.UnmarshalException;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.ordogene.file.utils.Calculation;
 import org.ordogene.file.utils.Const;
@@ -188,6 +189,7 @@ public class MasterTest {
 		Assertions.assertThat(m.compute(userIdTest, JSONmodel)).isNull();
 	}
 
+	@Ignore
 	@Test
 	public void updateCalculationTest_OK_isRunning() throws Exception {
 		Master m = new Master();
