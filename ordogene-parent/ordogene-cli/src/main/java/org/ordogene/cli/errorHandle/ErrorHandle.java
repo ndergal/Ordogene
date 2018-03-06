@@ -18,24 +18,37 @@ public class ErrorHandle extends DefaultResponseErrorHandler {
 	@Override
 	public void handleError(ClientHttpResponse response) throws IOException {
 		HttpStatus statusCode = getHttpStatusCode(response);
+		byte[] responseBody = getResponseBody(response);
+		String error = extractResponseError(responseBody);
 		switch (statusCode.series()) {
-		case CLIENT_ERROR:
-			byte[] responseBody = getResponseBody(response);
-			String statusText = "";
-			try {
-				ApiJsonResponse ajr = (ApiJsonResponse) Parser.parseJsonFile(responseBody, ApiJsonResponse.class);
-				statusText = ajr.getError();
-			} catch (UnmarshalException e) {
-				// Nothing to do because never append (normally)
-			}
-			throw new HttpClientErrorException(statusCode, statusText,
-					response.getHeaders(), responseBody, getCharset(response));
-		case SERVER_ERROR:
-			throw new HttpServerErrorException(statusCode, response.getStatusText(),
-					response.getHeaders(), getResponseBody(response), getCharset(response));
-		default:
-			throw new RestClientException("Unknown status code [" + statusCode + "]");
+			case CLIENT_ERROR:
+				if(error == null) {
+					throw new HttpClientErrorException(statusCode, error,
+							response.getHeaders(), responseBody, getCharset(response));
+				} else {
+					throw new HttpClientErrorException(statusCode, response.getStatusText(),
+							response.getHeaders(), responseBody, getCharset(response));
+				}
+			case SERVER_ERROR:
+				if(error == null) {
+					throw new HttpServerErrorException(statusCode, error,
+							response.getHeaders(), responseBody, getCharset(response));
+				} else {
+					throw new HttpServerErrorException(statusCode, response.getStatusText(),
+							response.getHeaders(), responseBody, getCharset(response));
+				}
+			default:
+				throw new RestClientException("Unknown status code [" + statusCode + "]");
+		}
 	}
+	
+	private String extractResponseError(byte[] responseBody) {
+		try {
+			ApiJsonResponse ajr = (ApiJsonResponse) Parser.parseJsonFile(responseBody, ApiJsonResponse.class);
+			return ajr.getError();
+		} catch (UnmarshalException | IOException e) {
+			return null;
+		}
 	}
 
 }

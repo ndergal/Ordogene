@@ -54,6 +54,8 @@ public class CalculationHandler {
 	public void launchCalculation() {
 
 		FileUtils.createCalculationDirectory(Paths.get(FileUtils.getCalculationDirectoryPath(username, cid, model.getName())));
+		
+		th.getCalculation().setCalculation(currentDate.getTime(), 0, 0, model.getExecTime(), cid, model.getName(), 0);
 
 		Engine<ActionGene, Long> engine = Engine
 				.builder(this::fitness, Genotype.of(Schedule.of(model, CHANCE_TO_STOP_SCHEDULE_CREATION), 1))
@@ -90,17 +92,16 @@ public class CalculationHandler {
 				// Get the message
 				String cmd = th.threadFromMaster();
 				// If the message is state, give informations
-				if (cmd != null && cmd.equals("state")) {
-					String msg = constructStateString(iteration, maxIteration, lastSavedIteration, best.getFitness());
-					th.threadToMaster(msg.toString());
-					// If the message is interrupt, stop the loop
-				} else if (cmd != null && cmd.equals("interrupt")) {
+				// If the message is interrupt, stop the loop
+				if (cmd != null && cmd.equals("interrupt")) {
 					interupted = true;
 				}
 			} catch (InterruptedException e) {
 				interupted = true;
 				Thread.currentThread().interrupt();
 			}
+			
+			updateState(iteration, lastSavedIteration, best.getFitness());
 
 			long currentTime = System.currentTimeMillis();
 			int interval = Integer.parseInt(Const.getConst().getOrDefault("ResultSaveInterval", "60")) * 1000;
@@ -132,6 +133,13 @@ public class CalculationHandler {
 		saveState(tmpCalc);
 	}
 
+	private void updateState(int iterationNumber, long lastIterationSaved, long fitnessSaved) {
+		Calculation c = th.getCalculation();
+		c.setIterationNumber(iterationNumber);
+		c.setLastIterationSaved(lastIterationSaved);
+		c.setFitnessSaved(fitnessSaved);
+	}
+
 	private void saveState(Calculation tmpCalc) {
 		try {
 			FileUtils.writeJsonInFile(tmpCalc, username, tmpCalc.getId(), tmpCalc.getName());
@@ -154,16 +162,6 @@ public class CalculationHandler {
 		} else {
 			logger.info(" Fail ");
 		}
-	}
-
-	private String constructStateString(int iteration, int maxIter, long lastIterationSaved, long fitness) {
-		StringBuilder sb = new StringBuilder();
-		sb.append(currentDate.getTime()).append("_");
-		sb.append(iteration).append("_");
-		sb.append(lastIterationSaved).append("_");
-		sb.append(maxIter).append("_");
-		sb.append(fitness);
-		return sb.toString();
 	}
 
 	/**
