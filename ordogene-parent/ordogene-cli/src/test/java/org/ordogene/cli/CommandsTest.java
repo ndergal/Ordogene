@@ -10,6 +10,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Ignore;
@@ -85,12 +88,10 @@ public class CommandsTest {
 	public void testListCalculationsEmpty() {
 		ResponseEntity<ApiJsonResponse> re = mock(ResponseEntity.class);
 		ApiJsonResponse ajr = mock(ApiJsonResponse.class);
-		List<Calculation> list = mock(List.class);
 		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
 				.thenReturn(re);
 		when(re.getBody()).thenReturn(ajr);
-		when(ajr.getList()).thenReturn(list);
-		when(list.isEmpty()).thenReturn(true);
+		when(ajr.getList()).thenReturn(Collections.emptyList());
 		assertNull(commands.listCalculations());
 	}
 
@@ -98,7 +99,19 @@ public class CommandsTest {
 	public void testListCalculations() {
 		ResponseEntity<ApiJsonResponse> re = mock(ResponseEntity.class);
 		ApiJsonResponse ajr = mock(ApiJsonResponse.class);
-		List<Calculation> list = mock(List.class);
+		List<Calculation> list = new ArrayList<>();
+		Calculation c = mock(Calculation.class);
+		
+		list.add(c);
+		
+		when(c.getFitnessSaved()).thenReturn(10L);
+		when(c.getId()).thenReturn(84923213);
+		when(c.getIterationNumber()).thenReturn(42);
+		when(c.getLastIterationSaved()).thenReturn(31L);
+		when(c.getMaxIteration()).thenReturn(100);
+		when(c.getName()).thenReturn("name");
+		when(c.getStartTimestamp()).thenReturn((new Date()).getTime());
+		
 		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
 				.thenReturn(re);
 		when(re.getBody()).thenReturn(ajr);
