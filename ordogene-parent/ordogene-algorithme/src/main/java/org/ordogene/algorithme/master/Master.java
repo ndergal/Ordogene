@@ -101,6 +101,10 @@ public class Master {
 		}
 
 	}
+	
+	public boolean isRunning(int cid) {
+		return threadMap.containsKey(cid);
+	}
 
 	public void updateCalculation(Calculation cal, String username) {
 		ThreadHandler th = null;
