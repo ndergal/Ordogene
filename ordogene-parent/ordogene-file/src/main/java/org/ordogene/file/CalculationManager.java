@@ -68,13 +68,13 @@ public class CalculationManager {
 	 * @param calculationName : name of the calculation to delete
 	 * @return true if success, false else.
 	 */
-	public boolean removeCalculation(String username, int calculationID, String calculationName) {
+	public boolean removeCalculation(String username, int cid, String cName) {
 		if (username == null || username.equals("")) {
 			return false;
 		}
 
 		File todelete = new File(Const.getConst().get("ApplicationPath") + File.separatorChar + username
-				+ File.separatorChar + calculationID + "_" + calculationName);
+				+ File.separatorChar + cid + "_" + cName);
 		if(!todelete.exists()) {
 			return false;
 		}

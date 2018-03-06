@@ -20,7 +20,6 @@ import org.ordogene.file.models.Relation;
 import io.jenetics.util.ISeq;
 
 /**
- * POJO
  * @author darwinners team
  *
  */

@@ -58,10 +58,10 @@ public class Master {
 		this.maxThread = maxThread;
 	}
 
-	public Integer compute(String idUser, String jsonString)
+	public Integer compute(String username, String jsonString)
 			throws JsonParseException, JsonMappingException, UnmarshalException, IOException {
 
-		Objects.requireNonNull(idUser);
+		Objects.requireNonNull(username);
 		Objects.requireNonNull(jsonString);
 
 		synchronized (threadMap) {
@@ -79,7 +79,7 @@ public class Master {
 
 		ThreadHandler th = new ThreadHandler();
 
-		CalculationHandler ch = new CalculationHandler(th, model, idUser, calculationId);
+		CalculationHandler ch = new CalculationHandler(th, model, username, calculationId);
 
 		Thread t = new Thread(() -> {
 
@@ -100,7 +100,7 @@ public class Master {
 
 	}
 
-	public void updateCalculation(Calculation cal, String userId) {
+	public void updateCalculation(Calculation cal, String username) {
 		ThreadHandler th = null;
 		synchronized (threadMap) {
 			th = threadMap.get(cal.getId());
@@ -125,7 +125,7 @@ public class Master {
 			}
 		} else {
 			try {
-				String pathName = FileUtils.getCalculationStatePath(userId, cal.getId(), cal.getName());
+				String pathName = FileUtils.getCalculationStatePath(username, cal.getId(), cal.getName());
 				Calculation tmpCal = (Calculation) Parser.parseJsonFile(Paths.get(pathName), Calculation.class);
 				cal.setCalculation(tmpCal.getStartTimestamp(), tmpCal.getIterationNumber(),
 						tmpCal.getLastIterationSaved(), tmpCal.getMaxIteration(), cal.getId(), cal.getName(),
@@ -147,8 +147,8 @@ public class Master {
 		cal.setRunning(true);
 	}
 
-	public boolean interruptCalculation(int calculationId) {
-		ThreadHandler th = threadMap.get(calculationId);
+	public boolean interruptCalculation(int cid) {
+		ThreadHandler th = threadMap.get(cid);
 		if (th != null) {
 			// IsRunning
 			try {

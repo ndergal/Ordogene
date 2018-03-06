@@ -5,7 +5,6 @@ import org.ordogene.algorithme.models.Action;
 import io.jenetics.Gene;
 
 /**
- * POJO : only have an action and a startTime
  * @author darwinners team
  *
  */

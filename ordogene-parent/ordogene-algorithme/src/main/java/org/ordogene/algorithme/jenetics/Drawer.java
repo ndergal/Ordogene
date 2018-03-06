@@ -67,7 +67,7 @@ public class Drawer {
 	 *            : Phenotype<ActionGene, Long> to convert in the 2D array
 	 * @return
 	 */
-	static ActionGene[][] buildStringActionMatrix(Phenotype<ActionGene, Long> individu) { // maxSize = model.getslot()
+	public static ActionGene[][] buildStringActionMatrix(Phenotype<ActionGene, Long> individu) { // maxSize = model.getslot()
 		Schedule s = (Schedule) individu.getGenotype().getChromosome();
 		List<ActionGene> actions = s.stream().collect(Collectors.toList());
 		int maxSize = s.getModel().getSlots();
@@ -165,7 +165,7 @@ public class Drawer {
 	 *            : display or not the table at the end of generation
 	 * @return
 	 */
-	static String htmlTableBuilder(String header, ActionGene[][] toPrintData, Model model, Long fitness,
+	public static String htmlTableBuilder(String header, ActionGene[][] toPrintData, Model model, Long fitness,
 			Environment endEnvironment, boolean display) {
 		Map<Action, Color> colorAction = new HashMap<>();
 		StringBuilder sb = new StringBuilder();

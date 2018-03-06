@@ -45,7 +45,7 @@ public class UserManager {
 	 *            : name of the user to add
 	 * @return true if the user has been added, false else.
 	 */
-	public boolean createAnUser(String username) {
+	public boolean createUser(String username) {
 		if (username == null || username.isEmpty()) {
 			return false;
 		} else {

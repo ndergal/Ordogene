@@ -38,14 +38,14 @@ public class CalculationHandler {
 	private final Date currentDate = new Date();
 	private final ThreadHandler th;
 	private final Model model;
-	private final String userId;
-	private final int calculationId;
+	private final String username;
+	private final int cid;
 
-	public CalculationHandler(ThreadHandler th, Model model, String userId, int calculationId) {
+	public CalculationHandler(ThreadHandler th, Model model, String username, int cid) {
 		this.th = th;
 		this.model = model;
-		this.userId = userId;
-		this.calculationId = calculationId;
+		this.username = username;
+		this.cid = cid;
 	}
 
 	/**
@@ -53,8 +53,7 @@ public class CalculationHandler {
 	 */
 	public void launchCalculation() {
 
-		FileUtils.createCalculationDirectory(
-				Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationId, model.getName())));
+		FileUtils.createCalculationDirectory(Paths.get(FileUtils.getCalculationDirectoryPath(username, cid, model.getName())));
 
 		Engine<ActionGene, Long> engine = Engine
 				.builder(this::fitness, Genotype.of(Schedule.of(model, CHANCE_TO_STOP_SCHEDULE_CREATION), 1))
@@ -110,7 +109,7 @@ public class CalculationHandler {
 
 				lastSave = currentTime;
 				lastSavedIteration = generation.getGeneration();
-				tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, calculationId,
+				tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, cid,
 						model.getName(), best.getFitness());
 
 				saveBest(best);
@@ -120,12 +119,12 @@ public class CalculationHandler {
 		// Create a calculation information to saved it on disk
 		Calculation tmpCalc = new Calculation();
 		if (best != null) {
-			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, calculationId,
+			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, cid,
 					model.getName(), best.getFitness());
 
 			saveBest(best);
 		} else {
-			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, calculationId,
+			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, cid,
 					model.getName(), 0);
 		}
 
@@ -135,7 +134,7 @@ public class CalculationHandler {
 
 	private void saveState(Calculation tmpCalc) {
 		try {
-			FileUtils.writeJsonInFile(tmpCalc, userId, tmpCalc.getId(), tmpCalc.getName());
+			FileUtils.writeJsonInFile(tmpCalc, username, tmpCalc.getId(), tmpCalc.getName());
 			logger.info("{} saved", tmpCalc);
 		} catch (IOException e) {
 			logger.debug(Arrays.toString(e.getStackTrace()));
@@ -150,8 +149,7 @@ public class CalculationHandler {
 		String htmlArray = Drawer.htmlTableBuilder(htmlTableHeader, actionGeneArray, model, best.getFitness(),
 				s.getEndEnv(), false);
 		logger.info("try to save : pngFile and htmlFile ... ");
-		if (FileUtils.saveResult(htmlArray,
-				Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationId, model.getName())))) {
+		if (FileUtils.saveResult(htmlArray, Paths.get(FileUtils.getCalculationDirectoryPath(username, cid, model.getName())))) {
 			logger.info(" Success ");
 		} else {
 			logger.info(" Fail ");
@@ -174,7 +172,7 @@ public class CalculationHandler {
 	 * @param value
 	 * @return
 	 */
-	public Long fitnessScaler(Long value) {
+	private Long fitnessScaler(Long value) {
 		if (Type.value.equals(model.getFitness().getType())) {
 			if (value == model.getFitness().getValue()) {
 				return Long.MAX_VALUE;
@@ -190,7 +188,7 @@ public class CalculationHandler {
 	 * @param ind
 	 * @return the fitness of this calculation
 	 */
-	public Long fitness(Genotype<ActionGene> ind) {
+	private Long fitness(Genotype<ActionGene> ind) {
 		long startFitness = model.getFitness().evalEnv(model.getStartEnvironment());
 		long transformationFitness = ind.stream().flatMap(c -> c.stream())
 				.mapToLong(ag -> model.getFitness().eval(ag.getAllele())).sum();
