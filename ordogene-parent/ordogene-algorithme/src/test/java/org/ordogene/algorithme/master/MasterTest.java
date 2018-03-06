@@ -29,7 +29,7 @@ public class MasterTest {
 	String JSONmodel = "{\n" + 
 			"    \"name\" : \"small_strategy_game.json\",\n" + 
 			"    \"slots\" : 2,\n" + 
-			"    \"exec_time\" : 5,\n" + 
+			"    \"exec_time\" : 10,\n" + 
 			"    \"environment\" : [\n" + 
 			"	{\"name\" : \"Nexus\", \"quantity\" : 1},\n" + 
 			"	{\"name\" : \"Peon\", \"quantity\" : 1},\n" + 
@@ -195,7 +195,7 @@ public class MasterTest {
 		int calculationId = m.compute(userIdTest, JSONmodel);
 		
 		// Just wait computation initialization
-		Thread.currentThread().sleep(100);
+		Thread.currentThread().sleep(500);
 		
 		Calculation toTest = new Calculation();
 		toTest.setId(calculationId);
