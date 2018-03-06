@@ -3,9 +3,9 @@
 "slots" : 140,
 "exec_time" : 10000,
 "environment" : [
-{"name" : "Employee", "quantity" : 0},
+{"name" : "Employee", "quantity" : 1},
 {"name" : "Product", "quantity" : 0},
-{"name" : "Money", "quantity" : 0},
+{"name" : "Money", "quantity" : 10000},
 {"name" : "Turnover", "quantity" : 0}
 ],
 "actions" : [
@@ -39,7 +39,7 @@
 "fitness" : {
 "type" : "max",
 "operands" : [
-{"name" : "Turnover", "coef" : 1}
+{"name" : "Turnover", "coef" : 1000}
 ]
 }
 }
