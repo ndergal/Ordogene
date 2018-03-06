@@ -43,6 +43,10 @@ public class ApiJsonResponseCreator {
 		return new ApiJsonResponse(null, 0, "The server can not run your calculation (the server is full)", null, null);
 	}
 	
+	public static ApiJsonResponse calculationIDisRunning(int cid) {
+		return new ApiJsonResponse(null, 0, "The calculation "+cid+" cannot be removed because it is currently running", null, null);
+	}
+	
 	
 	
 }
