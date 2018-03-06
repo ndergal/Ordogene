@@ -60,6 +60,14 @@
 			<version>1.4</version>
 		</dependency>
 
+
+		<dependency>
+			<groupId>com.github.oshi</groupId>
+			<artifactId>oshi-core</artifactId>
+			<version>3.4.4</version>
+		</dependency>
+
+
 	</dependencies>
 
 	<build>

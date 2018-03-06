@@ -30,7 +30,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
  */
 public class Master {
 	private static final Logger log = LoggerFactory.getLogger(Master.class);
-	private static final int DEFAULT_THREAD = 10;
+	private static final int DEFAULT_THREAD = 5;
 	private final int maxThread;
 	private int currentThread;
 	private final Map<Integer, ThreadHandler> threadMap = new HashMap<>();
