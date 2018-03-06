@@ -40,7 +40,7 @@ public class Commands {
 	private static final String CALCULATIONS = "/calculations/";
 	private static final String PROBLEM_WITH_THE_COMMUNICATION_BETWEEN_CLIENT_AND_SERVER = "Problem with the communication between client and server";
 	private final SimpleDateFormat formater = new SimpleDateFormat("dd/MM/yyyy-HH:mm");
-	private String id;
+	private String username;
 	private static final Logger log = LoggerFactory.getLogger(Commands.class);
 
 	private final String[] tableFields = { "Calculation Id", "Name", "Date", "Running", "Fitness", "Iteration done",
@@ -63,8 +63,8 @@ public class Commands {
 			case "no":
 				do {
 					log.info("Enter your group id : ");
-					id = scanner.nextLine();
-				} while (id.isEmpty() ? true : !getUser(id));
+					username = scanner.nextLine();
+				} while (username.isEmpty() ? true : !getUser(username));
 				break loop;
 			case "y":
 			case "Y":
@@ -88,7 +88,7 @@ public class Commands {
 		// Request
 		ResponseEntity<ApiJsonResponse> response = null;
 		try {
-			response = restTemplate.exchange("/" + id + "/calculations", HttpMethod.GET, null, ApiJsonResponse.class);
+			response = restTemplate.exchange("/" + username + "/calculations", HttpMethod.GET, null, ApiJsonResponse.class);
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
 			log.error(e.getStatusCode() + " -- " + e.getStatusText());
 			return null;
@@ -108,6 +108,14 @@ public class Commands {
 		}
 		TableBuilder builder = fillTable(list);
 		return builder.addFullBorder(BorderStyle.oldschool).build();
+	}
+
+	/**
+	 * Display the current username
+	 */
+	@ShellMethod(value = "Print the current username")
+	public String whoiam() {
+		return "Your current username is '" + username + "'";
 	}
 
 	/**
@@ -132,7 +140,7 @@ public class Commands {
 		HttpEntity<String> request = new HttpEntity<String>(jsonContentRead, headers);
 
 		try {
-			ResponseEntity<ApiJsonResponse> response = restTemplate.exchange("/" + id + CALCULATIONS, HttpMethod.PUT,
+			ResponseEntity<ApiJsonResponse> response = restTemplate.exchange("/" + username + CALCULATIONS, HttpMethod.PUT,
 					request, ApiJsonResponse.class);
 			int cid = response.getBody().getCid();
 			return "Calculation '" + cid + "' launched";
@@ -155,7 +163,7 @@ public class Commands {
 	public String stopCalculation(@ShellOption({ "-cid", "--calculationid" }) int cid) {
 		// Request
 		try {
-			restTemplate.exchange("/" + id + CALCULATIONS + cid, HttpMethod.POST, null, ApiJsonResponse.class);
+			restTemplate.exchange("/" + username + CALCULATIONS + cid, HttpMethod.POST, null, ApiJsonResponse.class);
 			return "Calculation '" + cid + "' stopped";
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
 			return e.getStatusCode() + " -- " + e.getStatusText();
@@ -175,7 +183,7 @@ public class Commands {
 	public String removeCalculation(@ShellOption({ "-cid", "--calculationid" }) int cid) {
 		// Request
 		try {
-			restTemplate.exchange("/" + id + CALCULATIONS + cid, HttpMethod.DELETE, null, ApiJsonResponse.class);
+			restTemplate.exchange("/" + username + CALCULATIONS + cid, HttpMethod.DELETE, null, ApiJsonResponse.class);
 			return "Calculation '" + cid + "' has been deleted.";
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
 			return e.getStatusCode() + " -- " + e.getStatusText();
@@ -206,9 +214,9 @@ public class Commands {
 		// Parameter validation
 		Path path = dst.toPath();
 		if (dst.isDirectory() && html) {
-			path = Paths.get(dst.toPath().toString() + File.separator + this.id + "_" + cid + ".html");
+			path = Paths.get(dst.toPath().toString() + File.separator + this.username + "_" + cid + ".html");
 		} else if (dst.isDirectory() && !html) {
-			path = Paths.get(dst.toPath().toString() + File.separator + this.id + "_" + cid + ".png");
+			path = Paths.get(dst.toPath().toString() + File.separator + this.username + "_" + cid + ".png");
 		}
 		if (path.toFile().exists() && !force) {
 			return "A file already exists, use --force to overwrite.";
@@ -219,7 +227,7 @@ public class Commands {
 		try {
 
 			if (html) {
-				response = restTemplate.exchange("/" + id + CALCULATIONS + cid + "/html", HttpMethod.GET, null,
+				response = restTemplate.exchange("/" + username + CALCULATIONS + cid + "/html", HttpMethod.GET, null,
 						ApiJsonResponse.class);
 				// Writing the html
 				String base64 = response.getBody().getBase64img();
@@ -227,7 +235,7 @@ public class Commands {
 				return "The html of the result is downloaded at " + dst;
 
 			} else {
-				response = restTemplate.exchange("/" + id + CALCULATIONS + cid, HttpMethod.GET, null,
+				response = restTemplate.exchange("/" + username + CALCULATIONS + cid, HttpMethod.GET, null,
 						ApiJsonResponse.class);
 				// Writing the image
 				String base64 = response.getBody().getBase64img();
@@ -281,7 +289,7 @@ public class Commands {
 		// Request
 		try {
 			restTemplate.exchange("/" + id, HttpMethod.GET, null, ApiJsonResponse.class);
-			this.id = id;
+			this.username = id;
 			log.info("Welcome back {}", id);
 			return true;
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
@@ -299,8 +307,8 @@ public class Commands {
 		try {
 			ResponseEntity<ApiJsonResponse> response = restTemplate.exchange("/", HttpMethod.PUT, null,
 					ApiJsonResponse.class);
-			id = response.getBody().getUserId();
-			log.info("Your new group id is {}", id);
+			username = response.getBody().getUserId();
+			log.info("Your new group id is {}", username);
 			return true;
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
 			log.error(e.getStatusCode() + " -- " + e.getStatusText());

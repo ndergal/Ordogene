@@ -3,7 +3,6 @@ package org.ordogene.algorithme.jenetics;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Iterator;
 
 import org.ordogene.algorithme.Model;
@@ -35,7 +34,6 @@ public class CalculationHandler {
 	private final int POPULATION_SIZE = 100;
 	private final double CHANCE_TO_STOP_SCHEDULE_CREATION = 0.002;
 
-	private final Date currentDate = new Date();
 	private final ThreadHandler th;
 	private final Model model;
 	private final String username;
@@ -54,8 +52,6 @@ public class CalculationHandler {
 	public void launchCalculation() {
 
 		FileUtils.createCalculationDirectory(Paths.get(FileUtils.getCalculationDirectoryPath(username, cid, model.getName())));
-		
-		th.getCalculation().setCalculation(currentDate.getTime(), 0, 0, model.getExecTime(), cid, model.getName(), 0);
 
 		Engine<ActionGene, Long> engine = Engine
 				.builder(this::fitness, Genotype.of(Schedule.of(model, CHANCE_TO_STOP_SCHEDULE_CREATION), 1))
@@ -110,7 +106,7 @@ public class CalculationHandler {
 
 				lastSave = currentTime;
 				lastSavedIteration = generation.getGeneration();
-				tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, cid,
+				tmpCalc.setCalculation(th.getCalculation().getStartTimestamp(), iteration, iteration, maxIteration, cid,
 						model.getName(), best.getFitness());
 
 				saveBest(best);
@@ -120,12 +116,12 @@ public class CalculationHandler {
 		// Create a calculation information to saved it on disk
 		Calculation tmpCalc = new Calculation();
 		if (best != null) {
-			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, cid,
+			tmpCalc.setCalculation(th.getCalculation().getStartTimestamp(), iteration, iteration, maxIteration, cid,
 					model.getName(), best.getFitness());
 
 			saveBest(best);
 		} else {
-			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, cid,
+			tmpCalc.setCalculation(th.getCalculation().getStartTimestamp(), iteration, iteration, maxIteration, cid,
 					model.getName(), 0);
 		}
 

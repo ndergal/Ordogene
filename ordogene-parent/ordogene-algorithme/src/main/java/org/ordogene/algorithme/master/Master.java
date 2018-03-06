@@ -78,6 +78,8 @@ public class Master {
 		int calculationId = toHash.hashCode();
 
 		ThreadHandler th = new ThreadHandler();
+		
+		th.getCalculation().setCalculation((new Date()).getTime(), 0, 0, model.getExecTime(), calculationId, model.getName(), 0);
 
 		CalculationHandler ch = new CalculationHandler(th, model, username, calculationId);
 
