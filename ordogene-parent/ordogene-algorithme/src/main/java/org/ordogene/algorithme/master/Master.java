@@ -74,10 +74,12 @@ public class Master {
 		JSONModel jmodel = (JSONModel) Parser.parseJsonFile(jsonString, JSONModel.class);
 		Model model = Model.createModel(jmodel);
 
-		String toHash = jsonString + (new Date()).toString();
+		String toHash = jsonString + (new Date()).getTime();
 		int calculationId = toHash.hashCode();
 
 		ThreadHandler th = new ThreadHandler();
+		
+		th.getCalculation().setCalculation((new Date()).getTime(), 0, 0, model.getExecTime(), calculationId, model.getName(), 0);
 
 		CalculationHandler ch = new CalculationHandler(th, model, username, calculationId);
 
@@ -99,6 +101,10 @@ public class Master {
 		}
 
 	}
+	
+	public boolean isRunning(int cid) {
+		return threadMap.containsKey(cid);
+	}
 
 	public void updateCalculation(Calculation cal, String username) {
 		ThreadHandler th = null;
@@ -107,22 +113,9 @@ public class Master {
 		}
 		if (th != null) {
 			// IsRunning
-			try {
-				th.clearMasterFromThread();
-				th.masterToThread("state");
-
-				// Format: epoch_iterationNumber_lastIterationSaved_maxIteration_fitness
-				String response = th.masterFromThread();
-				if (response == null) {
-					log.error("The calculation does not respond at the request");
-					return;
-				}
-				String[] state = response.split("_");
-				updateCalculWithState(cal, state);
-			} catch (InterruptedException e) {
-				// Master will be closed
-				Thread.currentThread().interrupt();
-			}
+			Calculation cSaved = th.getCalculation();
+			cal.setCalculation(cSaved.getStartTimestamp(), cSaved.getIterationNumber(), cSaved.getLastIterationSaved(), cSaved.getMaxIteration(), cSaved.getId(), cSaved.getName(), cSaved.getFitnessSaved());
+			cal.setRunning(true);
 		} else {
 			try {
 				String pathName = FileUtils.getCalculationStatePath(username, cal.getId(), cal.getName());
@@ -135,16 +128,6 @@ public class Master {
 				log.error("Problem to read the calculation ");
 			}
 		}
-	}
-
-	private void updateCalculWithState(Calculation cal, String[] state) throws InternalError {
-		try {
-			cal.setCalculation(Long.valueOf(state[0]), Integer.valueOf(state[1]), Integer.valueOf(state[2]),
-					Integer.valueOf(state[3]), cal.getId(), cal.getName(), Integer.valueOf(state[4]));
-		} catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-			throw new InternalError("Problem with calculation format informations");
-		}
-		cal.setRunning(true);
 	}
 
 	public boolean interruptCalculation(int cid) {

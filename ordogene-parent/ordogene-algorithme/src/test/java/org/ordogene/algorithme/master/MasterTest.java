@@ -194,6 +194,9 @@ public class MasterTest {
 		
 		int calculationId = m.compute(userIdTest, JSONmodel);
 		
+		// Just wait computation initialization
+		Thread.currentThread().sleep(100);
+		
 		Calculation toTest = new Calculation();
 		toTest.setId(calculationId);
 		toTest.setName("small_strategy_game.json");
