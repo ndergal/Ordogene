@@ -96,7 +96,7 @@ public class CalculationController {
 
 		if (!optCalc.isPresent()) {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.calculationIDNotExist(calculationId),
-					HttpStatus.BAD_REQUEST);
+					HttpStatus.NOT_FOUND);
 		} else {
 			Calculation calcToDelete = optCalc.get();
 			if(masterAlgorithme.isRunning(calculationId)) {

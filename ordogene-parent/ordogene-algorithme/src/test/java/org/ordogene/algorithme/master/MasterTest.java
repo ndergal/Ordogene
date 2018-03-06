@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MasterTest {
-	
+
 	private final static Logger log = LoggerFactory.getLogger(MasterTest.class);
 	
 	String JSONmodel = "{\n" + 
@@ -120,8 +120,8 @@ public class MasterTest {
 		try {
 			Files.createDirectories(Paths.get(Const.getConst().get("ApplicationPath") + File.separator + "tester"));
 		} catch (IOException e) {
-			log.error("Error while creating the directory " + Const.getConst().get("ApplicationPath")
-					+ File.separator + "tester");
+			log.error("Error while creating the directory " + Const.getConst().get("ApplicationPath") + File.separator
+					+ "tester");
 			e.printStackTrace();
 		}
 
@@ -137,7 +137,7 @@ public class MasterTest {
 		int res = new Master().compute("tester", jsonContentPost);
 		assertNotEquals(-2, res);
 	}
-	
+
 	public void MasterTest_defaultConstructor() {
 		new Master();
 	}
@@ -147,16 +147,16 @@ public class MasterTest {
 		new Master(12);
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void MasterTest_argumentConstructor_negative_value() {
 		new Master(-3);
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void MasterTest_argumentConstructor_zero_value() {
 		new Master(0);
 	}
-	
+
 	@Test
 	public void computeTest_null_idUser() {
 		Master m = new Master();
@@ -164,7 +164,7 @@ public class MasterTest {
 			m.compute(null, JSONmodel);
 		}).isInstanceOf(NullPointerException.class);
 	}
-	
+
 	@Test
 	public void computeTest_null_jsonModel() {
 		Master m = new Master();
@@ -172,95 +172,95 @@ public class MasterTest {
 			m.compute(userIdTest, null);
 		}).isInstanceOf(NullPointerException.class);
 	}
-	
+
 	@Test
 	public void computeTest_OK() throws Exception {
 		Master m = new Master();
-		
+
 		Assertions.assertThat(m.compute(userIdTest, JSONmodel)).isNotNull();
 	}
-	
+
 	@Test
 	public void computeTest_serverFull() throws Exception {
 		Master m = new Master(1);
-		
+
 		Assertions.assertThat(m.compute(userIdTest, JSONmodel)).isNotNull();
 		Assertions.assertThat(m.compute(userIdTest, JSONmodel)).isNull();
 	}
-	
+
 	@Test
 	public void updateCalculationTest_OK_isRunning() throws Exception {
 		Master m = new Master();
-		
+
 		int calculationId = m.compute(userIdTest, JSONmodel);
-		
+
 		// Just wait computation initialization
 		Thread.currentThread().sleep(500);
 		
 		Calculation toTest = new Calculation();
 		toTest.setId(calculationId);
 		toTest.setName("small_strategy_game.json");
-		
+
 		m.updateCalculation(toTest, userIdTest);
-		
+
 		assertNotEquals(0, toTest.getIterationNumber());
 		assertNotEquals(0, toTest.getMaxIteration());
 		assertNotEquals(0, toTest.getStartTimestamp());
 		assertTrue(toTest.isRunning());
 	}
-	
+
 	@Test
 	public void updateCalculationTest_OK_notRunning() throws Exception {
 		Master m = new Master();
-		
+
 		int calculationId = m.compute(userIdTest, JSONmodel);
-		
-		//TODO change by something else?
-		Thread.sleep(5000); //wait end of calculation
-		
+
+		// TODO change by something else?
+		Thread.sleep(5000); // wait end of calculation
+
 		Calculation toTest = new Calculation();
 		toTest.setId(calculationId);
 		toTest.setName("small_strategy_game.json");
-		
+
 		m.updateCalculation(toTest, userIdTest);
-		
+
 		assertNotEquals(0, toTest.getIterationNumber());
 		assertNotEquals(0, toTest.getMaxIteration());
 		assertNotEquals(0, toTest.getStartTimestamp());
 		assertFalse(toTest.isRunning());
 	}
-	
+
 	@Test
 	public void updateCalculationTest_KO_notExist() throws Exception {
 		Master m = new Master();
-		
+
 		int calculationId = m.compute(userIdTest, JSONmodel);
-		
+
 		Calculation toTest = new Calculation();
 		toTest.setId(calculationId + 1);
 		toTest.setName("small_strategy_game.json");
-		
+
 		m.updateCalculation(toTest, userIdTest);
-		
+
 		assertEquals(0, toTest.getIterationNumber());
 		assertEquals(0, toTest.getMaxIteration());
 		assertEquals(0, toTest.getStartTimestamp());
 		assertFalse(toTest.isRunning());
 	}
-	
+
 	@Test
 	public void interruptCalculationTest_OK() throws Exception {
 		Master m = new Master();
-		
+
 		int calculationId = m.compute(userIdTest, JSONmodel);
-		
+
 		assertTrue(m.interruptCalculation(calculationId));
 	}
-	
+
 	@Test
 	public void interruptCalculationTest_OK_notLaunch() throws Exception {
 		Master m = new Master();
-		
+
 		assertFalse(m.interruptCalculation(12));
 	}
 
