@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
@@ -40,7 +41,7 @@ public class Commands {
 	private static final String CALCULATIONS = "/calculations/";
 	private static final String PROBLEM_WITH_THE_COMMUNICATION_BETWEEN_CLIENT_AND_SERVER = "Problem with the communication between client and server";
 	private final SimpleDateFormat formater = new SimpleDateFormat("dd/MM/yyyy-HH:mm");
-	private String id;
+	private String username;
 	private static final Logger log = LoggerFactory.getLogger(Commands.class);
 
 	private final String[] tableFields = { "Calculation Id", "Name", "Date", "Running", "Fitness", "Iteration done",
@@ -63,8 +64,8 @@ public class Commands {
 			case "no":
 				do {
 					log.info("Enter your group id : ");
-					id = scanner.nextLine();
-				} while (id.isEmpty() ? true : !getUser(id));
+					username = scanner.nextLine();
+				} while (username.isEmpty() ? true : !getUser(username));
 				break loop;
 			case "y":
 			case "Y":
@@ -88,7 +89,7 @@ public class Commands {
 		// Request
 		ResponseEntity<ApiJsonResponse> response = null;
 		try {
-			response = restTemplate.exchange("/" + id + "/calculations", HttpMethod.GET, null, ApiJsonResponse.class);
+			response = restTemplate.exchange("/" + username + "/calculations", HttpMethod.GET, null, ApiJsonResponse.class);
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
 			log.error(e.getStatusCode() + " -- " + e.getStatusText());
 			return null;
@@ -106,8 +107,18 @@ public class Commands {
 			log.info("No calculations yet");
 			return null;
 		}
+		long runningCalculation = list.stream().filter(Calculation::isRunning).count();
 		TableBuilder builder = fillTable(list);
+		log.info("Calculation in progress: {}", runningCalculation);
 		return builder.addFullBorder(BorderStyle.oldschool).build();
+	}
+
+	/**
+	 * Display the current username
+	 */
+	@ShellMethod(value = "Print the current username")
+	public String whoami() {
+		return "Your current username is '" + username + "'";
 	}
 
 	/**
@@ -117,7 +128,7 @@ public class Commands {
 	 *            path to model to send
 	 */
 	@ShellMethod(value = "Launch a calculation from a model")
-	public String launchCalculation(File model) {
+	public String launchCalculation(@ShellOption({ "-m", "--model" }) File model) {
 		// Parameter validation
 		String jsonContentRead;
 		try {
@@ -132,7 +143,7 @@ public class Commands {
 		HttpEntity<String> request = new HttpEntity<String>(jsonContentRead, headers);
 
 		try {
-			ResponseEntity<ApiJsonResponse> response = restTemplate.exchange("/" + id + CALCULATIONS, HttpMethod.PUT,
+			ResponseEntity<ApiJsonResponse> response = restTemplate.exchange("/" + username + CALCULATIONS, HttpMethod.PUT,
 					request, ApiJsonResponse.class);
 			int cid = response.getBody().getCid();
 			return "Calculation '" + cid + "' launched";
@@ -152,10 +163,10 @@ public class Commands {
 	 *            id of the calculation
 	 */
 	@ShellMethod(value = "Stop a calculation")
-	public String stopCalculation(int cid) {
+	public String stopCalculation(@ShellOption({ "-cid", "--calculationid" }) int cid) {
 		// Request
 		try {
-			restTemplate.exchange("/" + id + CALCULATIONS + cid, HttpMethod.POST, null, ApiJsonResponse.class);
+			restTemplate.exchange("/" + username + CALCULATIONS + cid, HttpMethod.POST, null, ApiJsonResponse.class);
 			return "Calculation '" + cid + "' stopped";
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
 			return e.getStatusCode() + " -- " + e.getStatusText();
@@ -172,10 +183,10 @@ public class Commands {
 	 *            id of the calculation
 	 */
 	@ShellMethod(value = "Remove a calculation")
-	public String removeCalculation(int cid) {
+	public String removeCalculation(@ShellOption({ "-cid", "--calculationid" }) int cid) {
 		// Request
 		try {
-			restTemplate.exchange("/" + id + CALCULATIONS + cid, HttpMethod.DELETE, null, ApiJsonResponse.class);
+			restTemplate.exchange("/" + username + CALCULATIONS + cid, HttpMethod.DELETE, null, ApiJsonResponse.class);
 			return "Calculation '" + cid + "' has been deleted.";
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
 			return e.getStatusCode() + " -- " + e.getStatusText();
@@ -198,15 +209,17 @@ public class Commands {
 	 *            if set, save the result in html (else, save in png)
 	 */
 	@ShellMethod(value = "Get the result of a calculation")
-	public String resultCalculation(int cid, File dst, @ShellOption(arity = 0, defaultValue = "false") boolean force,
+	public String resultCalculation(@ShellOption({ "-cid", "--calculationid" }) int cid,
+			@ShellOption({ "-d", "--destination" }) File dst,
+			@ShellOption(arity = 0, defaultValue = "false") boolean force,
 			@ShellOption(arity = 0, defaultValue = "false") boolean html) {
 
 		// Parameter validation
 		Path path = dst.toPath();
 		if (dst.isDirectory() && html) {
-			path = Paths.get(dst.toPath().toString() + File.separator + this.id + "_" + cid + ".html");
+			path = Paths.get(dst.toPath().toString() + File.separator + this.username + "_" + cid + ".html");
 		} else if (dst.isDirectory() && !html) {
-			path = Paths.get(dst.toPath().toString() + File.separator + this.id + "_" + cid + ".png");
+			path = Paths.get(dst.toPath().toString() + File.separator + this.username + "_" + cid + ".png");
 		}
 		if (path.toFile().exists() && !force) {
 			return "A file already exists, use --force to overwrite.";
@@ -217,20 +230,20 @@ public class Commands {
 		try {
 
 			if (html) {
-				response = restTemplate.exchange("/" + id + CALCULATIONS + cid + "/html", HttpMethod.GET, null,
+				response = restTemplate.exchange("/" + username + CALCULATIONS + cid + "/html", HttpMethod.GET, null,
 						ApiJsonResponse.class);
 				// Writing the html
 				String base64 = response.getBody().getBase64img();
 				FileUtils.saveHtmlFromBase64(base64, path.toAbsolutePath().toString());
-				return "The html of the result is downloaded at " + dst;
+				return "The html of the result is downloaded at " + path;
 
 			} else {
-				response = restTemplate.exchange("/" + id + CALCULATIONS + cid, HttpMethod.GET, null,
+				response = restTemplate.exchange("/" + username + CALCULATIONS + cid, HttpMethod.GET, null,
 						ApiJsonResponse.class);
 				// Writing the image
 				String base64 = response.getBody().getBase64img();
 				FileUtils.saveImageFromBase64(base64, path.toAbsolutePath().toString());
-				return "The image of the result is downloaded at " + dst;
+				return "The image of the result is downloaded at " + path;
 			}
 
 		} catch (IOException e) {
@@ -251,7 +264,7 @@ public class Commands {
 	 *            file to open
 	 */
 	@ShellMethod(value = "Open a file", key = { "xdg-open", "start", "open" })
-	public boolean xdgOpen(File file) {
+	public boolean xdgOpen(@ShellOption({ "-i", "--file" }) File file) {
 		Runtime currentRuntime = Runtime.getRuntime();
 		String absolutePath = file.getAbsolutePath();
 		String cmd = absolutePath;
@@ -279,7 +292,7 @@ public class Commands {
 		// Request
 		try {
 			restTemplate.exchange("/" + id, HttpMethod.GET, null, ApiJsonResponse.class);
-			this.id = id;
+			this.username = id;
 			log.info("Welcome back {}", id);
 			return true;
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
@@ -297,8 +310,8 @@ public class Commands {
 		try {
 			ResponseEntity<ApiJsonResponse> response = restTemplate.exchange("/", HttpMethod.PUT, null,
 					ApiJsonResponse.class);
-			id = response.getBody().getUserId();
-			log.info("Your new group id is {}", id);
+			username = response.getBody().getUserId();
+			log.info("Your new group id is {}", username);
 			return true;
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
 			log.error(e.getStatusCode() + " -- " + e.getStatusText());
