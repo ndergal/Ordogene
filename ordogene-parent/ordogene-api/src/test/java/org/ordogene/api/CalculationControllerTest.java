@@ -377,10 +377,6 @@ public class CalculationControllerTest {
 	@Test
 	public void removeCalculationUserNotExistTest() throws Exception {
 		FileUtils.removeUser(userTest);
-<<<<<<< HEAD
-
-=======
->>>>>>> branch 'dev' of https://ndergal@bitbucket.org/darwinners/ordogene.git
 		
 		mvc.perform(delete("/" + userTest + "/calculations/" + cidTest)).andExpect(status().isNotFound())
 				.andReturn();
