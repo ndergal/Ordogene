@@ -1,4 +1,8 @@
 {
     "ApplicationPath": "/opt/ordogene/testProjectFiles",
-    "ResultSaveInterval": 60
+    "ResultSaveInterval": 60,
+    "MaxComputationThreads": 7,
+    "IndividualNumberByGeneration": 120,
+    "ProbabilityToStopIndividualCreation":0.0021
+    
 }
