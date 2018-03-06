@@ -392,7 +392,7 @@ public class CalculationControllerTest {
 		Files.createDirectories(Paths.get(userDirectory));
 		
 		mvc.perform(delete("/" + userTest + "/calculations/" + cidTest))
-				.andExpect(status().isBadRequest()).andReturn();
+				.andExpect(status().isNotFound()).andReturn();
 
 	}
 
