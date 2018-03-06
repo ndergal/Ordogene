@@ -195,7 +195,7 @@ public class MasterTest {
 		int calculationId = m.compute(userIdTest, JSONmodel);
 
 		// Just wait computation initialization
-		Thread.currentThread().sleep(500);
+		Thread.currentThread().sleep(1000);
 		
 		Calculation toTest = new Calculation();
 		toTest.setId(calculationId);
