@@ -114,7 +114,7 @@ public class Commands {
 	 * Display the current username
 	 */
 	@ShellMethod(value = "Print the current username")
-	public String whoiam() {
+	public String whoami() {
 		return "Your current username is '" + username + "'";
 	}
 
