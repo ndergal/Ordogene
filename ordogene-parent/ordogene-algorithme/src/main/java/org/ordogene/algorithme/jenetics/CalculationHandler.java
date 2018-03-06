@@ -30,10 +30,56 @@ import io.jenetics.engine.EvolutionResult;
  * 
  */
 public class CalculationHandler {
-	private final Logger logger = LoggerFactory.getLogger(CalculationHandler.class);
+	private static final Logger logger = LoggerFactory.getLogger(CalculationHandler.class);
 
-	private final int POPULATION_SIZE = 100;
-	private final double CHANCE_TO_STOP_SCHEDULE_CREATION = 0.002;
+	private static final int POPULATION_SIZE;
+	static {
+		int tmpPopSize;
+		int defaultPopulationSize = 100;
+		String popMaxFromMap = Const.getConst().get("IndividualNumberByGeneration");
+		if (popMaxFromMap == null) {
+			tmpPopSize = defaultPopulationSize;
+			logger.info(
+					"IndividualNumberByGeneration option is not present in the configuration file. Use default value : "
+							+ defaultPopulationSize);
+		} else {
+			try {
+				tmpPopSize = Integer.parseInt(popMaxFromMap);
+			} catch (NumberFormatException e) {
+				tmpPopSize = defaultPopulationSize;
+				logger.info(
+						"IndividualNumberByGeneration option in the configuration file is not a valid number. Use default value : "
+								+ defaultPopulationSize);
+			}
+		}
+		POPULATION_SIZE = tmpPopSize;
+
+		//
+		
+		double tmpProba;
+		double defaultProba = 0.002;
+		String probaFromMap = Const.getConst().get("ProbabilityToStopIndividualCreation");
+		if (probaFromMap == null) {
+			tmpProba = defaultProba;
+			logger.info(
+					"ProbabilityToStopIndividualCreation option is not present in the configuration file. Use default value : "
+							+ defaultProba);
+		} else {
+			try {
+				tmpProba = Double.parseDouble(probaFromMap);
+			} catch (NumberFormatException e) {
+				tmpProba = defaultProba;
+				logger.info(
+						"ProbabilityToStopIndividualCreation option in the configuration file is not a valid number. Use default value : "
+								+ defaultProba);
+			}
+		}
+		CHANCE_TO_STOP_SCHEDULE_CREATION = tmpProba;
+	}
+
+
+
+	private static final double CHANCE_TO_STOP_SCHEDULE_CREATION; // = 0.002;
 
 	private final ThreadHandler th;
 	private final Model model;
@@ -52,8 +98,9 @@ public class CalculationHandler {
 	 */
 	public void launchCalculation() {
 
-		FileUtils.createCalculationDirectory(Paths.get(FileUtils.getCalculationDirectoryPath(username, cid, model.getName())));
-		
+		FileUtils.createCalculationDirectory(
+				Paths.get(FileUtils.getCalculationDirectoryPath(username, cid, model.getName())));
+
 		Engine<ActionGene, Long> engine = Engine
 				.builder(this::fitness, Genotype.of(Schedule.of(model, CHANCE_TO_STOP_SCHEDULE_CREATION), 1))
 				.optimize(Type.min.equals(model.getFitness().getType()) ? Optimize.MINIMUM : Optimize.MAXIMUM)
@@ -97,7 +144,7 @@ public class CalculationHandler {
 				interupted = true;
 				Thread.currentThread().interrupt();
 			}
-			
+
 			updateState(iteration, lastSavedIteration, best.getFitness());
 
 			long currentTime = System.currentTimeMillis();
@@ -154,7 +201,8 @@ public class CalculationHandler {
 		String htmlArray = Drawer.htmlTableBuilder(htmlTableHeader, actionGeneArray, model, best.getFitness(),
 				s.getEndEnv(), false);
 		logger.info("try to save : pngFile and htmlFile ... ");
-		if (FileUtils.saveResult(htmlArray, Paths.get(FileUtils.getCalculationDirectoryPath(username, cid, model.getName())))) {
+		if (FileUtils.saveResult(htmlArray,
+				Paths.get(FileUtils.getCalculationDirectoryPath(username, cid, model.getName())))) {
 			logger.info(" Success ");
 		} else {
 			logger.info(" Fail ");
