@@ -117,7 +117,7 @@ public class Commands {
 	 *            path to model to send
 	 */
 	@ShellMethod(value = "Launch a calculation from a model")
-	public String launchCalculation(File model) {
+	public String launchCalculation(@ShellOption({ "-m", "--model" }) File model) {
 		// Parameter validation
 		String jsonContentRead;
 		try {
@@ -152,7 +152,7 @@ public class Commands {
 	 *            id of the calculation
 	 */
 	@ShellMethod(value = "Stop a calculation")
-	public String stopCalculation(int cid) {
+	public String stopCalculation(@ShellOption({ "-cid", "--calculationid" }) int cid) {
 		// Request
 		try {
 			restTemplate.exchange("/" + id + CALCULATIONS + cid, HttpMethod.POST, null, ApiJsonResponse.class);
@@ -172,7 +172,7 @@ public class Commands {
 	 *            id of the calculation
 	 */
 	@ShellMethod(value = "Remove a calculation")
-	public String removeCalculation(int cid) {
+	public String removeCalculation(@ShellOption({ "-cid", "--calculationid" }) int cid) {
 		// Request
 		try {
 			restTemplate.exchange("/" + id + CALCULATIONS + cid, HttpMethod.DELETE, null, ApiJsonResponse.class);
@@ -198,7 +198,9 @@ public class Commands {
 	 *            if set, save the result in html (else, save in png)
 	 */
 	@ShellMethod(value = "Get the result of a calculation")
-	public String resultCalculation(int cid, File dst, @ShellOption(arity = 0, defaultValue = "false") boolean force,
+	public String resultCalculation(@ShellOption({ "-cid", "--calculationid" }) int cid,
+			@ShellOption({ "-d", "--destination" }) File dst,
+			@ShellOption(arity = 0, defaultValue = "false") boolean force,
 			@ShellOption(arity = 0, defaultValue = "false") boolean html) {
 
 		// Parameter validation
@@ -251,7 +253,7 @@ public class Commands {
 	 *            file to open
 	 */
 	@ShellMethod(value = "Open a file", key = { "xdg-open", "start", "open" })
-	public boolean xdgOpen(File file) {
+	public boolean xdgOpen(@ShellOption({ "-i", "--file" }) File file) {
 		Runtime currentRuntime = Runtime.getRuntime();
 		String absolutePath = file.getAbsolutePath();
 		String cmd = absolutePath;
