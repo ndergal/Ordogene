@@ -235,7 +235,7 @@ public class Commands {
 				// Writing the html
 				String base64 = response.getBody().getBase64img();
 				FileUtils.saveHtmlFromBase64(base64, path.toAbsolutePath().toString());
-				return "The html of the result is downloaded at " + path;
+				return "The html of the result is downloaded at " + dst.toPath().toString() + File.separator + this.username + "_" + cid + ".html";
 
 			} else {
 				response = restTemplate.exchange("/" + username + CALCULATIONS + cid, HttpMethod.GET, null,
@@ -243,7 +243,7 @@ public class Commands {
 				// Writing the image
 				String base64 = response.getBody().getBase64img();
 				FileUtils.saveImageFromBase64(base64, path.toAbsolutePath().toString());
-				return "The image of the result is downloaded at " + path;
+				return "The image of the result is downloaded at " + dst.toPath().toString() + File.separator + this.username + "_" + cid + ".png";
 			}
 
 		} catch (IOException e) {
