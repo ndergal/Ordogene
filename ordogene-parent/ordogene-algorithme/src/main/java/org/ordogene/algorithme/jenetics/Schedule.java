@@ -16,6 +16,11 @@ import io.jenetics.Chromosome;
 import io.jenetics.util.ISeq;
 import io.jenetics.util.RandomRegistry;
 
+/**
+ * Represents an individual (as a sequance of Actions)
+ * @author darwinners team
+ *
+ */
 public class Schedule implements Chromosome<ActionGene> {
 
 	private static final Logger logger = LoggerFactory.getLogger(Schedule.class);
