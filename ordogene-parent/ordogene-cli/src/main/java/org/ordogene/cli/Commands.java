@@ -89,7 +89,8 @@ public class Commands {
 		// Request
 		ResponseEntity<ApiJsonResponse> response = null;
 		try {
-			response = restTemplate.exchange("/" + username + "/calculations", HttpMethod.GET, null, ApiJsonResponse.class);
+			response = restTemplate.exchange("/" + username + "/calculations", HttpMethod.GET, null,
+					ApiJsonResponse.class);
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
 			log.error(e.getStatusCode() + " -- " + e.getStatusText());
 			return null;
@@ -118,7 +119,22 @@ public class Commands {
 	 */
 	@ShellMethod(value = "Print the current username")
 	public String whoami() {
-		return "Your current username is '" + username + "'";
+		return username;
+	}
+
+	/**
+	 * 
+	 * Display the resources on the remote server
+	 */
+	@ShellMethod(value = "Get the remote resources")
+	public String resources() {
+		// Request
+		ResponseEntity<ApiJsonResponse> response = null;
+		response = restTemplate.exchange("/resources", HttpMethod.GET, null, ApiJsonResponse.class);
+		// parse the base 64 result 
+		String b64res = response.getBody().getBase64img();
+		byte[] decodedBytes = Base64.getDecoder().decode(b64res);
+		return new String(decodedBytes);
 	}
 
 	/**
@@ -143,8 +159,8 @@ public class Commands {
 		HttpEntity<String> request = new HttpEntity<String>(jsonContentRead, headers);
 
 		try {
-			ResponseEntity<ApiJsonResponse> response = restTemplate.exchange("/" + username + CALCULATIONS, HttpMethod.PUT,
-					request, ApiJsonResponse.class);
+			ResponseEntity<ApiJsonResponse> response = restTemplate.exchange("/" + username + CALCULATIONS,
+					HttpMethod.PUT, request, ApiJsonResponse.class);
 			int cid = response.getBody().getCid();
 			return "Calculation '" + cid + "' launched";
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
@@ -235,7 +251,7 @@ public class Commands {
 				// Writing the html
 				String base64 = response.getBody().getBase64img();
 				FileUtils.saveHtmlFromBase64(base64, path.toAbsolutePath().toString());
-				return "The html of the result is downloaded at " + path.toAbsolutePath().toString();
+				return "The html of the result is downloaded at " + path;
 
 			} else {
 				response = restTemplate.exchange("/" + username + CALCULATIONS + cid, HttpMethod.GET, null,
@@ -243,7 +259,7 @@ public class Commands {
 				// Writing the image
 				String base64 = response.getBody().getBase64img();
 				FileUtils.saveImageFromBase64(base64, path.toAbsolutePath().toString());
-				return "The image of the result is downloaded at " +  path.toAbsolutePath().toString();
+				return "The image of the result is downloaded at " + path;
 			}
 
 		} catch (IOException e) {
