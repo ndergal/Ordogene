@@ -3,8 +3,8 @@ package org.ordogene.algorithme.jenetics;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Iterator;
+import java.util.concurrent.Executors;
 
 import org.ordogene.algorithme.Model;
 import org.ordogene.algorithme.master.ThreadHandler;
@@ -35,7 +35,6 @@ public class CalculationHandler {
 	private final int POPULATION_SIZE = 100;
 	private final double CHANCE_TO_STOP_SCHEDULE_CREATION = 0.002;
 
-	private final Date currentDate = new Date();
 	private final ThreadHandler th;
 	private final Model model;
 	private final String username;
@@ -54,12 +53,12 @@ public class CalculationHandler {
 	public void launchCalculation() {
 
 		FileUtils.createCalculationDirectory(Paths.get(FileUtils.getCalculationDirectoryPath(username, cid, model.getName())));
-
+		
 		Engine<ActionGene, Long> engine = Engine
 				.builder(this::fitness, Genotype.of(Schedule.of(model, CHANCE_TO_STOP_SCHEDULE_CREATION), 1))
 				.optimize(Type.min.equals(model.getFitness().getType()) ? Optimize.MINIMUM : Optimize.MAXIMUM)
 				.fitnessScaler(this::fitnessScaler).populationSize(POPULATION_SIZE).selector(new TournamentSelector<>())
-				.alterers(new ScheduleCrossover(model, 0.2)).build();
+				.alterers(new ScheduleCrossover(model, 0.2)).executor(Executors.newSingleThreadExecutor()).build();
 
 		// Initialize all variable to do loop
 		// The engine have an iterator which gie next generation on next method
@@ -90,17 +89,16 @@ public class CalculationHandler {
 				// Get the message
 				String cmd = th.threadFromMaster();
 				// If the message is state, give informations
-				if (cmd != null && cmd.equals("state")) {
-					String msg = constructStateString(iteration, maxIteration, lastSavedIteration, best.getFitness());
-					th.threadToMaster(msg.toString());
-					// If the message is interrupt, stop the loop
-				} else if (cmd != null && cmd.equals("interrupt")) {
+				// If the message is interrupt, stop the loop
+				if (cmd != null && cmd.equals("interrupt")) {
 					interupted = true;
 				}
 			} catch (InterruptedException e) {
 				interupted = true;
 				Thread.currentThread().interrupt();
 			}
+			
+			updateState(iteration, lastSavedIteration, best.getFitness());
 
 			long currentTime = System.currentTimeMillis();
 			int interval = Integer.parseInt(Const.getConst().getOrDefault("ResultSaveInterval", "60")) * 1000;
@@ -109,7 +107,7 @@ public class CalculationHandler {
 
 				lastSave = currentTime;
 				lastSavedIteration = generation.getGeneration();
-				tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, cid,
+				tmpCalc.setCalculation(th.getCalculation().getStartTimestamp(), iteration, iteration, maxIteration, cid,
 						model.getName(), best.getFitness());
 
 				saveBest(best);
@@ -119,17 +117,24 @@ public class CalculationHandler {
 		// Create a calculation information to saved it on disk
 		Calculation tmpCalc = new Calculation();
 		if (best != null) {
-			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, cid,
+			tmpCalc.setCalculation(th.getCalculation().getStartTimestamp(), iteration, iteration, maxIteration, cid,
 					model.getName(), best.getFitness());
 
 			saveBest(best);
 		} else {
-			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, cid,
+			tmpCalc.setCalculation(th.getCalculation().getStartTimestamp(), iteration, iteration, maxIteration, cid,
 					model.getName(), 0);
 		}
 
 		// Save the information
 		saveState(tmpCalc);
+	}
+
+	private void updateState(int iterationNumber, long lastIterationSaved, long fitnessSaved) {
+		Calculation c = th.getCalculation();
+		c.setIterationNumber(iterationNumber);
+		c.setLastIterationSaved(lastIterationSaved);
+		c.setFitnessSaved(fitnessSaved);
 	}
 
 	private void saveState(Calculation tmpCalc) {
@@ -154,16 +159,6 @@ public class CalculationHandler {
 		} else {
 			logger.info(" Fail ");
 		}
-	}
-
-	private String constructStateString(int iteration, int maxIter, long lastIterationSaved, long fitness) {
-		StringBuilder sb = new StringBuilder();
-		sb.append(currentDate.getTime()).append("_");
-		sb.append(iteration).append("_");
-		sb.append(lastIterationSaved).append("_");
-		sb.append(maxIter).append("_");
-		sb.append(fitness);
-		return sb.toString();
 	}
 
 	/**
