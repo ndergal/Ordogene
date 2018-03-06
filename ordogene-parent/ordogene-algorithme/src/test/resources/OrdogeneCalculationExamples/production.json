@@ -59,7 +59,7 @@
 	}
     ],
     "fitness" : {
-	"type" : "min",
+	"type" : "max",
 	"operands" : [
 	    {"name" : "argent", "coef" : 1}
 	]
