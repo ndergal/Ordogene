@@ -28,8 +28,6 @@ import gui.ava.html.image.generator.HtmlImageGenerator;
  */
 public class FileUtils {
 
-	private final static String ALPHA_NUM = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-
 	private final static UserManager uh = new UserManager();
 	private final static CalculationManager ch = new CalculationManager();
 
@@ -263,6 +261,5 @@ public class FileUtils {
 
 		// Object to JSON in file
 		mapper.writeValue(dest.toFile(), content);
-
 	}
 }

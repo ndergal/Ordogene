@@ -1,6 +1,12 @@
 package org.ordogene.file.models;
 
 import java.util.List;
+
+/**
+ * POJO
+ * @author darwinners team
+ *
+ */
 import java.util.Objects;
 
 import org.ordogene.file.parser.Validable;
@@ -10,7 +16,7 @@ public class JSONAction implements Validable {
 	private String name;
 	private int time;
 	private List<JSONInput> input;
-	private List<JSONEntity> output; 
+	private List<JSONEntity> output;
 
 	@Override
 	public boolean isValid() {

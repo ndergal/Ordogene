@@ -19,6 +19,10 @@ import org.ordogene.file.models.Relation;
 
 import io.jenetics.util.ISeq;
 
+/**
+ * @author darwinners team
+ *
+ */
 public class Model {
 	
 	private static final String CURRENT_TIME_CANNOT_BE_NEGATIVE = "The current time cannot be negative";

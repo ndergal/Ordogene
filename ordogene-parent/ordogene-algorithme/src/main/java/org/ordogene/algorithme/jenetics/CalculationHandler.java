@@ -106,7 +106,7 @@ public class CalculationHandler {
 			int interval = Integer.parseInt(Const.getConst().getOrDefault("ResultSaveInterval", "60")) * 1000;
 			if (lastSave + interval < currentTime) {
 				Calculation tmpCalc = new Calculation();
-				
+
 				lastSave = currentTime;
 				lastSavedIteration = generation.getGeneration();
 				tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, cid,
@@ -186,7 +186,7 @@ public class CalculationHandler {
 	 * Fonction de fitness de l'engine
 	 * 
 	 * @param ind
-	 * @return
+	 * @return the fitness of this calculation
 	 */
 	private Long fitness(Genotype<ActionGene> ind) {
 		long startFitness = model.getFitness().evalEnv(model.getStartEnvironment());

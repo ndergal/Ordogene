@@ -16,16 +16,28 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
 
+/**
+ * Class to get Const, loaded from the configuration file.
+ * @author darwinners team
+ *
+ */
 public class Const {
 	private final static Logger log = LoggerFactory.getLogger(Const.class);
 
 	private static Map<String, String> resourcesMap;
-	
+
 	private Const() {
-		
+
 	}
 
-	 
+	/**
+	 * 
+	 * @param configFilePath
+	 *            : path to the config file to load. The file content must be in
+	 *            Json format
+	 * @return true if the config file has been loaded and parsed, false otherwise.
+	 */
+
 	public static boolean loadConfig(String configFilePath) {
 
 		Map<String, String> tmpResourcesMap;
@@ -60,9 +72,9 @@ public class Const {
 		}
 		return true;
 	}
-	
+
 	public static Map<String, String> getConst() {
-		if(resourcesMap==null || resourcesMap.size()==0) {
+		if (resourcesMap == null || resourcesMap.size() == 0) {
 			log.error("No configuration loaded.");
 			return new HashMap<>();
 		}
@@ -70,5 +82,5 @@ public class Const {
 
 	}
 }
- 
-//  
+
+//

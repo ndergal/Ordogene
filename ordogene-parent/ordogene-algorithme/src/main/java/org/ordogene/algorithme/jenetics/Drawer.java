@@ -28,8 +28,9 @@ import io.jenetics.Phenotype;
  */
 public class Drawer {
 	private final static Logger log = LoggerFactory.getLogger(Drawer.class);
-	
-	private Drawer() {}
+
+	private Drawer() {
+	}
 
 	/**
 	 * Build a html table header with a prefix (and the column number) for each
@@ -41,7 +42,7 @@ public class Drawer {
 	 *            : html table content
 	 * @return
 	 */
-	public static String buildHtmlTableHeader(String prefix, Object[][] content) {
+	static String buildHtmlTableHeader(String prefix, Object[][] content) {
 		int nbCol = 0;
 		for (Object[] aga : content) {
 			if (aga.length > nbCol)

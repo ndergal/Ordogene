@@ -194,6 +194,8 @@ public class Commands {
 	 *            path of the generated image
 	 * @param force
 	 *            if set, overwrite if dst already exists
+	 * @param html
+	 *            if set, save the result in html (else, save in png)
 	 */
 	@ShellMethod(value = "Get the result of a calculation")
 	public String resultCalculation(int cid, File dst, @ShellOption(arity = 0, defaultValue = "false") boolean force,

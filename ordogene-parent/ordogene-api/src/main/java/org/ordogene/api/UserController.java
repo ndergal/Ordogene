@@ -13,6 +13,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * API class to handle users (check if exists, add, generate names)
+ * @author darwinners team
+ *
+ */
 @RestController
 public class UserController {
 
