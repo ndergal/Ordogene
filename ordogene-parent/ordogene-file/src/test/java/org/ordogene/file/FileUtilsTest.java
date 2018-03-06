@@ -108,14 +108,6 @@ public class FileUtilsTest {
 	}
 
 	@Test
-	public void getRandomUid() {
-		int size = 89;
-		String ruid = FileUtils.generateRandomUserId(size);
-		assertFalse(ruid == null);
-		assertEquals(size, ruid.length());
-	}
-
-	@Test
 	public void testEncodeAndDecode() throws IOException, URISyntaxException {
 		Path path1 = Paths.get(FileUtilsTest.class.getClassLoader().getResource("./test-image/doge_test.png").toURI());
 		Path path2 = Paths.get(FileUtilsTest.class.getClassLoader().getResource("./test-image/result.png").toURI());
@@ -157,5 +149,22 @@ public class FileUtilsTest {
 		Path path1 = Paths.get(FileUtilsTest.class.getClassLoader().getResource("test-image/").toURI());
 
 		FileUtils.encodeFile(path1);
+	}
+	
+	@Test
+	public void testWriteJsonInFile() throws Exception {
+		Path path = Paths.get(FileUtils.getCalculationDirectoryPath("tester", 0, "test") + File.separator + "state.json");
+		FileUtils.writeJsonInFile("coucou", "tester", 0, "test");
+		
+		assertEquals("\""+"coucou"+"\"", new String(Files.readAllBytes(path)));
+	}
+	
+	@Test
+	public void testSaveResult() throws Exception {
+		Path path = Paths.get(FileUtilsTest.class.getClassLoader().getResource("./test-html/").toString());
+		boolean saved = FileUtils.saveResult("<html></html>", path);
+
+		assertTrue(saved);
+		assertEquals("<html></html>", new String(Files.readAllBytes(Paths.get(path + File.separator + "result.html"))));
 	}
 }

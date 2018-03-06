@@ -11,6 +11,7 @@ import org.ordogene.algorithme.master.ThreadHandler;
 import org.ordogene.file.FileUtils;
 import org.ordogene.file.models.Type;
 import org.ordogene.file.utils.Calculation;
+import org.ordogene.file.utils.Const;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +22,13 @@ import io.jenetics.TournamentSelector;
 import io.jenetics.engine.Engine;
 import io.jenetics.engine.EvolutionResult;
 
+/**
+ * Handle one calculation per instance
+ * 
+ * @author darwinners team
+ *
+ * 
+ */
 public class CalculationHandler {
 	private final Logger logger = LoggerFactory.getLogger(CalculationHandler.class);
 
@@ -30,19 +38,22 @@ public class CalculationHandler {
 	private final Date currentDate = new Date();
 	private final ThreadHandler th;
 	private final Model model;
-	private final String userId;
-	private final int calculationId;
+	private final String username;
+	private final int cid;
 
-	public CalculationHandler(ThreadHandler th, Model model, String userId, int calculationId) {
+	public CalculationHandler(ThreadHandler th, Model model, String username, int cid) {
 		this.th = th;
 		this.model = model;
-		this.userId = userId;
-		this.calculationId = calculationId;
+		this.username = username;
+		this.cid = cid;
 	}
 
+	/**
+	 * launch its calculation
+	 */
 	public void launchCalculation() {
 
-		FileUtils.createCalculationDirectory(Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationId, model.getName())));
+		FileUtils.createCalculationDirectory(Paths.get(FileUtils.getCalculationDirectoryPath(username, cid, model.getName())));
 
 		Engine<ActionGene, Long> engine = Engine
 				.builder(this::fitness, Genotype.of(Schedule.of(model, CHANCE_TO_STOP_SCHEDULE_CREATION), 1))
@@ -67,7 +78,6 @@ public class CalculationHandler {
 		while (itEngine.hasNext() && iteration < maxIteration && !interupted) {
 			// Get the next generation
 			EvolutionResult<ActionGene, Long> generation = itEngine.next();
-			// Get it on statistic module
 
 			// Get the best member
 			best = generation.getBestPhenotype();
@@ -78,13 +88,13 @@ public class CalculationHandler {
 			// Block to read master commands
 			try {
 				// Get the message
-				String str = th.threadFromMaster();
+				String cmd = th.threadFromMaster();
 				// If the message is state, give informations
-				if (str != null && str.equals("state")) {
+				if (cmd != null && cmd.equals("state")) {
 					String msg = constructStateString(iteration, maxIteration, lastSavedIteration, best.getFitness());
 					th.threadToMaster(msg.toString());
 					// If the message is interrupt, stop the loop
-				} else if (str != null && str.equals("interrupt")) {
+				} else if (cmd != null && cmd.equals("interrupt")) {
 					interupted = true;
 				}
 			} catch (InterruptedException e) {
@@ -93,43 +103,56 @@ public class CalculationHandler {
 			}
 
 			long currentTime = System.currentTimeMillis();
-			if (lastSave + 60_000 < currentTime) {
+			int interval = Integer.parseInt(Const.getConst().getOrDefault("ResultSaveInterval", "60")) * 1000;
+			if (lastSave + interval < currentTime) {
+				Calculation tmpCalc = new Calculation();
+
 				lastSave = currentTime;
 				lastSavedIteration = generation.getGeneration();
-				Drawer.buildStringActionMatrix(best);
+				tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, cid,
+						model.getName(), best.getFitness());
+
+				saveBest(best);
 			}
 		}
 
 		// Create a calculation information to saved it on disk
 		Calculation tmpCalc = new Calculation();
-
 		if (best != null) {
-			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, calculationId,
+			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, cid,
 					model.getName(), best.getFitness());
 
-			ActionGene[][] actionGeneArray = Drawer.buildStringActionMatrix(best);
-			String htmlTableHeader = Drawer.buildHtmlTableHeader("Time :", actionGeneArray);
-
-			String htmlArray = Drawer.htmlTableBuilder(model.getName(), htmlTableHeader, 60.0, "px", actionGeneArray,
-					false);
-			logger.info("try to save : pngFile and htmlFile ... ");
-			if (FileUtils.saveResult(htmlArray, Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationId, model.getName())))) {
-				logger.info(" Success ");
-			} else {
-				logger.info(" Fail ");
-			}
+			saveBest(best);
 		} else {
-			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, calculationId,
+			tmpCalc.setCalculation(currentDate.getTime(), iteration, iteration, maxIteration, cid,
 					model.getName(), 0);
 		}
 
 		// Save the information
+		saveState(tmpCalc);
+	}
+
+	private void saveState(Calculation tmpCalc) {
 		try {
-			FileUtils.writeJsonInFile(tmpCalc, userId, tmpCalc.getId(), tmpCalc.getName());
-			logger.info(tmpCalc + " saved");
+			FileUtils.writeJsonInFile(tmpCalc, username, tmpCalc.getId(), tmpCalc.getName());
+			logger.info("{} saved", tmpCalc);
 		} catch (IOException e) {
 			logger.debug(Arrays.toString(e.getStackTrace()));
-			logger.error(tmpCalc + " not saved.");
+			logger.error("{} not saved", tmpCalc);
+		}
+	}
+
+	private void saveBest(Phenotype<ActionGene, Long> best) {
+		ActionGene[][] actionGeneArray = Drawer.buildStringActionMatrix(best);
+		String htmlTableHeader = Drawer.buildHtmlTableHeader("", actionGeneArray);
+		Schedule s = (Schedule) best.getGenotype().getChromosome();
+		String htmlArray = Drawer.htmlTableBuilder(htmlTableHeader, actionGeneArray, model, best.getFitness(),
+				s.getEndEnv(), false);
+		logger.info("try to save : pngFile and htmlFile ... ");
+		if (FileUtils.saveResult(htmlArray, Paths.get(FileUtils.getCalculationDirectoryPath(username, cid, model.getName())))) {
+			logger.info(" Success ");
+		} else {
+			logger.info(" Fail ");
 		}
 	}
 
@@ -149,7 +172,7 @@ public class CalculationHandler {
 	 * @param value
 	 * @return
 	 */
-	public Long fitnessScaler(Long value) {
+	private Long fitnessScaler(Long value) {
 		if (Type.value.equals(model.getFitness().getType())) {
 			if (value == model.getFitness().getValue()) {
 				return Long.MAX_VALUE;
@@ -163,13 +186,13 @@ public class CalculationHandler {
 	 * Fonction de fitness de l'engine
 	 * 
 	 * @param ind
-	 * @return
+	 * @return the fitness of this calculation
 	 */
-	public Long fitness(Genotype<ActionGene> ind) {
+	private Long fitness(Genotype<ActionGene> ind) {
 		long startFitness = model.getFitness().evalEnv(model.getStartEnvironment());
 		long transformationFitness = ind.stream().flatMap(c -> c.stream())
 				.mapToLong(ag -> model.getFitness().eval(ag.getAllele())).sum();
-		return startFitness + transformationFitness;
+		return startFitness + transformationFitness - ((Schedule) ind.getChromosome()).getDuration();
 	}
 
 }

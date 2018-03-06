@@ -61,7 +61,7 @@ public class Application {
 				// --server.port=8081
 			} else {
 				String[] newArgs = new String[args.length + 1];
-				log.info("Launch Ordogene server on port " + portParameterInt + ".");
+				log.info("Launch Ordogene server on port {}.", portParameterInt);
 				System.arraycopy(args, 0, newArgs, 0, args.length);
 				newArgs[args.length] = "--server.port=" + portParameterInt;
 				SpringApplication.run(Application.class, newArgs);

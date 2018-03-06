@@ -6,6 +6,11 @@ import org.ordogene.file.parser.Validable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+/**
+ * POJO
+ * @author darwinners team
+ *
+ */
 public class ApiJsonResponse implements Validable {
 	private String userId;
 	private int cid;

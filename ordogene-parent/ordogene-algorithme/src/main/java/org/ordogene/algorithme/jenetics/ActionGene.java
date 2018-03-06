@@ -4,6 +4,10 @@ import org.ordogene.algorithme.models.Action;
 
 import io.jenetics.Gene;
 
+/**
+ * @author darwinners team
+ *
+ */
 public class ActionGene implements Gene<Action, ActionGene> {
 
 	private final Action action;

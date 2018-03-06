@@ -6,6 +6,8 @@ import org.ordogene.file.utils.ApiJsonResponse;
 import org.ordogene.file.utils.Calculation;
 
 public class ApiJsonResponseCreator {
+	private ApiJsonResponseCreator() {
+	}
 	
 	public static ApiJsonResponse userIdNull() {
 		return new ApiJsonResponse(null, 0, "The userId to check is null or empty", null, null);

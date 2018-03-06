@@ -28,7 +28,7 @@ public class MasterTest {
 	
 	String JSONmodel = "{\n" + 
 			"    \"name\" : \"small_strategy_game.json\",\n" + 
-			"    \"slots\" : 300,\n" + 
+			"    \"slots\" : 2,\n" + 
 			"    \"exec_time\" : 5,\n" + 
 			"    \"environment\" : [\n" + 
 			"	{\"name\" : \"Nexus\", \"quantity\" : 1},\n" + 
@@ -196,14 +196,13 @@ public class MasterTest {
 		
 		Calculation toTest = new Calculation();
 		toTest.setId(calculationId);
-		toTest.setName("c100");
+		toTest.setName("small_strategy_game.json");
 		
 		m.updateCalculation(toTest, userIdTest);
 		
 		assertNotEquals(0, toTest.getIterationNumber());
 		assertNotEquals(0, toTest.getMaxIteration());
 		assertNotEquals(0, toTest.getStartTimestamp());
-		assertNotEquals(0, toTest.getFitnessSaved());
 		assertTrue(toTest.isRunning());
 	}
 	
@@ -214,7 +213,7 @@ public class MasterTest {
 		int calculationId = m.compute(userIdTest, JSONmodel);
 		
 		//TODO change by something else?
-		Thread.sleep(10000); //wait end of calculation
+		Thread.sleep(5000); //wait end of calculation
 		
 		Calculation toTest = new Calculation();
 		toTest.setId(calculationId);
@@ -225,7 +224,6 @@ public class MasterTest {
 		assertNotEquals(0, toTest.getIterationNumber());
 		assertNotEquals(0, toTest.getMaxIteration());
 		assertNotEquals(0, toTest.getStartTimestamp());
-		assertNotEquals(0, toTest.getFitnessSaved());
 		assertFalse(toTest.isRunning());
 	}
 	
@@ -244,7 +242,6 @@ public class MasterTest {
 		assertEquals(0, toTest.getIterationNumber());
 		assertEquals(0, toTest.getMaxIteration());
 		assertEquals(0, toTest.getStartTimestamp());
-		assertEquals(0, toTest.getFitnessSaved());
 		assertFalse(toTest.isRunning());
 	}
 	

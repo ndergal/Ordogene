@@ -10,16 +10,38 @@ import java.util.stream.Collectors;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
+import org.ordogene.algorithme.Model;
 import org.ordogene.algorithme.models.Action;
+import org.ordogene.algorithme.models.Entity;
+import org.ordogene.algorithme.models.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
 import io.jenetics.Phenotype;
 
+/**
+ * Draw the best individual computed by the algorithm
+ * 
+ * @author darwinners team
+ *
+ */
 public class Drawer {
 	private final static Logger log = LoggerFactory.getLogger(Drawer.class);
 
+	private Drawer() {
+	}
+
+	/**
+	 * Build a html table header with a prefix (and the column number) for each
+	 * column
+	 * 
+	 * @param prefix
+	 *            : defined prefix
+	 * @param content
+	 *            : html table content
+	 * @return
+	 */
 	static String buildHtmlTableHeader(String prefix, Object[][] content) {
 		int nbCol = 0;
 		for (Object[] aga : content) {
@@ -37,7 +59,15 @@ public class Drawer {
 		return sb.toString();
 	}
 
-	static ActionGene[][] buildStringActionMatrix(Phenotype<ActionGene, Long> individu) { // maxSize = model.getslot()
+	/**
+	 * Build a 2d array which contents all the ActionGene from a
+	 * Phenotype<ActionGene, Long>
+	 * 
+	 * @param individu
+	 *            : Phenotype<ActionGene, Long> to convert in the 2D array
+	 * @return
+	 */
+	public static ActionGene[][] buildStringActionMatrix(Phenotype<ActionGene, Long> individu) { // maxSize = model.getslot()
 		Schedule s = (Schedule) individu.getGenotype().getChromosome();
 		List<ActionGene> actions = s.stream().collect(Collectors.toList());
 		int maxSize = s.getModel().getSlots();
@@ -64,9 +94,6 @@ public class Drawer {
 				realMaxSize = startTime + action.getAllele().getTime();
 			}
 			nextIndex++;
-
-			int[][] toPrintArray2 = new int[indexedList.size()][];
-			toPrintArray2 = indexedList.toArray(toPrintArray2);
 		}
 
 		// remove all "-1" useless cells
@@ -122,18 +149,71 @@ public class Drawer {
 		return new Color(rgb);
 	}
 
-	static String htmlTableBuilder(String title, String header, double cellSize, String unit,
-			ActionGene[][] toPrintData, boolean display) {
+	/**
+	 * build a html table in String format
+	 * 
+	 * @param header
+	 *            : header of the table
+	 * @param toPrintData
+	 *            : data (ActionGene 2D array) to put in the table
+	 * @param model
+	 *            : model of the corresponding individual
+	 * @param fitness
+	 *            : fitness of the corresponding individual
+	 * @param endEnvironment
+	 * @param display
+	 *            : display or not the table at the end of generation
+	 * @return
+	 */
+	public static String htmlTableBuilder(String header, ActionGene[][] toPrintData, Model model, Long fitness,
+			Environment endEnvironment, boolean display) {
 		Map<Action, Color> colorAction = new HashMap<>();
-		// content
-		StringBuilder sbTr = new StringBuilder();
 		StringBuilder sb = new StringBuilder();
-		sb.append("<html><body><h2>").append(title).append("</h2><table border=1>");
-		int nbColsMax = 0;
+
+		sb.append("<html><head>");
+		sb.append("<meta charset=\"utf-8\"/>");
+		sb.append("<style>");
+		sb.append("html, body {\n" + "  font-family: \"Lucida Console\", Monaco, monospace;\n" + "  margin: 0;\n"
+				+ "}\n" + "table {\n" + "  border-collapse: collapse;\n" + "}\n" + "thead {\n"
+				+ "  border-bottom: 1px solid #2D2D2D;\n" + "}\n" + "td, th {\n" + "  padding: 8px 12px;\n" + "}\n"
+				+ "th {\n" + "  text-align: left;\n" + "  border-left: 1px dotted #2D2D2D;\n" + "}\n" + "td:empty {\n"
+				+ "  border: 1px dotted #CCCCCC;\n" + "}\n" + "td:not(:empty) {\n" + "  border: 1px solid #2D2D2D;\n"
+				+ "}\n" + "td:not(:empty):hover {\n"
+				+ "  box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);\n" + "}\n"
+				+ "h2 {\n" + "  padding: 10px 20px 10px 20px;\n" + "  background: white;\n" + "  position: fixed;\n"
+				+ "  top: 0;\n" + "  width: 100%;\n" + "  z-index: 2;\n"
+				+ "  box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);\n" + "}\n"
+				+ ".header {\n" + "  padding: 10px 20px 10px 20px;\n" + "  background: white;\n"
+				+ "  position: fixed;\n" + "  top: 48px;\n" + "  height: 100%;\n" + "  overflow-y: auto;\n"
+				+ "  width: 220px;\n" + "  z-index: 1;\n"
+				+ "  box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);\n" + "}\n"
+				+ "table {\n" + "  position: absolute;\n" + "  left: 260px;\n" + "  top: 48px;\n" + "}");
+		sb.append("</style>");
+		sb.append("</head><body>");
+		sb.append("<h2>Ordogène : ").append(model.getName()).append("</h2>");
+		sb.append("<div class=\"header\">");
+		sb.append("<div class=\"startEnv\"><p>Start environment :</p>");
+		sb.append("<ul>");
+		for (Entity entity : model.getStartEnvironment().getEntities()) {
+			sb.append("<li>").append(entity.getQuantity()).append(" x ").append(entity.getName()).append("</li>");
+		}
+		sb.append("</ul></div>");
+		sb.append("<div class=\"endEnv\"><p>End environment :</p>");
+		sb.append("<ul>");
+		for (Entity entity : endEnvironment.getEntities()) {
+			sb.append("<li>").append(entity.getQuantity()).append(" x ").append(entity.getName()).append("</li>");
+		}
+		sb.append("</ul></div>");
+		sb.append("<p>Fitness = ").append(fitness).append("</p>");
+		sb.append("</div>");
+		sb.append("<table>");
+		sb.append("<thead>").append(header).append("</thead>");
+		sb.append("<tbody>");
 		for (ActionGene[] row : toPrintData) {
-			sbTr.append("<tr>");
-			for (int i = 0; i < row.length; i++) {
-				// handle colors
+			sb.append("<tr>");
+			int i = 0;
+			while (i < row.length) {
+				// COLOR
 				Color currentActionColor = null;
 				if (row[i] != null) {
 					currentActionColor = colorAction.get(row[i].getAllele());
@@ -146,48 +226,46 @@ public class Drawer {
 				}
 				String htmlRgb = "rgb(" + currentActionColor.getRed() + ',' + currentActionColor.getGreen() + ','
 						+ currentActionColor.getBlue() + ')';
-				// write data in large or small td
+				// END COLOR
+
+				// TD
+				sb.append("<td style='");
+				sb.append("background-color: ").append(htmlRgb).append(";");
+				sb.append("'");
+				// TD LENGTH
 				int currentActionDuration = 1;
-				int nbCols = 0;
-				if (row[i] != null && row[i].getAllele() != null) {
+				if (row[i] != null/* && row[i].getAllele() != null */) {
 					currentActionDuration = row[i].getAllele().getTime();
 				}
-				nbCols += currentActionDuration;
 				if (currentActionDuration > 1) {
-					sbTr.append("<td style='background-color: ").append(htmlRgb).append("; width:").append(cellSize)
-							.append(unit).append("' colspan=" + currentActionDuration + ">");
-					if (row[i] != null) {
-						sbTr.append(row[i].getAllele().getName());
-					}
-					sbTr.append("</td>");
-					i = i + currentActionDuration - 1;
-				} else {
-					sbTr.append("<td style='background-color: ").append(htmlRgb).append("; width:").append(cellSize)
-							.append(unit).append("'>");
-					if (row[i] != null) {
-						sbTr.append(row[i].getAllele().getName());
-					}
-					sbTr.append("</td>");
+					sb.append(" colspan=" + currentActionDuration);
 				}
-				if (nbCols > nbColsMax) {
-					nbColsMax = nbCols;
+				// END TD LENGTH
+				sb.append(" title=\"").append(currentActionDuration).append("\"");
+				sb.append(">");
+				if (row[i] != null) {
+					sb.append(row[i].getAllele().getName());
+				}
+				sb.append("</td>");
+				// END TD
+
+				// GOTO END ACTION
+				if (currentActionDuration > 1) {
+					i += currentActionDuration;
+				} else {
+					i += 1;
 				}
 			}
-			sbTr.append("</tr>");
+			sb.append("</tr>");
 		}
-		sbTr.append("</table>");
+		sb.append("</tbody></table>");
 
-		// header
-		sb.append(header);
-
-		String res = sb.toString() + sbTr.toString();
+		String res = sb.toString();
 		if (display) {
 			log.info(res);
 			JOptionPane.showMessageDialog(null, new JLabel(res));
 		}
 		return res;
-
-		// JOptionPane.showMessageDialog(null, html);
 	}
 
 }

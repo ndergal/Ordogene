@@ -28,7 +28,7 @@ public class UserManagerTest {
 		UserManager uh = new UserManager();
 		if (uh.checkUserExists("bwana"))
 			uh.removeUser("bwana");
-		assertTrue(uh.createAnUser("bwana"));
+		assertTrue(uh.createUser("bwana"));
 		uh.removeUser("bwana");
 	}
 
@@ -36,7 +36,7 @@ public class UserManagerTest {
 	public void removesUserTest() {
 		UserManager uh = new UserManager();
 		if (!uh.checkUserExists("edsvinubb"))
-			uh.createAnUser("bwana");
+			uh.createUser("bwana");
 
 		assertTrue(uh.removeUser("bwana"));
 	}

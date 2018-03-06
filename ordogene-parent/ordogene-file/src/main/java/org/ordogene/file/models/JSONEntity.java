@@ -3,7 +3,11 @@ package org.ordogene.file.models;
 import java.util.Objects;
 
 import org.ordogene.file.parser.Validable;
-
+/**
+ * POJO
+ * @author darwinners team
+ *
+ */
 public class JSONEntity implements Validable {
 	private String name;
 	private int quantity;

@@ -156,7 +156,7 @@ public class CommandsTest {
 	public void testStopCalculationClientException() {
 		HttpClientErrorException e = new HttpClientErrorException(HttpStatus.BAD_REQUEST, "test status text");
 		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
-				.thenThrow(HttpClientErrorException.class);
+				.thenThrow(e);
 		assertEquals(HttpStatus.BAD_REQUEST.value() + " -- test status text", commands.stopCalculation(666));
 	}
 
@@ -180,8 +180,8 @@ public class CommandsTest {
 		HttpServerErrorException e = new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "test status text");
 		String dst = "/tmp/result.png";
 		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
-				.thenThrow(HttpServerErrorException.class);
-		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value() + " -- test status text", commands.resultCalculation(666, new File(dst), true));
+				.thenThrow(e);
+		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value() + " -- test status text",  commands.resultCalculation(666, new File(dst), true,false));
 	}
 
 	@Test
@@ -189,8 +189,8 @@ public class CommandsTest {
 		HttpClientErrorException e = new HttpClientErrorException(HttpStatus.BAD_REQUEST, "test status text");
 		String dst = "/tmp/result.png";
 		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
-				.thenThrow(HttpClientErrorException.class);
-		assertEquals(HttpStatus.BAD_REQUEST.value() + " -- test status text", commands.resultCalculation(666, new File(dst), true));
+				.thenThrow(e);
+		assertEquals(HttpStatus.BAD_REQUEST.value() + " -- test status text", commands.resultCalculation(666, new File(dst), true,false));
 	}
 
 	@Test
@@ -198,7 +198,7 @@ public class CommandsTest {
 		String dst = "/tmp/result.png";
 		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
 				.thenThrow(RestClientException.class);
-		assertEquals("Problem with the communication between client and server", commands.resultCalculation(666, new File(dst), true));
+		assertEquals("Problem with the communication between client and server", commands.resultCalculation(666, new File(dst), true,false));
 	}
 
 	@Test
@@ -211,7 +211,7 @@ public class CommandsTest {
 				.thenReturn(re);
 		when(re.getBody()).thenReturn(ajr);
 		when(ajr.getBase64img()).thenReturn(base64img);
-		assertEquals("The image of the result is downloaded at " + dst, commands.resultCalculation(666, new File(dst), true));
+		assertEquals("The image of the result is downloaded at " + dst, commands.resultCalculation(666, new File(dst), true,false));
 	}
 	
 	@Test

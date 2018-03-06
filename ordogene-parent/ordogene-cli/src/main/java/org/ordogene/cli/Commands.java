@@ -57,24 +57,24 @@ public class Commands {
 			Scanner scanner = new Scanner(System.in);
 			String choice = scanner.nextLine();
 			switch (choice) {
-				case "":
-				case "n":
-				case "N":
-				case "no":
-					do {
-						log.info("Enter your group id : ");
-						id = scanner.nextLine();
-					} while (id.isEmpty() ? true : !getUser(id));
-					break loop;
-				case "y":
-				case "Y":
-				case "yes":
-					if (!createUser()) {
-						log.error("Problem with the server: user creation failed");
-						System.exit(1);
-					}
-					break loop;
-				default:
+			case "":
+			case "n":
+			case "N":
+			case "no":
+				do {
+					log.info("Enter your group id : ");
+					id = scanner.nextLine();
+				} while (id.isEmpty() ? true : !getUser(id));
+				break loop;
+			case "y":
+			case "Y":
+			case "yes":
+				if (!createUser()) {
+					log.error("Problem with the server: user creation failed");
+					System.exit(1);
+				}
+				break loop;
+			default:
 			}
 		}
 		log.info("\n");
@@ -122,10 +122,10 @@ public class Commands {
 		String jsonContentRead;
 		try {
 			jsonContentRead = FileUtils.readFile(model);
-		} catch (IOException | IllegalArgumentException e ) {
+		} catch (IOException | IllegalArgumentException e) {
 			return e.getMessage();
 		}
-		
+
 		// Request
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
@@ -137,7 +137,7 @@ public class Commands {
 			int cid = response.getBody().getCid();
 			return "Calculation '" + cid + "' launched";
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
-			 return e.getStatusCode() + " -- " + e.getStatusText();
+			return e.getStatusCode() + " -- " + e.getStatusText();
 		} catch (RestClientException e) {
 			log.debug(e.getMessage());
 			return PROBLEM_WITH_THE_COMMUNICATION_BETWEEN_CLIENT_AND_SERVER;
@@ -176,7 +176,7 @@ public class Commands {
 		// Request
 		try {
 			restTemplate.exchange("/" + id + CALCULATIONS + cid, HttpMethod.DELETE, null, ApiJsonResponse.class);
-			return "Calculation " + cid + " has been deleted.";
+			return "Calculation '" + cid + "' has been deleted.";
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
 			return e.getStatusCode() + " -- " + e.getStatusText();
 		} catch (RestClientException e) {
@@ -194,14 +194,19 @@ public class Commands {
 	 *            path of the generated image
 	 * @param force
 	 *            if set, overwrite if dst already exists
+	 * @param html
+	 *            if set, save the result in html (else, save in png)
 	 */
 	@ShellMethod(value = "Get the result of a calculation")
-	public String resultCalculation(int cid, File dst, @ShellOption(arity = 0, defaultValue = "false") boolean force) {
+	public String resultCalculation(int cid, File dst, @ShellOption(arity = 0, defaultValue = "false") boolean force,
+			@ShellOption(arity = 0, defaultValue = "false") boolean html) {
 
 		// Parameter validation
 		Path path = dst.toPath();
-		if (dst.isDirectory()) {
-			path = Paths.get(dst.toPath().toString() + File.separator + this.id + "_" + cid);
+		if (dst.isDirectory() && html) {
+			path = Paths.get(dst.toPath().toString() + File.separator + this.id + "_" + cid + ".html");
+		} else if (dst.isDirectory() && !html) {
+			path = Paths.get(dst.toPath().toString() + File.separator + this.id + "_" + cid + ".png");
 		}
 		if (path.toFile().exists() && !force) {
 			return "A file already exists, use --force to overwrite.";
@@ -210,24 +215,61 @@ public class Commands {
 		// Request
 		ResponseEntity<ApiJsonResponse> response = null;
 		try {
-			response = restTemplate.exchange("/" + id + CALCULATIONS + cid, HttpMethod.GET, null,
-					ApiJsonResponse.class);
 
-			// Writing the image
+			if (html) {
+				response = restTemplate.exchange("/" + id + CALCULATIONS + cid + "/html", HttpMethod.GET, null,
+						ApiJsonResponse.class);
+				// Writing the html
+				String base64 = response.getBody().getBase64img();
+				FileUtils.saveHtmlFromBase64(base64, path.toAbsolutePath().toString());
+				return "The html of the result is downloaded at " + dst;
 
-			String base64img = response.getBody().getBase64img();
-			try {
-				FileUtils.saveImageFromBase64(base64img, path.toAbsolutePath().toString());
-			} catch (IOException e) {
-				// IOException or NoSuchFileException
-				return e.getMessage();
+			} else {
+				response = restTemplate.exchange("/" + id + CALCULATIONS + cid, HttpMethod.GET, null,
+						ApiJsonResponse.class);
+				// Writing the image
+				String base64 = response.getBody().getBase64img();
+				FileUtils.saveImageFromBase64(base64, path.toAbsolutePath().toString());
+				return "The image of the result is downloaded at " + dst;
 			}
-			return "The image of the result is downloaded at " + dst;
+
+		} catch (IOException e) {
+			// IOException or NoSuchFileException
+			return e.getMessage();
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
 			return e.getStatusCode() + " -- " + e.getStatusText();
 		} catch (RestClientException e) {
 			log.debug(e.getMessage());
 			return PROBLEM_WITH_THE_COMMUNICATION_BETWEEN_CLIENT_AND_SERVER;
+		}
+	}
+
+	/**
+	 * Open a file with the default launcher for it"
+	 * 
+	 * @param file
+	 *            file to open
+	 */
+	@ShellMethod(value = "Open a file", key = { "xdg-open", "start", "open" })
+	public boolean xdgOpen(File file) {
+		Runtime currentRuntime = Runtime.getRuntime();
+		String absolutePath = file.getAbsolutePath();
+		String cmd = absolutePath;
+		if (isLinux()) {
+			cmd = (String.format("xdg-open %s", absolutePath));
+		} else if (isMac()) {
+			cmd = (String.format("open %s", absolutePath));
+		} else if (isWindows() && isWindows9X()) {
+			cmd = (String.format("command.com /C start %s", absolutePath));
+		} else if (isWindows()) {
+			cmd = (String.format("cmd /c start %s", absolutePath));
+		}
+		try {
+			currentRuntime.exec(cmd);
+			return true;
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			return false;
 		}
 	}
 
@@ -238,7 +280,7 @@ public class Commands {
 		try {
 			restTemplate.exchange("/" + id, HttpMethod.GET, null, ApiJsonResponse.class);
 			this.id = id;
-			log.info("Welcome back " + id);
+			log.info("Welcome back {}", id);
 			return true;
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
 			log.error(e.getStatusCode() + " -- " + e.getStatusText());
@@ -256,7 +298,7 @@ public class Commands {
 			ResponseEntity<ApiJsonResponse> response = restTemplate.exchange("/", HttpMethod.PUT, null,
 					ApiJsonResponse.class);
 			id = response.getBody().getUserId();
-			log.info("Your new group id is " + id);
+			log.info("Your new group id is {}", id);
 			return true;
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
 			log.error(e.getStatusCode() + " -- " + e.getStatusText());
@@ -276,7 +318,7 @@ public class Commands {
 		}
 		for (int i = 0; i < list.size(); i++) {
 			Calculation c = list.get(i);
-			log.debug(c.toString());
+			log.debug("{}", c);
 			data[i + 1][0] = String.valueOf(c.getId());
 			data[i + 1][1] = c.getName();
 			data[i + 1][2] = formater.format(new Date(c.getStartTimestamp()));
@@ -287,5 +329,25 @@ public class Commands {
 			data[i + 1][7] = String.valueOf(c.getMaxIteration());
 		}
 		return builder;
+	}
+
+	private static boolean isWindows() {
+		String os = System.getProperty("os.name").toLowerCase();
+		return os.indexOf("windows") != -1 || os.indexOf("nt") != -1;
+	}
+
+	private static boolean isMac() {
+		String os = System.getProperty("os.name").toLowerCase();
+		return os.indexOf("mac") != -1;
+	}
+
+	private static boolean isLinux() {
+		String os = System.getProperty("os.name").toLowerCase();
+		return os.indexOf("linux") != -1;
+	}
+
+	private static boolean isWindows9X() {
+		String os = System.getProperty("os.name").toLowerCase();
+		return os.equals("windows 95") || os.equals("windows 98");
 	}
 }

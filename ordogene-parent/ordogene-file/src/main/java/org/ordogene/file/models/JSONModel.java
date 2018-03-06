@@ -10,6 +10,12 @@ import org.ordogene.file.parser.Validable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+
+/**
+ * POJO
+ * @author darwinners team
+ *
+ */
 public class JSONModel implements Validable {
 	private int slots;
 	@JsonProperty("exec_time")
@@ -26,6 +32,10 @@ public class JSONModel implements Validable {
 				&& fitness.isValid() && this.Consistency() && name != null;
 	}
 
+	/**
+	 * 
+	 * @return true if the actual model is full and coherent, false otherwise
+	 */
 	private boolean Consistency() {
 		Set<String> all = new HashSet<String>();
 		Set<String> contained = new HashSet<String>();
