@@ -18,6 +18,7 @@ import io.jenetics.util.RandomRegistry;
 
 /**
  * Represents an individual (as a sequance of Actions)
+ * 
  * @author darwinners team
  *
  */
@@ -39,18 +40,17 @@ public class Schedule implements Chromosome<ActionGene> {
 
 	@Override
 	public Chromosome<ActionGene> newInstance() {
-		// jenetics parallelise un maximum de tâches, comme nous utilisons un unique model pour tous les individus
-		// il faut bloquer sont accès lors de la création d'un individu pour éviter les états incohérents du model
-		synchronized (model) {
-			return of(model, 0.001);
-		}
+		// jenetics parallelise un maximum de tâches, comme nous utilisons un unique
+		// model pour tous les individus
+		// il faut bloquer sont accès lors de la création d'un individu pour éviter les
+		// états incohérents du model
+		return of(model, 0.001);
 	}
 
 	@Override
 	public Chromosome<ActionGene> newInstance(ISeq<ActionGene> genes) {
-		long newDuration = genes.stream()
-								.mapToLong(ag -> ag.getStartTime() + ag.getAllele().getTime())
-								.max().getAsLong();
+		long newDuration = genes.stream().mapToLong(ag -> ag.getStartTime() + ag.getAllele().getTime()).max()
+				.getAsLong();
 		return new Schedule(genes, model, model.calculEndEnvironment(genes), newDuration);
 	}
 
