@@ -34,6 +34,15 @@ public class Model {
 	private final Fitness fitness;
 	private ActionSelector actionSelector = new ActionSelector();
 
+	/**
+	 * Constructor
+	 * @param name Name of the model
+	 * @param slots Number of slots
+	 * @param execTime Maximum execution time for an individual
+	 * @param environment The starting environment for this model
+	 * @param actions The collection of all actions within this model
+	 * @param fitness The fitness function
+	 */
 	public Model(String name, int slots, int execTime, Environment environment,
 			Set<Action> actions, Fitness fitness) {
 		if (slots <= 0) {
@@ -53,6 +62,11 @@ public class Model {
 		this.fitness = Objects.requireNonNull(fitness);
 	}
 
+	/**
+	 * Factory method for Model class
+	 * @param jm JSONModel to parse into a Model
+	 * @return a Model based from the given JSONModel 
+	 */
 	public static Model createModel(JSONModel jm) {
 		Objects.requireNonNull(jm);
 		Environment env = new Environment(
@@ -74,9 +88,9 @@ public class Model {
 	/**
 	 * Check if the action can be done with the actual environment
 	 * 
-	 * @param a
-	 *            The action to checked
-	 * @param currentEnvironment 
+	 * @param a The action to check
+	 * @param currentEnvironment Environment on which the Action 'a' is checked
+	 * @param currentTime When does the Action 'a' starts
 	 * @return True if the action can be done, else False
 	 */
 	public boolean workable(Action a, Environment currentEnvironment, int currentTime) {
@@ -105,8 +119,8 @@ public class Model {
 
 	/**
 	 * Give an {@link Action} workable in the environment
-	 * @param currentEnvironment2 
-	 * 
+	 * @param currentEnvironment The Environment 
+	 * @param currentTime When 
 	 * @return an {@link Action workable} else the empty Action
 	 */
 	public Action getWorkableAction(Environment currentEnvironment, int currentTime) {
