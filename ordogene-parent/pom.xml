@@ -14,7 +14,7 @@
 	</modules>
 	<groupId>fr.ordogene</groupId>
 	<artifactId>ordogene-parent</artifactId>
-	<version>0.0.3-SNAPSHOT</version>
+	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<properties>
 		<maven.compiler.target>1.8</maven.compiler.target>
@@ -38,6 +38,5 @@
 		<connection>scm:git:https://bitbucket.org/darwinners/ordogene.git</connection>
  		<developerConnection>scm:git:https://bitbucket.org/darwinners/ordogene.git</developerConnection>
 		<url>https://bitbucket.org/darwinners/ordogene.git</url>
-	  <tag>ordogene-parent-0.0.1</tag>
   </scm>
 </project>
