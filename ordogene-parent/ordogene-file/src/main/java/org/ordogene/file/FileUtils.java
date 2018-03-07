@@ -23,6 +23,7 @@ import gui.ava.html.image.generator.HtmlImageGenerator;
 
 /**
  * Handle files for all the project : create, write in, check, remove, get path
+ * 
  * @author darwinners team
  *
  */
@@ -75,10 +76,13 @@ public class FileUtils {
 
 	/**
 	 * 
-	 * @param userId : owner of the calculation
-	 * @param cid : id of the calculation
-	 * @param calName : name of the calculation
-	 * @return : path of the calculation 
+	 * @param userId
+	 *            : owner of the calculation
+	 * @param cid
+	 *            : id of the calculation
+	 * @param cName
+	 *            : name of the calculation
+	 * @return : path of the calculation
 	 */
 	public static String getCalculationDirectoryPath(String userId, int cid, String cName) {
 		return Const.getConst().get("ApplicationPath") + File.separatorChar + userId + File.separatorChar + "" + cid
@@ -87,9 +91,12 @@ public class FileUtils {
 
 	/**
 	 * 
-	 * @param userId : owner of the calculation
-	 * @param cid : id of the calculation
-	 * @param calName : name of the calculation
+	 * @param userId
+	 *            : owner of the calculation
+	 * @param cid
+	 *            : id of the calculation
+	 * @param calName
+	 *            : name of the calculation
 	 * @return : path of the state.json file for this calculation
 	 */
 	public static String getCalculationStatePath(String userId, int cid, String calName) {
@@ -98,6 +105,7 @@ public class FileUtils {
 
 	/**
 	 * call the method to get user's calculations
+	 * 
 	 * @param username
 	 * @return the calculations of the specified user in argument
 	 */
@@ -139,6 +147,7 @@ public class FileUtils {
 
 	/**
 	 * call the method to remove user's calculations
+	 * 
 	 * @param username
 	 *            : owner of the calculation to deleter
 	 * @param cid
@@ -153,9 +162,12 @@ public class FileUtils {
 
 	/**
 	 * 
-	 * @param base64Html : html code in base 64
-	 * @param pathDstHtml : path to save the base 64 html decoded
-	 * @throws IOException : if it's not possible to write (rights, incorrect path,...)
+	 * @param base64Html
+	 *            : html code in base 64
+	 * @param pathDstHtml
+	 *            : path to save the base 64 html decoded
+	 * @throws IOException
+	 *             : if it's not possible to write (rights, incorrect path,...)
 	 */
 	public static void saveHtmlFromBase64(String base64Html, String pathDstHtml) throws IOException {
 		Objects.requireNonNull(base64Html);
@@ -203,7 +215,7 @@ public class FileUtils {
 	 * 
 	 * @param html
 	 *            : html content to write
-	 * @param directory
+	 * @param calculationDirectory
 	 *            : destination Path for the .png and .html file
 	 * @return true if the files has been writed successfully, false otherwise.
 	 */
@@ -215,18 +227,18 @@ public class FileUtils {
 			if (htmlPath != null) {
 				Files.write(htmlPath, html.getBytes(StandardCharsets.UTF_8));
 			}
-	
+
 			HtmlImageGenerator imageGenerator = new HtmlImageGenerator();
 			imageGenerator.loadHtml(html);
 			imageGenerator.saveAsImage(pngPath.toString());
-	
+
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}
 	}
-	
+
 	/**
 	 * call the method to check if the given user exist on the server
 	 * 
@@ -248,6 +260,8 @@ public class FileUtils {
 	 *            : id of the calculation to write in
 	 * @param calName
 	 *            : name of the calculation to write in
+	 *
+	 * @throws IOException
 	 */
 	public static void writeJsonInFile(Object content, String username, int cid, String calName) throws IOException {
 		Path dest = Paths.get(getCalculationStatePath(username, cid, calName));

@@ -29,7 +29,7 @@ public class Parser {
 	 * @throws JsonParseException
 	 * @throws JsonMappingException
 	 * @throws IllegalAccessException
-	 * @throws UnmarshalException : if all the fields are not presents in the JSON.
+	 * @throws UnmarshalException : if all the required fields are not presents in the JSON.
 	 */
 	public static Validable parseJsonFile(Path jsonPath, Class<? extends Validable> classe)
 			throws IOException, JsonParseException, JsonMappingException, IllegalAccessException, UnmarshalException {
@@ -47,7 +47,7 @@ public class Parser {
 	 * @throws JsonParseException
 	 * @throws JsonMappingException
 	 * @throws IllegalAccessException
-	 * @throws UnmarshalException : if all the fields are not presents in the JSON.
+	 * @throws UnmarshalException : if all the required fields are not presents in the JSON.
 	 */
 	public static Validable parseJsonFile(String jsonString, Class<? extends Validable> classe)
 			throws JsonParseException, JsonMappingException, IOException, UnmarshalException {
@@ -58,13 +58,13 @@ public class Parser {
 	/**
 	 * 
 	 * @param jsonPath : byte array to parse
-	 * @param classe : class of the Object to deserialize into <- Must implements Validable.
+	 * @param classe : class of the Object to deserialize into (Must implements Validable)
 	 * @return parsed file in a Validable object.
-	 * @throws IOException
+	 * @throws IOException : if impossible to read the data
 	 * @throws JsonParseException
 	 * @throws JsonMappingException
 	 * @throws IllegalAccessException
-	 * @throws UnmarshalException : if all the fields are not presents in the JSON.
+	 * @throws UnmarshalException : if all the required fields are not presents in the JSON.
 	 */
 	public static Validable parseJsonFile(byte[] jsonData, Class<? extends Validable> classe)
 			throws JsonParseException, JsonMappingException, IOException, UnmarshalException {

@@ -64,8 +64,8 @@ public class CalculationManager {
 	/**
 	 * remove the calculation specified
 	 * @param username : specified calculation owner
-	 * @param calculationID : id of the calculation to delete
-	 * @param calculationName : name of the calculation to delete
+	 * @param cid : id of the calculation to delete
+	 * @param cName : name of the calculation to delete
 	 * @return true if success, false else.
 	 */
 	public boolean removeCalculation(String username, int cid, String cName) {
