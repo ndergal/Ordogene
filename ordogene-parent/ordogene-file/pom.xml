@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.ordogene</groupId>
 		<artifactId>ordogene-parent</artifactId>
-		<version>0.0.2</version>
+		<version>0.0.3-SNAPSHOT</version>
 	</parent>
 	<artifactId>ordogene-file</artifactId>
 	<name>ordogene-file</name>
