@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.ordogene</groupId>
 		<artifactId>ordogene-parent</artifactId>
-		<version>0.0.3-SNAPSHOT</version>
+		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>ordogene-algorithme</artifactId>
 	<name>ordogene-algorithme</name>
@@ -31,7 +31,7 @@
 		<dependency>
 			<groupId>fr.ordogene</groupId>
 			<artifactId>ordogene-file</artifactId>
-			<version>0.0.3-SNAPSHOT</version>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jacoco</groupId>
@@ -51,34 +51,6 @@
 
 	<build>
 		<plugins>
-
-			<!-- <plugin> -->
-			<!-- <groupId>org.apache.maven.plugins</groupId> -->
-			<!-- <artifactId>maven-assembly-plugin</artifactId> -->
-			<!-- <configuration> -->
-			<!-- get all project dependencies -->
-			<!-- <descriptorRefs> -->
-			<!-- <descriptorRef>jar-with-dependencies</descriptorRef> -->
-			<!-- </descriptorRefs> -->
-			<!-- MainClass in mainfest make a executable jar -->
-			<!-- <archive> -->
-			<!-- <manifest> -->
-			<!-- <mainClass>fr.ordogene.algorithme.Main</mainClass> -->
-			<!-- </manifest> -->
-			<!-- </archive> -->
-
-			<!-- </configuration> -->
-			<!-- <executions> -->
-			<!-- <execution> -->
-			<!-- <id>make-assembly</id> -->
-			<!-- bind to the packaging phase -->
-			<!-- <phase>package</phase> -->
-			<!-- <goals> -->
-			<!-- <goal>single</goal> -->
-			<!-- </goals> -->
-			<!-- </execution> -->
-			<!-- </executions> -->
-			<!-- </plugin> -->
 
 			<plugin>
 				<groupId>org.jacoco</groupId>
