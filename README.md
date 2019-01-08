@@ -49,7 +49,7 @@ Inside the **ordogene-parent** directory run :
 
 ### Documentation ###
 
-[User Manual](https://bitbucket.org/darwinners/ordogene/src/b32ed07f152c29d3e0c05ca8e07c08b5772017c1/ordogene-parent/docs/User_Manual.pdf?at=master "link to the User Manual")
+[User Manual](https://github.com/ndergal/Ordogene/blob/LaunchCalculation/docs/User_Manual.pdf "link to the User Manual")
 
 [Jenetics LIBRARY USER'S MANUAL](http://jenetics.io/manual/manual-4.0.0.pdf "link to the Jenetics LIBRARY USER'S MANUAL")  
 
