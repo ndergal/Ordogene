@@ -1,16 +1,20 @@
 package org.ordogene.algorithme.master;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
+import java.util.Objects;
 
 import javax.xml.bind.UnmarshalException;
 
 import org.ordogene.algorithme.Model;
 import org.ordogene.file.JSONModel;
 import org.ordogene.file.parser.Parser;
+import org.ordogene.file.utils.Calculation;
+import org.ordogene.file.utils.Const;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -21,107 +25,111 @@ public class Master {
 	private int currentThread;
 	private final Map<Integer, ThreadHandler> threadMap = new HashMap<>();
 
-	static class ThreadHandler {
-		private Thread thread;
-		private final BlockingQueue<String> queue1 = new ArrayBlockingQueue<>(1);
-		private final BlockingQueue<String> queue2 = new ArrayBlockingQueue<>(1);
-
-		public void masterToThread(String str) throws InterruptedException {
-			queue1.put(str);
-		}
-
-		public String masterFromThread() throws InterruptedException {
-			return queue2.take();
-		}
-
-		public void threadToMaster(String str) throws InterruptedException {
-			queue2.put(str);
-		}
-
-		public String threadFromMaster() throws InterruptedException {
-			return queue1.poll();
-		}
-
-		public void setThread(Thread thread) {
-			this.thread = thread;
-		}
-
-	}
-
 	public Master() {
 		maxThread = DEFAULT_THREAD;
 	}
 
 	public Master(int maxThread) {
+		if(maxThread <= 0) {
+			throw new IllegalArgumentException("The max Thread can not be zero or negative");
+		}
 		this.maxThread = maxThread;
 	}
 
-	public int compute(String idUser, String jsonString) throws JsonParseException, JsonMappingException,
-			InstantiationException, IllegalAccessException, UnmarshalException, IOException, InterruptedException {
+	public Integer compute(String idUser, String jsonString)
+			throws JsonParseException, JsonMappingException, UnmarshalException, IOException {
 
+		Objects.requireNonNull(idUser);
+		Objects.requireNonNull(jsonString);
+		
 		synchronized (threadMap) {
 			if (currentThread == maxThread) {
-				// timeout -2 complet ~5sec -1 error random
-				return -2;
+				return null;
 			}
 			currentThread++;
 		}
 
 		JSONModel jmodel = (JSONModel) Parser.parseJsonFile(jsonString, JSONModel.class);
 		Model model = Model.createModel(jmodel);
-		int numCalc = jsonString.hashCode();
+
+		String toHash = jsonString + (new Date()).toString();
+		int calculationId = toHash.hashCode();
 
 		ThreadHandler th = new ThreadHandler();
-		Thread t = new Thread(() -> {
-			
-			try {
-				Dummy.fakeCalculation(th, idUser,numCalc);
-			} catch (InterruptedException | IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			
-			/*
-			System.out.println("hello world !");
-			int i = 5;
-			while (i > 0) {
-				try {
-					threadMap.wait(1000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				try {
-					String str = th.threadFromMaster();
-					if (str != null) {
-						th.threadToMaster("hello thread");
-					}
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				i--;
-			}
-			*/
 
-			// TODO donner blockingqueue a la méthode sunchronized pour get th
+		CalculationHandler ch = new CalculationHandler(th, model, idUser, calculationId);
+
+		Thread t = new Thread(() -> {
+
+			ch.launchCalculation();
+
 			synchronized (threadMap) {
 				currentThread--;
- 				threadMap.remove(numCalc);
+				threadMap.remove(calculationId);
 				return;
 			}
 		});
+
 		synchronized (threadMap) {
-			th.setThread(t);
+			threadMap.put(calculationId, th);
 			t.start();
-			threadMap.put(numCalc, th);
-			return numCalc;
+			return calculationId;
+		}
+
+	}
+
+	public void updateCalculation(Calculation cal, String userId) {
+		ThreadHandler th = threadMap.get(cal.getId());
+		if (th != null) {
+			// IsRunning
+			try {
+				th.masterToThread("state");
+
+				// Format: epoch_iterationNumber_lastIterationSaved_maxIteration_fitness
+				String[] state = th.masterFromThread().split("_");
+				try {
+					cal.setCalculation(Long.valueOf(state[0]), Integer.valueOf(state[1]), Integer.valueOf(state[2]),
+							Integer.valueOf(state[3]), cal.getId(), cal.getName(), Integer.valueOf(state[4]));
+				} catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+					throw new InternalError("Problem with calculation format informations");
+				}
+				cal.setRunning(true);
+			} catch (InterruptedException e) {
+				// Master will be closed
+				Thread.currentThread().interrupt();
+			}
+		} else {
+			try {
+				String pathName = Const.getConst().get("ApplicationPath") + File.separator + userId + File.separator
+						+ cal.getId() + "_" + cal.getName() + File.separatorChar + "state.json";
+				Calculation tmpCal = (Calculation) Parser.parseJsonFile(Paths.get(pathName), Calculation.class);
+				cal.setStartTimestamp(tmpCal.getStartTimestamp());
+				cal.setIterationNumber(tmpCal.getIterationNumber());
+				cal.setLastIterationSaved(tmpCal.getLastIterationSaved());
+				cal.setMaxIteration(tmpCal.getMaxIteration());
+				cal.setFitnessSaved(tmpCal.getFitnessSaved());
+				cal.setRunning(false);
+			} catch (IllegalAccessException | UnmarshalException | IOException e) {
+				System.err.println("Problem to read the calculation ");
+			}
 		}
 	}
 
-	public String getInfoByNumCalc(int numCalc) throws InterruptedException {
-		ThreadHandler th = threadMap.get(numCalc);
-		th.masterToThread("something");
-		return th.masterFromThread();
+	// TODO connection with Thread
+	public boolean interruptCalculation(int calculationId) {
+		ThreadHandler th = threadMap.get(calculationId);
+		if (th != null) {
+			// IsRunning
+			try {
+				th.masterToThread("interrupt");
+				return true;
+			} catch (InterruptedException e) {
+				// Master will be closed
+				Thread.currentThread().interrupt();
+				return false;
+			}
+		} else {
+			return false;
+		}
 	}
 }

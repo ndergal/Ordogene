@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 import org.ordogene.file.models.JSONAction;
 
 public class Action {
-	public static Action EMPTY(int time) {
-		return new Action("EMPTY", time, Collections.emptySet(), Collections.emptySet());
+	public static Action EMPTY() {
+		return new Action("EMPTY", 1, Collections.emptySet(), Collections.emptySet());
 	}
 	
 	private final String name;

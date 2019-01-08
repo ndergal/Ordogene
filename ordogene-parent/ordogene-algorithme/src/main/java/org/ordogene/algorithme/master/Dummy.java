@@ -10,23 +10,23 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.concurrent.ArrayBlockingQueue;
 
-import org.ordogene.algorithme.master.Master.ThreadHandler;
 import org.ordogene.file.utils.Const;
 
 public class Dummy {
 
-	public static void fakeCalculation(ThreadHandler th, String uid, int cid) throws InterruptedException, IOException {
-		int occur = 0;
+
+	public static void fakeCalculation(String calculationName, String uid, int cid, int occur) throws InterruptedException, IOException {
+
 		if (uid == null) {
 			System.err.println("Pas de dossier ou écrire spécifié en argument!");
 		}
 		String location = Const.getConst().get("ApplicationPath");
-		if (location == null) {
+		if (location == null) { // avoid problem with noconfig file : only for the dev
 			location = "/home/ordogene/testProjectFiles/";
 		}
-		location = location + File.separator + uid + File.separator + cid+"_Dummy";
+		
+		location = location + File.separator + uid + File.separator + cid + "_" + calculationName;
 		if (!Files.exists(Paths.get(location))) {
 			Files.createDirectories(Paths.get(location));
 		}
@@ -36,27 +36,26 @@ public class Dummy {
 			System.err.println("Error while creating the directory " + location);
 			e.printStackTrace();
 		}
-		while (occur < 10) {
-			Thread.sleep(900);
-			try (FileOutputStream fos = new FileOutputStream(location + File.separator + "result" + occur + ".jpg")) {
+
+		Thread.sleep(900);
+		if (occur == 0) {
+
+			try (FileOutputStream fos = new FileOutputStream(location + File.separator + "result" + ".png")) {
 				URL doge = new URL("https://quiteirregular.files.wordpress.com/2014/02/doge.png");
 				ReadableByteChannel rbc = Channels.newChannel(doge.openStream());
 				fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
 			} catch (FileAlreadyExistsException e) {
 				System.err.println("already exists: " + e.getMessage());
 			}
-			occur++;
-			try {
-				String str = th.threadFromMaster();
-				if (str != null) {
-					th.threadToMaster("hello thread");
-				}
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		} else {
+			try (FileOutputStream fos = new FileOutputStream(location + File.separator + "result" + occur + ".png")) {
+				URL doge = new URL("https://quiteirregular.files.wordpress.com/2014/02/doge.png");
+				ReadableByteChannel rbc = Channels.newChannel(doge.openStream());
+				fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+			} catch (FileAlreadyExistsException e) {
+				System.err.println("already exists: " + e.getMessage());
 			}
 		}
-
 	}
 
 	private static String imgAsBase64(URL imgUrl) throws IOException {

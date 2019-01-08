@@ -55,7 +55,12 @@ public class Const {
 	}
 	
 	public static Map<String, String> getConst() {
+		if(resourcesMap==null || resourcesMap.size()==0) {
+			System.err.println("No configuration loaded.");
+			return new HashMap<>();
+		}
 		return Collections.unmodifiableMap(resourcesMap);
+
 	}
 }
  

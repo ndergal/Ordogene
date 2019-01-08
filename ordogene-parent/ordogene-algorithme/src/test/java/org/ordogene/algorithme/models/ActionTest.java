@@ -3,13 +3,10 @@ package org.ordogene.algorithme.models;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 
 import org.junit.Test;
 import org.ordogene.file.models.JSONAction;
@@ -21,17 +18,7 @@ public class ActionTest {
 
 	@Test
 	public void testEMPTY() {
-		Action.EMPTY(1);
-	}
-
-	@Test(expected=IllegalArgumentException.class)
-	public void testEMPTY_zero_time() {
-		Action.EMPTY(0);
-	}
-
-	@Test(expected=IllegalArgumentException.class)
-	public void testEMPTY_negative_time() {
-		Action.EMPTY(-1);
+		Action.EMPTY();
 	}
 
 	@Test

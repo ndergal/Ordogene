@@ -1,5 +1,6 @@
 {
 "snaps" : [5,10,20,100],
+    "name" : "short_path_200.json",
 "slots" : 440,
 "exec_time" : 10000,
 "environment" : [

@@ -22,6 +22,7 @@ public class JSONModel implements Validable {
 	private int slots;
 	@JsonProperty("exec_time")
 	private int execTime;
+	private String name;
 	private List<JSONEntity> environment;
 	private List<JSONAction> actions;
 	private JSONFitness fitness;
@@ -73,6 +74,14 @@ public class JSONModel implements Validable {
 		if (slots <= 0) {
 			throw new IllegalArgumentException("slots number cannot be negative or equal to zero");
 		}
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public int getExecTime() {
@@ -127,6 +136,8 @@ public class JSONModel implements Validable {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Model\n[snaps=");
 		builder.append(snaps);
+		builder.append(",\nname=");
+		builder.append(name);
 		builder.append(",\nslots=");
 		builder.append(slots);
 		builder.append(",\nexecTime=");

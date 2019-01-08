@@ -37,16 +37,19 @@
 			<scope>test</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>fr.ordogene</groupId>
-			<artifactId>ordogene-algorithme</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
+		<!-- <dependency> <groupId>fr.ordogene</groupId> <artifactId>ordogene-file</artifactId> 
+			<version>0.0.1-SNAPSHOT</version> </dependency> -->
 
 		<dependency>
 			<groupId>org.jacoco</groupId>
 			<artifactId>jacoco-maven-plugin</artifactId>
 			<version>0.7.9</version>
+		</dependency>
+
+		<dependency>
+			<groupId>fr.ordogene</groupId>
+			<artifactId>ordogene-algorithme</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
@@ -103,6 +106,7 @@
 					</execution>
 				</executions>
 			</plugin>
+
 
 			<plugin>
 				<groupId>org.jacoco</groupId>

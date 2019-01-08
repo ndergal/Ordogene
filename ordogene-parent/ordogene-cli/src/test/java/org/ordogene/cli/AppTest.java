@@ -1,38 +1,35 @@
 package org.ordogene.cli;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.shell.jline.PromptProvider;
 
 /**
- * Unit test for simple App.
+ * These tests are for coverage purposes
+ * @author ordogene
+ *
  */
-public class AppTest 
-    extends TestCase
-{
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public AppTest( String testName )
-    {
-        super( testName );
-    }
-
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
-    {
-        return new TestSuite( AppTest.class );
-    }
-
-    /**
-     * Rigourous Test :-)
-     */
-    public void testApp()
-    {
-        assertTrue( true );
-    }
+@RunWith(MockitoJUnitRunner.class)
+public class AppTest {
+	
+	private App app;
+	
+	@Before
+	public void init() {
+		app = new App();
+	}
+	
+	@Test
+	public void should_cover_rest_template_bean_method() throws Exception {
+		app.myRestTemplate(new RestTemplateBuilder());
+	}
+	
+	@Test
+	public void should_cover_prompt_provider_bean_method() throws Exception {
+		PromptProvider pp = app.myPromptProvider();
+		pp.getPrompt();
+	}
 }
