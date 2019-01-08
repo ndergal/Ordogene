@@ -55,4 +55,4 @@ Inside the **ordogene-parent** directory run :
 
 ### Contribution guidelines ###
 
-* If you want to contribute to the project you have to fork before
+* If you want to contribute to the project you have to fork.
