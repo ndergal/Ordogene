@@ -1,0 +1,5 @@
+{
+    "ApplicationPath": "/opt/ordogene/testProjectFiles",
+    "ResultSaveInterval": 60,
+    "MaxComputationThreads": 9
+}

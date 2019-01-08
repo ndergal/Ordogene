@@ -1,0 +1,742 @@
+{
+    "name" : "short_path_50.json",
+"slots" : 200,
+"exec_time" : 10000,
+"environment" : [
+{"name" : "node_0", "quantity" : 0},
+{"name" : "node_1", "quantity" : 0},
+{"name" : "node_2", "quantity" : 0},
+{"name" : "node_3", "quantity" : 0},
+{"name" : "node_4", "quantity" : 0},
+{"name" : "node_5", "quantity" : 0},
+{"name" : "node_6", "quantity" : 0},
+{"name" : "node_7", "quantity" : 0},
+{"name" : "node_8", "quantity" : 0},
+{"name" : "node_9", "quantity" : 0},
+{"name" : "node_10", "quantity" : 0},
+{"name" : "node_11", "quantity" : 0},
+{"name" : "node_12", "quantity" : 0},
+{"name" : "node_13", "quantity" : 0},
+{"name" : "node_14", "quantity" : 0},
+{"name" : "node_15", "quantity" : 0},
+{"name" : "node_16", "quantity" : 0},
+{"name" : "node_17", "quantity" : 0},
+{"name" : "node_18", "quantity" : 0},
+{"name" : "node_19", "quantity" : 0},
+{"name" : "node_20", "quantity" : 0},
+{"name" : "node_21", "quantity" : 0},
+{"name" : "node_22", "quantity" : 0},
+{"name" : "node_23", "quantity" : 0},
+{"name" : "node_24", "quantity" : 0},
+{"name" : "node_25", "quantity" : 0},
+{"name" : "node_26", "quantity" : 0},
+{"name" : "node_27", "quantity" : 0},
+{"name" : "node_28", "quantity" : 0},
+{"name" : "node_29", "quantity" : 0},
+{"name" : "node_30", "quantity" : 0},
+{"name" : "node_31", "quantity" : 0},
+{"name" : "node_32", "quantity" : 0},
+{"name" : "node_33", "quantity" : 0},
+{"name" : "node_34", "quantity" : 0},
+{"name" : "node_35", "quantity" : 0},
+{"name" : "node_36", "quantity" : 0},
+{"name" : "node_37", "quantity" : 0},
+{"name" : "node_38", "quantity" : 0},
+{"name" : "node_39", "quantity" : 0},
+{"name" : "node_40", "quantity" : 0},
+{"name" : "node_41", "quantity" : 0},
+{"name" : "node_42", "quantity" : 0},
+{"name" : "node_43", "quantity" : 0},
+{"name" : "node_44", "quantity" : 0},
+{"name" : "node_45", "quantity" : 0},
+{"name" : "node_46", "quantity" : 0},
+{"name" : "node_47", "quantity" : 0},
+{"name" : "node_48", "quantity" : 0},
+{"name" : "node_49", "quantity" : 1},
+{"name" : "energie", "quantity" : 200}
+],
+"actions" : [
+  {"name" : "edges_1_22", "time" : 1,
+     "input" : [
+       { "name" : "node_1", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_22", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_2_6", "time" : 1,
+     "input" : [
+       { "name" : "node_2", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_6", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_2_28", "time" : 1,
+     "input" : [
+       { "name" : "node_2", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_28", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_3_8", "time" : 1,
+     "input" : [
+       { "name" : "node_3", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_8", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_3_14", "time" : 1,
+     "input" : [
+       { "name" : "node_3", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_14", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_3_35", "time" : 1,
+     "input" : [
+       { "name" : "node_3", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_35", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_4_11", "time" : 1,
+     "input" : [
+       { "name" : "node_4", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_11", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_6_22", "time" : 1,
+     "input" : [
+       { "name" : "node_6", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_22", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_6_37", "time" : 1,
+     "input" : [
+       { "name" : "node_6", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_37", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_6_46", "time" : 1,
+     "input" : [
+       { "name" : "node_6", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_46", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_7_9", "time" : 1,
+     "input" : [
+       { "name" : "node_7", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_9", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_8_11", "time" : 1,
+     "input" : [
+       { "name" : "node_8", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_11", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_8_31", "time" : 1,
+     "input" : [
+       { "name" : "node_8", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_31", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_9_14", "time" : 1,
+     "input" : [
+       { "name" : "node_9", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_14", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_9_41", "time" : 1,
+     "input" : [
+       { "name" : "node_9", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_41", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_10_27", "time" : 1,
+     "input" : [
+       { "name" : "node_10", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_27", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_11_5", "time" : 1,
+     "input" : [
+       { "name" : "node_11", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_5", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_12_23", "time" : 1,
+     "input" : [
+       { "name" : "node_12", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_23", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_12_28", "time" : 1,
+     "input" : [
+       { "name" : "node_12", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_28", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_13_43", "time" : 1,
+     "input" : [
+       { "name" : "node_13", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_43", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_14_23", "time" : 1,
+     "input" : [
+       { "name" : "node_14", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_23", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_14_32", "time" : 1,
+     "input" : [
+       { "name" : "node_14", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_32", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_14_44", "time" : 1,
+     "input" : [
+       { "name" : "node_14", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_44", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_16_9", "time" : 1,
+     "input" : [
+       { "name" : "node_16", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_9", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_17_2", "time" : 1,
+     "input" : [
+       { "name" : "node_17", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_2", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_17_4", "time" : 1,
+     "input" : [
+       { "name" : "node_17", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_4", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_17_16", "time" : 1,
+     "input" : [
+       { "name" : "node_17", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_16", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_18_39", "time" : 1,
+     "input" : [
+       { "name" : "node_18", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_39", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_18_45", "time" : 1,
+     "input" : [
+       { "name" : "node_18", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_45", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_19_2", "time" : 1,
+     "input" : [
+       { "name" : "node_19", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_2", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_19_23", "time" : 1,
+     "input" : [
+       { "name" : "node_19", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_23", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_19_40", "time" : 1,
+     "input" : [
+       { "name" : "node_19", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_40", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_20_8", "time" : 1,
+     "input" : [
+       { "name" : "node_20", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_8", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_20_31", "time" : 1,
+     "input" : [
+       { "name" : "node_20", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_31", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_21_18", "time" : 1,
+     "input" : [
+       { "name" : "node_21", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_18", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_21_28", "time" : 1,
+     "input" : [
+       { "name" : "node_21", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_28", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_21_34", "time" : 1,
+     "input" : [
+       { "name" : "node_21", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_34", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_23_10", "time" : 1,
+     "input" : [
+       { "name" : "node_23", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_10", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_23_14", "time" : 1,
+     "input" : [
+       { "name" : "node_23", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_14", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_23_45", "time" : 1,
+     "input" : [
+       { "name" : "node_23", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_45", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_24_8", "time" : 1,
+     "input" : [
+       { "name" : "node_24", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_8", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_25_39", "time" : 1,
+     "input" : [
+       { "name" : "node_25", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_39", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_25_43", "time" : 1,
+     "input" : [
+       { "name" : "node_25", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_43", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_26_24", "time" : 1,
+     "input" : [
+       { "name" : "node_26", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_24", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_27_18", "time" : 1,
+     "input" : [
+       { "name" : "node_27", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_18", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_28_9", "time" : 1,
+     "input" : [
+       { "name" : "node_28", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_9", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_28_17", "time" : 1,
+     "input" : [
+       { "name" : "node_28", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_17", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_28_43", "time" : 1,
+     "input" : [
+       { "name" : "node_28", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_43", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_29_10", "time" : 1,
+     "input" : [
+       { "name" : "node_29", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_10", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_29_21", "time" : 1,
+     "input" : [
+       { "name" : "node_29", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_21", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_30_6", "time" : 1,
+     "input" : [
+       { "name" : "node_30", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_6", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_30_44", "time" : 1,
+     "input" : [
+       { "name" : "node_30", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_44", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_31_9", "time" : 1,
+     "input" : [
+       { "name" : "node_31", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_9", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_31_17", "time" : 1,
+     "input" : [
+       { "name" : "node_31", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_17", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_31_44", "time" : 1,
+     "input" : [
+       { "name" : "node_31", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_44", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_35_44", "time" : 1,
+     "input" : [
+       { "name" : "node_35", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_44", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_36_5", "time" : 1,
+     "input" : [
+       { "name" : "node_36", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_5", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_36_21", "time" : 1,
+     "input" : [
+       { "name" : "node_36", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_21", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_38_21", "time" : 1,
+     "input" : [
+       { "name" : "node_38", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_21", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_38_30", "time" : 1,
+     "input" : [
+       { "name" : "node_38", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_30", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_39_2", "time" : 1,
+     "input" : [
+       { "name" : "node_39", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_2", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_39_36", "time" : 1,
+     "input" : [
+       { "name" : "node_39", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_36", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_40_5", "time" : 1,
+     "input" : [
+       { "name" : "node_40", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_5", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_40_17", "time" : 1,
+     "input" : [
+       { "name" : "node_40", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_17", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_40_27", "time" : 1,
+     "input" : [
+       { "name" : "node_40", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_27", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_41_2", "time" : 1,
+     "input" : [
+       { "name" : "node_41", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_2", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_41_35", "time" : 1,
+     "input" : [
+       { "name" : "node_41", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_35", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_41_42", "time" : 1,
+     "input" : [
+       { "name" : "node_41", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_42", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_42_8", "time" : 1,
+     "input" : [
+       { "name" : "node_42", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_8", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_43_36", "time" : 1,
+     "input" : [
+       { "name" : "node_43", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_36", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_44_7", "time" : 1,
+     "input" : [
+       { "name" : "node_44", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_7", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_44_15", "time" : 1,
+     "input" : [
+       { "name" : "node_44", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_15", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_47_12", "time" : 1,
+     "input" : [
+       { "name" : "node_47", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_12", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_48_28", "time" : 1,
+     "input" : [
+       { "name" : "node_48", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_28", "quantity" : 1}
+     ]
+  },
+  {"name" : "edges_49_3", "time" : 1,
+     "input" : [
+       { "name" : "node_49", "quantity" : 1, "relation" : "r" },
+       { "name" : "energie", "quantity" : 1, "relation" : "c" }
+     ],
+     "output" : [
+       {"name" : "node_3", "quantity" : 1}
+     ]
+  }
+],
+"fitness" : {
+"type" : "max",
+"operands" : [
+{"name" : "node_34", "coef" : 50},
+{"name" : "energie", "coef" : 1}
+]
+}
+}

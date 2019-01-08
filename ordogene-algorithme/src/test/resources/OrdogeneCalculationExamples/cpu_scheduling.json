@@ -1,0 +1,148 @@
+{
+    "name" : "cpu_scheduling.json",
+    "slots" : 300,
+    "exec_time" : 100,
+    "environment" : [
+	{"name" : "cpu", "quantity" : 4},
+	{"name" : "t1", "quantity" : 0},
+	{"name" : "t2", "quantity" : 0},
+	{"name" : "t3", "quantity" : 0},
+	{"name" : "t4", "quantity" : 0},
+	{"name" : "t5", "quantity" : 0},
+	{"name" : "t6", "quantity" : 0},
+	{"name" : "t7", "quantity" : 0},
+	{"name" : "t8", "quantity" : 0},
+	{"name" : "t9", "quantity" : 0},
+	{"name" : "t10", "quantity" : 0},
+	{"name" : "t11", "quantity" : 0},
+	{"name" : "t12", "quantity" : 0},
+	{"name" : "t13", "quantity" : 0}
+    ],
+    "actions" : [
+        {"name" : "do_t1", "time" : 1,
+         "input" : [
+    	     { "name" : "cpu", "quantity" : 1, "relation" : "p" }
+	 ],
+	 "output" : [
+	     {"name" : "t1", "quantity" : 1}
+	 ]
+	},
+        {"name" : "do_t2", "time" : 1,
+         "input" : [
+    	     { "name" : "cpu", "quantity" : 1, "relation" : "p" }
+	 ],
+	 "output" : [
+	     {"name" : "t2", "quantity" : 1}
+	 ]
+	},
+        {"name" : "do_t3", "time" : 1,
+         "input" : [
+    	     { "name" : "cpu", "quantity" : 1, "relation" : "p" }
+	 ],
+	 "output" : [
+	     {"name" : "t3", "quantity" : 1}
+	 ]
+	},
+        {"name" : "do_t4", "time" : 1,
+         "input" : [
+    	     { "name" : "cpu", "quantity" : 1, "relation" : "p" },
+    	     { "name" : "t1", "quantity" : 1, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "t4", "quantity" : 1}
+	 ]
+	},
+        {"name" : "do_t5", "time" : 1,
+         "input" : [
+    	     { "name" : "cpu", "quantity" : 1, "relation" : "p" },
+    	     { "name" : "t1", "quantity" : 1, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "t5", "quantity" : 1}
+	 ]
+	},
+        {"name" : "do_t6", "time" : 1,
+         "input" : [
+    	     { "name" : "cpu", "quantity" : 1, "relation" : "p" },
+    	     { "name" : "t2", "quantity" : 1, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "t6", "quantity" : 1}
+	 ]
+	},
+        {"name" : "do_t7", "time" : 1,
+         "input" : [
+    	     { "name" : "cpu", "quantity" : 1, "relation" : "p" },
+    	     { "name" : "t3", "quantity" : 1, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "t7", "quantity" : 1}
+	 ]
+	},
+        {"name" : "do_t8", "time" : 1,
+         "input" : [
+    	     { "name" : "cpu", "quantity" : 1, "relation" : "p" },
+    	     { "name" : "t3", "quantity" : 1, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "t8", "quantity" : 1}
+	 ]
+	},
+        {"name" : "do_t9", "time" : 1,
+         "input" : [
+    	     { "name" : "cpu", "quantity" : 1, "relation" : "p" },
+    	     { "name" : "t4", "quantity" : 1, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "t9", "quantity" : 1}
+	 ]
+	},
+        {"name" : "do_t10", "time" : 1,
+         "input" : [
+    	     { "name" : "cpu", "quantity" : 1, "relation" : "p" },
+    	     { "name" : "t5", "quantity" : 1, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "t10", "quantity" : 1}
+	 ]
+	},
+        {"name" : "do_t11", "time" : 1,
+         "input" : [
+    	     { "name" : "cpu", "quantity" : 1, "relation" : "p" },
+    	     { "name" : "t7", "quantity" : 1, "relation" : "c" },
+    	     { "name" : "t8", "quantity" : 1, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "t11", "quantity" : 1}
+	 ]
+	},
+        {"name" : "do_t12", "time" : 1,
+         "input" : [
+    	     { "name" : "cpu", "quantity" : 1, "relation" : "p" },
+    	     { "name" : "t9", "quantity" : 1, "relation" : "c" },
+    	     { "name" : "t10", "quantity" : 1, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "t12", "quantity" : 1}
+	 ]
+	},
+        {"name" : "do_t13", "time" : 1,
+         "input" : [
+    	     { "name" : "cpu", "quantity" : 1, "relation" : "p" },
+    	     { "name" : "t6", "quantity" : 1, "relation" : "c" },
+    	     { "name" : "t11", "quantity" : 1, "relation" : "c" },
+    	     { "name" : "t12", "quantity" : 1, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "t13", "quantity" : 1}
+	 ]
+	}
+    ],
+    "fitness" : {
+	"type" : "value",
+	"value" : 50,
+	"operands" : [
+	    {"name" : "t13", "coef" : 50}
+	]
+    }
+}

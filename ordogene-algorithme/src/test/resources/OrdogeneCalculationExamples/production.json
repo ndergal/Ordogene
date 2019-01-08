@@ -1,0 +1,67 @@
+{
+    "name" : "production.json",
+    "slots" : 1000,
+    "exec_time" : 10,
+    "environment" : [
+	{"name" : "argent", "quantity" : 1000},
+	{"name" : "vis", "quantity" : 0},
+	{"name" : "bois", "quantity" : 0},
+	{"name" : "planche_30", "quantity" : 0},
+	{"name" : "planche_70", "quantity" : 0},
+	{"name" : "employe", "quantity" : 4},
+	{"name" : "meuble", "quantity" : 0}
+    ],
+    "actions" : [
+        {"name" : "acheter_vis", "time" : 1,
+         "input" : [
+    	     { "name" : "argent", "quantity" : 2, "relation" : "c" }
+	 ],
+	 "output" : [
+	     {"name" : "vis", "quantity" : 50}
+	 ]
+	},
+        {"name" : "acheter_bois", "time" : 1,
+         "input" : [
+    	     { "name" : "argent", "quantity" : 15, "relation" : "c" }
+		 ],
+		 "output" : [
+		     {"name" : "bois", "quantity" : 10}
+		 ]
+	},
+        {"name" : "couper", "time" : 7,
+         "input" : [
+    	     { "name" : "bois", "quantity" : 1, "relation" : "c" },
+    	     { "name" : "employe", "quantity" : 1, "relation" : "p" }
+		 ],
+		 "output" : [
+		     {"name" : "planche_30", "quantity" : 1},
+		     {"name" : "planche_70", "quantity" : 1}
+		 ]
+	},
+        {"name" : "assembler", "time" : 4,
+         "input" : [
+    	     { "name" : "planche_30", "quantity" : 5, "relation" : "c" },
+    	     { "name" : "planche_70", "quantity" : 2, "relation" : "c" },
+    	     { "name" : "vis", "quantity" : 20, "relation" : "c" },
+    	     { "name" : "employe", "quantity" : 1, "relation" : "p" }
+		 ],
+		 "output" : [
+		     {"name" : "meuble", "quantity" : 1}
+		 ]
+	},
+        {"name" : "vendre", "time" : 2,
+         "input" : [
+    	     { "name" : "meuble", "quantity" : 1, "relation" : "c" }
+		 ],
+		 "output" : [
+		     {"name" : "argent", "quantity" : 450}
+		 ]
+	}
+    ],
+    "fitness" : {
+	"type" : "max",
+	"operands" : [
+	    {"name" : "argent", "coef" : 100}
+	]
+    }
+}
