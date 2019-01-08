@@ -10,7 +10,7 @@ import org.ordogene.file.utils.Const;
 /**
  * Unit test for simple App.
  */
-public class UserHandlerTest {
+public class UserManagerTest {
 
 	@Before
 	public void init() {
@@ -19,24 +19,24 @@ public class UserHandlerTest {
 	
 	@Test
 	public void noUserTest() {
-		UserHandler uh = new UserHandler();
+		UserManager uh = new UserManager();
 		assertFalse(uh.checkUserExists("edsvinubb"));
 	}
 
 	@Test
 	public void createUserTest() {
-		UserHandler uh = new UserHandler();
+		UserManager uh = new UserManager();
 		if (uh.checkUserExists("bwana"))
 			uh.removeUser("bwana");
-		assertTrue(uh.createAnUser("bwana"));
+		assertTrue(uh.createUser("bwana"));
 		uh.removeUser("bwana");
 	}
 
 	@Test
 	public void removesUserTest() {
-		UserHandler uh = new UserHandler();
+		UserManager uh = new UserManager();
 		if (!uh.checkUserExists("edsvinubb"))
-			uh.createAnUser("bwana");
+			uh.createUser("bwana");
 
 		assertTrue(uh.removeUser("bwana"));
 	}

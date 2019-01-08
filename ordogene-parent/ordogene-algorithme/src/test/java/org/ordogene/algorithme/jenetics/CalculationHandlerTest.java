@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Random;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -12,9 +13,11 @@ import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.ordogene.algorithme.Model;
 import org.ordogene.algorithme.master.ThreadHandler;
-import org.ordogene.file.JSONModel;
+import org.ordogene.file.models.JSONModel;
 import org.ordogene.file.parser.Parser;
 import org.ordogene.file.utils.Const;
+
+import io.jenetics.util.RandomRegistry;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CalculationHandlerTest {
@@ -50,7 +53,7 @@ public class CalculationHandlerTest {
 	public void testCalculationHandler2() throws Exception {
 		//RandomRegistry.setRandom(new Random(0));
 		URL urlTestFile = CalculationHandlerTest.class.getClassLoader()
-				.getResource("OrdogeneCalculationExamples" + File.separator + "short_path_10.json");
+				.getResource("OrdogeneCalculationExamples" + File.separator + "tiny_strategy_game.json");
 		byte[] contentFile = Files.readAllBytes(Paths.get(urlTestFile.toURI()));
 		String jsonContent = new String(contentFile);
 
@@ -63,12 +66,12 @@ public class CalculationHandlerTest {
 	public void testCalculationHandler3() throws Exception {
 		//RandomRegistry.setRandom(new Random(0));
 		URL urlTestFile = CalculationHandlerTest.class.getClassLoader()
-				.getResource("OrdogeneCalculationExamples" + File.separator + "small_strategy_game.json");
+				.getResource("OrdogeneCalculationExamples" + File.separator + "short_path_10.json");
 		byte[] contentFile = Files.readAllBytes(Paths.get(urlTestFile.toURI()));
 		String jsonContent = new String(contentFile);
 
 		CalculationHandler sb = new CalculationHandler(new ThreadHandler(),
-				Model.createModel((JSONModel) Parser.parseJsonFile(jsonContent, JSONModel.class)), userId, 0);
+				Model.createModel((JSONModel) Parser.parseJsonFile(jsonContent, JSONModel.class)), userId, 10);
 		sb.launchCalculation();
 	}
 }

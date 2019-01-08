@@ -1,8 +1,7 @@
 {
-"snaps" : [5,10,20,100],
-    "name" : "short_path_10.json",
+"name" : "short_path_10.json",
 "slots" : 100,
-"exec_time" : 10000,
+"exec_time" : 100,
 "environment" : [
 {"name" : "node_0", "quantity" : 0},
 {"name" : "node_1", "quantity" : 0},

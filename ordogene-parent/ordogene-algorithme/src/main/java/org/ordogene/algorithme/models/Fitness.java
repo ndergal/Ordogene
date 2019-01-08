@@ -9,6 +9,7 @@ import org.ordogene.file.models.Relation;
 import org.ordogene.file.models.Type;
 
 public class Fitness {
+	
 	private final Type type;
 	private Long value;
 	private final HashMap<String, Long> operands = new HashMap<>();

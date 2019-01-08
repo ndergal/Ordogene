@@ -1,6 +1,7 @@
 package org.ordogene.algorithme.jenetics;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -8,36 +9,57 @@ import java.util.TreeMap;
 import org.ordogene.algorithme.Model;
 import org.ordogene.algorithme.models.Action;
 import org.ordogene.algorithme.models.Environment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import io.jenetics.AbstractChromosome;
 import io.jenetics.Chromosome;
 import io.jenetics.util.ISeq;
 import io.jenetics.util.RandomRegistry;
 
-public class Schedule extends AbstractChromosome<ActionGene> {
+/**
+ * Represents an individual (as a sequance of Actions)
+ * 
+ * @author darwinners team
+ *
+ */
+public class Schedule implements Chromosome<ActionGene> {
 
-	private static final long serialVersionUID = 1L;
+	private static final Logger logger = LoggerFactory.getLogger(Schedule.class);
 
+	private final ISeq<ActionGene> seq;
 	private final Model model;
+	private final Environment endEnv;
+	private final long duration;
 
-	public Schedule(ISeq<ActionGene> seq, Model model) {
-		super(seq);
+	public Schedule(ISeq<ActionGene> seq, Model model, Environment endEnv, long duration) {
+		this.seq = seq;
 		this.model = model;
+		this.endEnv = endEnv;
+		this.duration = duration;
 	}
-
 
 	@Override
 	public Chromosome<ActionGene> newInstance() {
-		return new Schedule(_genes, model);
+		// jenetics parallelise un maximum de tâches, comme nous utilisons un unique
+		// model pour tous les individus
+		// il faut bloquer sont accès lors de la création d'un individu pour éviter les
+		// états incohérents du model
+		return of(model, 0.001);
 	}
 
 	@Override
 	public Chromosome<ActionGene> newInstance(ISeq<ActionGene> genes) {
-		return new Schedule(genes, model);
+		long newDuration = genes.stream().mapToLong(ag -> ag.getStartTime() + ag.getAllele().getTime()).max()
+				.getAsLong();
+		return new Schedule(genes, model, model.calculEndEnvironment(genes), newDuration);
+	}
+
+	public Environment getEndEnv() {
+		return endEnv;
 	}
 
 	public static Schedule of(Model model, double probaToStop) {
-		//System.out.println("\n\nNEW SCHEDULE");
+		logger.debug("\n\nNEW SCHEDULE");
 		model.resetModel();
 		// Environment which evolve with the creation
 		Environment envAfterStart = model.getStartEnvironment().copy();
@@ -46,91 +68,104 @@ public class Schedule extends AbstractChromosome<ActionGene> {
 		SortedMap<Integer, List<Action>> map = new TreeMap<>();
 		// List which represent the sequence
 		ArrayList<ActionGene> seq = new ArrayList<>();
-		// Boolean to end action at current time
 		// The current time
 		int timeAtStart = 0;
 		int timeAtEnd = 0;
 
 		// Continue while a action is in progress or a Action is possible
-		// TODO add possibility to stop while and stop Schedule building
-		while (model.hasWorkableAction(envAfterEnd, timeAtEnd) || !map.isEmpty()) {
+		while (model.hasWorkableAction(envAfterEnd, timeAtEnd)) {
 
 			// Select a action
-			//System.out.println("Time :" + currentTime);
 			Action action = model.getWorkableAction(envAfterEnd, timeAtEnd);
-			if(action != null) {
-				
+			if (action != null) {
+
 				// Parallele start
-				if(model.workable(action, envAfterStart, timeAtStart)) {
+				if (model.workable(action, envAfterStart, timeAtStart)) {
 					// Create ActionGene and add it on seq
 					ActionGene actionGene = ActionGene.of(action, timeAtStart);
-					seq.add(actionGene);	
+					seq.add(actionGene);
 
-					//Change StartEnvironment
+					// Change StartEnvironment
 					model.startAction(action, envAfterStart, timeAtStart);
-					
+
 				} else {
-				// start After
+					// start After
 					ActionGene actionGene = ActionGene.of(action, timeAtEnd);
 					seq.add(actionGene);
-					
+
 					// Change startTime
 					timeAtStart = timeAtEnd;
-					
+
 					// Change StartEnvironment
 					envAfterStart = envAfterEnd;
 					model.startAction(action, envAfterStart, timeAtStart);
 				}
-				
+
 				// Calcul actionEndTime
 				int actionEndTime = timeAtStart + action.getTime();
 				// Add action in map to end it later
-				List<Action> actions = map.get(actionEndTime);
-				if (actions == null) {
-					actions = new ArrayList<>();
-					map.put(actionEndTime, actions);
-				}
+				List<Action> actions = map.computeIfAbsent(actionEndTime, (key) -> new ArrayList<>());
 				actions.add(action);
 			}
-			
-			if(timeAtEnd == timeAtStart) {
+
+			if (timeAtEnd == timeAtStart || action == null) {
 				// Remove action which ended in previous startTime
 				map.remove(timeAtEnd);
+				if (map.isEmpty()) {
+					break;
+				}
 			}
-			
+
 			// Change timeAtEnd
 			timeAtEnd = map.firstKey();
-			
+
 			// Change EndEnvironment
 			envAfterEnd = envAfterStart.copy();
-			for(Action a : map.get(timeAtEnd)) {
+			for (Action a : map.get(timeAtEnd)) {
 				model.endAction(envAfterEnd, a);
 			}
-			
+
 			double randomValue = RandomRegistry.getRandom().nextDouble();
-			if(randomValue < probaToStop) {
+			if (randomValue < probaToStop) {
 				break;
 			}
-			
-		}
-		
-		map.remove(timeAtEnd);
-		final Environment finalEnv = envAfterEnd;
-		map.forEach((endTime,actionList) -> {
-			for(Action a : actionList) {
-				model.endAction(finalEnv, a);
-			}
-		});
-		
-		System.out.println("Seq : " + seq);
-		System.out.println("Size seq : " + seq.size());
-		System.out.println("End Env :" + finalEnv);
-		return new Schedule(ISeq.of(seq), model);
-	}
 
+		}
+		return new Schedule(ISeq.of(seq), model, envAfterEnd, timeAtEnd);
+
+	}
 
 	public Model getModel() {
 		return model;
+	}
+
+	public long getDuration() {
+		return duration;
+	}
+
+	@Override
+	public boolean isValid() {
+		return seq.stream().allMatch(ActionGene::isValid);
+	}
+
+	@Override
+	public Iterator<ActionGene> iterator() {
+		return seq.iterator();
+	}
+
+	@Override
+	public ActionGene getGene(int index) {
+		return seq.get(index);
+	}
+
+	@Override
+	public int length() {
+		return seq.length();
+	}
+
+	@Override
+	public ISeq<ActionGene> toSeq() {
+		return seq;
 	}
 
 }

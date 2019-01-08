@@ -1,9 +1,10 @@
 package org.ordogene.api;
 
+import java.security.SecureRandom;
+
 import org.ordogene.api.utils.ApiJsonResponseCreator;
-import org.ordogene.file.FileService;
+import org.ordogene.file.FileUtils;
 import org.ordogene.file.utils.ApiJsonResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,11 +13,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * API class to handle users (check if exists, add, generate names)
+ * @author darwinners team
+ *
+ */
 @RestController
 public class UserController {
 
-	@Autowired
-	FileService fs;
+	private final static String ALPHA_NUM = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 	
 	/**
@@ -30,7 +35,7 @@ public class UserController {
 		if (userId == null || "".equals(userId)) {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
 		}
-		if (!fs.userExist(userId)) {
+		if (!FileUtils.userExist(userId)) {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNotExist(userId), HttpStatus.NOT_FOUND);
 		} else {
 			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(userId, 0, null, null, null),HttpStatus.OK);
@@ -48,7 +53,7 @@ public class UserController {
 		if (userId == null || "".equals(userId)) {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
 		}
-		if(fs.addUser(userId)) {
+		if(FileUtils.addUser(userId)) {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdCreated(userId),HttpStatus.OK);
 		}
 		return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNotCreated(),HttpStatus.INTERNAL_SERVER_ERROR);
@@ -62,11 +67,19 @@ public class UserController {
 	@ResponseBody
 	public ResponseEntity<ApiJsonResponse> createUserRandomId() {
 		int nbCharRandom = 7;
-		String randomId = fs.generateRandomUserId(nbCharRandom);
-		while (fs.userExist(randomId)) {
-			randomId = fs.generateRandomUserId(nbCharRandom);
-		}
+		String randomId;
+		do {
+			randomId = generateRandomUserId(nbCharRandom);
+		} while (FileUtils.userExist(randomId));
 		return createUserGivenId(randomId);
+	}
+	
+	private static String generateRandomUserId(int nbChar) {
+		SecureRandom rnd = new SecureRandom();
+		StringBuilder sb = new StringBuilder(nbChar);
+		for (int i = 0; i < nbChar; i++)
+			sb.append(ALPHA_NUM.charAt(rnd.nextInt(ALPHA_NUM.length())));
+		return sb.toString();
 	}
 	
  

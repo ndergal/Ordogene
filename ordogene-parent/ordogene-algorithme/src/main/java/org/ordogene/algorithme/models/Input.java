@@ -22,10 +22,6 @@ public class Input extends Entity{
 		return relation;
 	}
 	
-	public Input copy() {
-		return new Input(getName(), getQuantity(), relation);
-	}
-	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

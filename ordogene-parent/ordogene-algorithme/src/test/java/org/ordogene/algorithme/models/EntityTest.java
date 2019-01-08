@@ -48,19 +48,6 @@ public class EntityTest {
 	}
 	
 	@Test
-	public void test_setQuantity() {
-		Entity e = new Entity("name", 0);
-		e.setQuantity(3);
-		assertEquals(3, e.getQuantity());
-	}
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void test_setQuantity_negative_value() {
-		Entity e = new Entity("name", 0);
-		e.setQuantity(-3);
-	}
-	
-	@Test
 	public void test_getName() {
 		Entity e = new Entity("name", 0);
 		assertEquals("name", e.getName());

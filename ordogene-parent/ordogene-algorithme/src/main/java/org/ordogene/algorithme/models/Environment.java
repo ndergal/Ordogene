@@ -6,7 +6,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-public class Environment {
+public class Environment{
+	
 	private final Map<String, Entity> entities = new HashMap<>();
 	
 	public Environment(Set<Entity> entities) {

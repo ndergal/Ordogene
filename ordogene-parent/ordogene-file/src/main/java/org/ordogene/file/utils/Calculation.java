@@ -7,8 +7,11 @@ import org.ordogene.file.parser.Validable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Calculation implements Validable {
+	
 	/**
-	 * 
+	 * POJO
+	 * @author darwinners team
+	 *
 	 */
 	private int id;
 	private String name;
@@ -16,7 +19,7 @@ public class Calculation implements Validable {
 	private int iterationNumber;
 	private int maxIteration;
 	private long fitnessSaved;
-	private int lastIterationSaved;
+	private long lastIterationSaved;
 	private long startTimestamp;
 
 	public long getStartTimestamp() {
@@ -79,11 +82,11 @@ public class Calculation implements Validable {
 		this.maxIteration = maxIteration;
 	}
 
-	public int getLastIterationSaved() {
+	public long getLastIterationSaved() {
 		return lastIterationSaved;
 	}
 
-	public void setLastIterationSaved(int lastIterationSaved) {
+	public void setLastIterationSaved(long lastIterationSaved) {
 		if(lastIterationSaved < 0) {
 			throw new IllegalArgumentException("The last iteration saved cannot be negative");
 		}
@@ -110,7 +113,7 @@ public class Calculation implements Validable {
 		final int prime = 31;
 		int result = prime + id;
 		result = prime * result + iterationNumber;
-		result = prime * result + lastIterationSaved;
+		result = prime * result + (int) (lastIterationSaved ^ (lastIterationSaved >>> 32));
 		result = prime * result + maxIteration;
 		result = prime * result + name.hashCode();
 		result = prime * result + (running ? 1231 : 1237);
@@ -140,7 +143,7 @@ public class Calculation implements Validable {
 	}
 
 	@JsonIgnore
-	public void setCalculation(long startTimestamp, int iterationNumber, int lstIterationSaved, int maxIteration,
+	public void setCalculation(long startTimestamp, int iterationNumber, long lstIterationSaved, int maxIteration,
 			int id, String name, long fitness) {
 		setStartTimestamp(startTimestamp);
 		setIterationNumber(iterationNumber);

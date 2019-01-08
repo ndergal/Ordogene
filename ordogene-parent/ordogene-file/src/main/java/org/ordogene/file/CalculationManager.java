@@ -7,21 +7,35 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
 
-import org.codehaus.plexus.util.FileUtils;
 import org.ordogene.file.utils.Calculation;
 import org.ordogene.file.utils.Const;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class CalculationHandler {
+/**
+ * Handle calculations : get as list, or remove
+ * @author darwinners team
+ *
+ */
+public class CalculationManager {
+	private final static Logger log = LoggerFactory.getLogger(CalculationManager.class);
 
-	List<Calculation> getCalculations(String username) {
+	/**
+	 * 
+	 * @param username 
+	 * @return return the calculation of the user specified in argument
+	 */
+	public List<Calculation> getCalculations(String username) {
 		List<Calculation> res = new ArrayList<>();
 		if (username == null || username.equals("")) {
 			return res;
 		}
 		Path userPath = Paths.get(Const.getConst().get("ApplicationPath") + File.separatorChar + username);
-		try (DirectoryStream<Path> userPathStream = Files.newDirectoryStream(userPath, p -> Files.isDirectory(p))) {
+		try (DirectoryStream<Path> userPathStream = Files.newDirectoryStream(userPath, p -> p.toFile().isDirectory())) {
 
 			userPathStream.forEach(p -> {
 				Calculation currenCalculation = new Calculation();
@@ -36,35 +50,44 @@ public class CalculationHandler {
 					return;
 				}
 				currenCalculation.setName(idAndName[1]);
-				// currenCalculation.set
 				res.add(currenCalculation);
 			});
 
 		} catch (IOException e) {
-			System.err.println("Error while browsing the path " + userPath.toString());
+			log.error("Error while browsing the path " + userPath.toString());
 			e.printStackTrace();
 		}
 
 		return res;
 	}
 
-	boolean removeCalculation(String username, int calculationID, String calculationName) {
+	/**
+	 * remove the calculation specified
+	 * @param username : specified calculation owner
+	 * @param cid : id of the calculation to delete
+	 * @param cName : name of the calculation to delete
+	 * @return true if success, false else.
+	 */
+	public boolean removeCalculation(String username, int cid, String cName) {
 		if (username == null || username.equals("")) {
 			return false;
 		}
 
 		File todelete = new File(Const.getConst().get("ApplicationPath") + File.separatorChar + username
-				+ File.separatorChar + calculationID + "_" + calculationName);
+				+ File.separatorChar + cid + "_" + cName);
 		if(!todelete.exists()) {
 			return false;
 		}
-		try {
-			FileUtils.deleteDirectory(todelete);
+		try(Stream<Path> paths = Files.walk(todelete.toPath())) {
+		    paths.sorted(Comparator.reverseOrder())
+		    .map(Path::toFile)
+		    .forEach(File::delete);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
 		}
 		return true;
 	}
+	
 
 }

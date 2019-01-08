@@ -12,6 +12,7 @@ import org.ordogene.algorithme.models.Action;
 import io.jenetics.util.RandomRegistry;
 
 public class ActionSelector {
+	
 	private Random random = RandomRegistry.getRandom();
 	
 	private long lowerWeight = 0;

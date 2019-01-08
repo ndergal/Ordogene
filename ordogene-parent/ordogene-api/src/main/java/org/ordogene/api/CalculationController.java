@@ -1,18 +1,16 @@
 package org.ordogene.api;
 
-import java.io.FileNotFoundException;
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import javax.xml.bind.UnmarshalException;
 
 import org.ordogene.algorithme.master.Master;
 import org.ordogene.api.utils.ApiJsonResponseCreator;
-import org.ordogene.file.FileService;
+import org.ordogene.file.FileUtils;
 import org.ordogene.file.utils.ApiJsonResponse;
 import org.ordogene.file.utils.Calculation;
 import org.slf4j.Logger;
@@ -30,20 +28,22 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
+/**
+ * API Class containing routes to interact with calculations (get as list, launch, remove, stop, download)
+ * @author darwinners team
+ *
+ */
 @RestController
 public class CalculationController {
 	private static final Logger log = LoggerFactory.getLogger(CalculationController.class);
 
 	@Autowired
-	private FileService fs;
-
-	@Autowired
 	private Master masterAlgorithme;
 
 	/**
-	 * 
-	 * @param userId
-	 * @return
+	 *
+	 * @param userId : owner of the calculation listed
+	 * @return ResponseEntity<APiJsonResponse> which contains calculation list for the user, with Http code : 200 (or Http code 400 if the userId given is null, or 404 if the user does not exists) 
 	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/{userId}/calculations", produces = "application/json")
 	@ResponseBody
@@ -52,17 +52,17 @@ public class CalculationController {
 		if (userId == null || "".equals(userId)) {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
 		}
-		if (!fs.userExist(userId)) {
+		if (!FileUtils.userExist(userId)) {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNotExist(userId),
 					HttpStatus.NOT_FOUND);
 		} else {
 			// Do list
-			List<Calculation> calculations = fs.getUserCalculations(userId);
+			List<Calculation> calculations = FileUtils.getUserCalculations(userId);
 			calculations.forEach(c -> {
 				try {
 					masterAlgorithme.updateCalculation(c, userId);
 				} catch (InternalError e) {
-					System.err.println("Problem with calculation format informations");
+					log.error("Problem with calculation format informations");
 					return;
 				}
 			});
@@ -71,72 +71,76 @@ public class CalculationController {
 					HttpStatus.OK);
 		}
 	}
+	
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{userId}/calculations/{calculationId}"/*
-																									 * , produces =
-																									 * "application/json"
-																									 */)
+	/**
+	 *
+	 * @param userId : owner of the calculation to delete
+	 * @param calculationId : id of the calculation to delete
+	 * @return ResponseEntity<APiJsonResponse> with Http code : 200 (or Http code 400 if the userId given is null or the calculationId invalid, 
+	 * or 404 if the user does not exists) 
+	 */
+	@RequestMapping(method = RequestMethod.DELETE, value = "/{userId}/calculations/{calculationId}")
 	@ResponseBody
 	public ResponseEntity<ApiJsonResponse> removeCalculation(@PathVariable String userId,
 			@PathVariable int calculationId) {
 		if (userId == null || "".equals(userId))
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
 
-		if (!fs.userExist(userId))
+		if (!FileUtils.userExist(userId))
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNotExist(userId),
 					HttpStatus.NOT_FOUND);
 
-		Optional<Calculation> optCalc = fs.getUserCalculations(userId).stream().filter(c -> c.getId() == calculationId)
+		Optional<Calculation> optCalc = FileUtils.getUserCalculations(userId).stream().filter(c -> c.getId() == calculationId)
 				.findFirst();
 
 		if (!optCalc.isPresent()) {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.calculationIDNotExist(calculationId),
-					HttpStatus.BAD_REQUEST);
+					HttpStatus.NOT_FOUND);
 		} else {
-			try {
-				Calculation calcToDelete = optCalc.get();
-				if (fs.removeUserCalculation(userId, calcToDelete)) {
-					return new ResponseEntity<ApiJsonResponse>(
-							new ApiJsonResponse(userId, calculationId, null, null, null), HttpStatus.OK);
-				} else {
-					return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.InternalServerError(),
-							HttpStatus.INTERNAL_SERVER_ERROR);
-				}
-			} catch (NoSuchElementException e) {
+			Calculation calcToDelete = optCalc.get();
+			if(masterAlgorithme.isRunning(calculationId)) {
 				return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.calculationIDNotExist(calculationId),
 						HttpStatus.BAD_REQUEST);
+			}
+			if (FileUtils.removeUserCalculation(userId,calcToDelete.getId(),calcToDelete.getName())) {
+				return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(userId, calculationId, null, null, null),
+						HttpStatus.OK);
+			} else {
+				return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.InternalServerError(),
+						HttpStatus.INTERNAL_SERVER_ERROR);
+
 			}
 		}
 
 	}
 
 	/**
-	 * 
-	 * @param userId
-	 * @return
+	 *
+	 * @param userId : owner of the calculation to stop
+	 * @param calculationId : id of the calculation to stop
+	 * @return ResponseEntity<APiJsonResponse> with Http code : 200 (or Http code 400 if the userId given is null or the calculationId invalid (does not exists or not running), 
+	 * or 404 if the user does not exists) 
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/{userId}/calculations/{calculationId}"/*
-																									 * , produces =
-																									 * "application/json"
-																									 */)
+	@RequestMapping(method = RequestMethod.POST, value = "/{userId}/calculations/{calculationId}")
 	@ResponseBody
 	public ResponseEntity<ApiJsonResponse> stopCalculation(@PathVariable String userId,
 			@PathVariable int calculationId) {
 		if (userId == null || "".equals(userId)) {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
 		}
-		if (!fs.userExist(userId)) {
+		if (!FileUtils.userExist(userId)) {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNotExist(userId),
 					HttpStatus.NOT_FOUND);
 		} else {
-			if (fs.getUserCalculations(userId).stream().anyMatch(c -> c.getId() == calculationId)) {
+			if (FileUtils.getUserCalculations(userId).stream().anyMatch(c -> c.getId() == calculationId)) {
 				if (masterAlgorithme.interruptCalculation(calculationId)) {
 					return new ResponseEntity<ApiJsonResponse>(
 							new ApiJsonResponse(userId, calculationId, null, null, null), HttpStatus.OK);
 				} else {
 					return new ResponseEntity<ApiJsonResponse>(
 							new ApiJsonResponse(userId, calculationId, "The calcul is not running.", null, null),
-							HttpStatus.NOT_FOUND);
+							HttpStatus.BAD_REQUEST);
 				}
 			} else {
 				return new ResponseEntity<ApiJsonResponse>(
@@ -147,15 +151,13 @@ public class CalculationController {
 	}
 
 	/**
-	 * 
-	 * @param userId
-	 * @param jsonBody
-	 * @return
+	 *
+	 * @param userId : owner of the calculation to launch
+	 * @param jsonBody : json of the calculation to launch
+	 * @return ResponseEntity<APiJsonResponse> containing the calculation id with Http code : 200 (or Http code 400 if the userId given is null or the json invalid, 
+	 * 503 if the server is full, or 404 if the user does not exists) 
 	 */
-	@RequestMapping(value = "/{userId}/calculations", method = RequestMethod.PUT /*
-																					 * , consumes =
-																					 * MediaType.APPLICATION_JSON_VALUE
-																					 */)
+	@RequestMapping(value = "/{userId}/calculations", method = RequestMethod.PUT )
 	@ResponseBody
 	public ResponseEntity<ApiJsonResponse> launchCalculation(@PathVariable String userId,
 			@RequestBody String jsonBody) {
@@ -165,7 +167,7 @@ public class CalculationController {
 		if (jsonBody == null || "".equals(jsonBody)) {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.jsonBodyNull(), HttpStatus.BAD_REQUEST);
 		}
-		if (!fs.userExist(userId)) {
+		if (!FileUtils.userExist(userId)) {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNotExist(userId),
 					HttpStatus.NOT_FOUND);
 		}
@@ -196,39 +198,79 @@ public class CalculationController {
 		}
 	}
 
-	@RequestMapping(value = "/{id}/calculations/{calculationid}")
+	
+	/**
+	 *
+	 * @param userId : owner of the calculation to get
+	 * @param calculationid : id of the calculation to get
+	 * @return ResponseEntity<APiJsonResponse> containing the base 64 of the calculation result (image)  Http code : 200 (or Http code 400 if the userId given is null or 404 if the calculation or user does not exists) 
+	 */
+	@RequestMapping(value = "/{userId}/calculations/{calculationid}", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<ApiJsonResponse> getCalculation(@PathVariable String id, @PathVariable int calculationid) {
+	public ResponseEntity<ApiJsonResponse> getCalculationPng(@PathVariable String userId, @PathVariable int calculationid) {
 
-		if (id == null || "".equals(id)) {
+		if (userId == null || "".equals(userId)) {
 			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
 		}
 
-		if (!fs.userExist(id)) {
-			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNotExist(id), HttpStatus.NOT_FOUND);
+		if (!FileUtils.userExist(userId)) {
+			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNotExist(userId), HttpStatus.NOT_FOUND);
 		} else {
-			List<Calculation> calculations = fs.getUserCalculations(id);
+			List<Calculation> calculations = FileUtils.getUserCalculations(userId);
 			Optional<Calculation> calcul = calculations.stream().filter(x -> x.getId() == calculationid).findFirst();
 			if (calcul.isPresent()) {
 
 				try {
-					Path imgPath = Paths.get(FileService.getCalculationPngPath(id, calcul.get()));
-					String base64img = FileService.encodeImage(imgPath);
+					String base64img = FileUtils.encodeFile(Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationid, calcul.get().getName()) + File.separator + "result.png"));
 					return new ResponseEntity<ApiJsonResponse>(
-							new ApiJsonResponse(id, calculationid, null, null, base64img), HttpStatus.OK);
-				} catch (FileNotFoundException e) {
-					return new ResponseEntity<ApiJsonResponse>(
-							new ApiJsonResponse(id, 0, "cannot find calculation path", null, null),
-							HttpStatus.NOT_FOUND);
+							new ApiJsonResponse(userId, calculationid, null, null, base64img), HttpStatus.OK);
 				} catch (IOException e) {
 					return new ResponseEntity<ApiJsonResponse>(
-							new ApiJsonResponse(id, 0, "cannot open calculation path", null, null),
+							new ApiJsonResponse(userId, 0, "The result does not exist", null, null),
 							HttpStatus.NOT_FOUND);
 				}
 
 			}
-			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(id, 0,
-					"calculation " + calculationid + " does not exist for user " + id, null, null),
+			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(userId, 0,
+					"calculation " + calculationid + " does not exist for user " + userId, null, null),
+					HttpStatus.NOT_FOUND);
+		}
+	}
+
+	/**
+	 *
+	 * @param userId : owner of the calculation to get
+	 * @param calculationid : id of the calculation to get
+	 * @return ResponseEntity<APiJsonResponse> containing the base 64 of the calculation result (html)  Http code : 200 (or Http code 400 if the userId given is null or 404 if the calculation or user does not exists) 
+	 */
+	@RequestMapping(value = "/{userId}/calculations/{calculationid}/html", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<ApiJsonResponse> getCalculationHtml(@PathVariable String userId, @PathVariable int calculationid) {
+
+		if (userId == null || "".equals(userId)) {
+			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNull(), HttpStatus.BAD_REQUEST);
+		}
+
+		if (!FileUtils.userExist(userId)) {
+			return new ResponseEntity<ApiJsonResponse>(ApiJsonResponseCreator.userIdNotExist(userId), HttpStatus.NOT_FOUND);
+		} else {
+			List<Calculation> calculations = FileUtils.getUserCalculations(userId);
+			Optional<Calculation> calcul = calculations.stream().filter(x -> x.getId() == calculationid).findFirst();
+			if (calcul.isPresent()) {
+
+				try {
+					String b64html = FileUtils.encodeFile(Paths.get(FileUtils.getCalculationDirectoryPath(userId, calculationid, calcul.get().getName()) + File.separator + "result.html"));
+					return new ResponseEntity<ApiJsonResponse>(
+							new ApiJsonResponse(userId, calculationid, null, null, b64html), HttpStatus.OK);
+				} catch (IOException e) {
+					return new ResponseEntity<ApiJsonResponse>(
+							new ApiJsonResponse(userId, 0, "cannot open calculation path", null, null),
+							HttpStatus.NOT_FOUND);
+				}
+
+			}
+			return new ResponseEntity<ApiJsonResponse>(new ApiJsonResponse(userId, 0,
+					"calculation " + calculationid + " does not exist for user " + userId, null, null),
 					HttpStatus.NOT_FOUND);
 		}
 	}

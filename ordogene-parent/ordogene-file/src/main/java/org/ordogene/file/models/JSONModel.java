@@ -1,4 +1,4 @@
-package org.ordogene.file;
+package org.ordogene.file.models;
 
 import java.util.HashSet;
 import java.util.List;
@@ -6,19 +6,17 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.ordogene.file.models.JSONAction;
-import org.ordogene.file.models.JSONEntity;
-import org.ordogene.file.models.JSONFitness;
-import org.ordogene.file.models.JSONInput;
-import org.ordogene.file.models.JSONOperand;
 import org.ordogene.file.parser.Validable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import edu.emory.mathcs.backport.java.util.Collections;
 
+/**
+ * POJO
+ * @author darwinners team
+ *
+ */
 public class JSONModel implements Validable {
-	private List<Integer> snaps;
 	private int slots;
 	@JsonProperty("exec_time")
 	private int execTime;
@@ -29,11 +27,15 @@ public class JSONModel implements Validable {
 
 	@Override
 	public boolean isValid() {
-		return snaps != null && slots != 0 && execTime != 0 && environment != null && actions != null && fitness != null
+		return slots != 0 && execTime != 0 && environment != null && actions != null && fitness != null
 				&& environment.stream().allMatch(Validable::isValid) && actions.stream().allMatch(Validable::isValid)
-				&& fitness.isValid() && this.Consistency();
+				&& fitness.isValid() && this.Consistency() && name != null;
 	}
 
+	/**
+	 * 
+	 * @return true if the actual model is full and coherent, false otherwise
+	 */
 	private boolean Consistency() {
 		Set<String> all = new HashSet<String>();
 		Set<String> contained = new HashSet<String>();
@@ -50,18 +52,6 @@ public class JSONModel implements Validable {
 		}
 		contained.addAll(fitness.getOperands().stream().map(JSONOperand::getName).collect(Collectors.toList()));
 		return contained.stream().allMatch(str -> all.contains(str));
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Integer> getSnaps() {
-		return Collections.unmodifiableList(snaps);
-	}
-
-	public void setSnaps(List<Integer> snaps) {
-		this.snaps = Objects.requireNonNull(snaps);
-		if (this.snaps.stream().anyMatch(x -> x <= 0)) {
-			throw new IllegalArgumentException("a snap time cannot be negative or equal to zero");
-		}
 	}
 
 	public int getSlots() {
@@ -134,9 +124,8 @@ public class JSONModel implements Validable {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("Model\n[snaps=");
-		builder.append(snaps);
-		builder.append(",\nname=");
+		builder.append("Model\n[");
+		builder.append("\nname=");
 		builder.append(name);
 		builder.append(",\nslots=");
 		builder.append(slots);

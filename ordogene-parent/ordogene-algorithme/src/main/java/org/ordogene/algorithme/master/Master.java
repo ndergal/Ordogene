@@ -1,9 +1,6 @@
 package org.ordogene.algorithme.master;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
 import java.util.HashMap;
@@ -14,22 +11,44 @@ import javax.xml.bind.UnmarshalException;
 
 import org.ordogene.algorithme.Model;
 import org.ordogene.algorithme.jenetics.CalculationHandler;
-import org.ordogene.file.JSONModel;
+import org.ordogene.file.FileUtils;
+import org.ordogene.file.models.JSONModel;
 import org.ordogene.file.parser.Parser;
 import org.ordogene.file.utils.Calculation;
 import org.ordogene.file.utils.Const;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
+/**
+ * Handle the algorithm threads
+ * 
+ * @author darwinners team
+ *
+ */
 public class Master {
-	private static final int DEFAULT_THREAD = 10;
+	private static final Logger log = LoggerFactory.getLogger(Master.class);
+	private static final int DEFAULT_THREAD = 5;
 	private final int maxThread;
 	private int currentThread;
 	private final Map<Integer, ThreadHandler> threadMap = new HashMap<>();
 
 	public Master() {
-		maxThread = DEFAULT_THREAD;
+		int tmpMaxThread;
+		String maxThreadFromMap = Const.getConst().get("MaxComputationThreads");
+		if (maxThreadFromMap == null) {
+			tmpMaxThread = DEFAULT_THREAD;
+			log.info("MaxComputationThreads option is not present in the configuration file. Use default value : "+DEFAULT_THREAD);
+		}
+		try {
+			tmpMaxThread = Integer.parseInt(maxThreadFromMap);
+		} catch(NumberFormatException e) {
+			tmpMaxThread = DEFAULT_THREAD;
+			log.info("MaxComputationThreads option in the configuration file is not a valid number. Use default value : "+DEFAULT_THREAD);
+		}
+		maxThread = tmpMaxThread;
 	}
 
 	public Master(int maxThread) {
@@ -39,10 +58,10 @@ public class Master {
 		this.maxThread = maxThread;
 	}
 
-	public Integer compute(String idUser, String jsonString)
+	public Integer compute(String username, String jsonString)
 			throws JsonParseException, JsonMappingException, UnmarshalException, IOException {
 
-		Objects.requireNonNull(idUser);
+		Objects.requireNonNull(username);
 		Objects.requireNonNull(jsonString);
 
 		synchronized (threadMap) {
@@ -55,16 +74,14 @@ public class Master {
 		JSONModel jmodel = (JSONModel) Parser.parseJsonFile(jsonString, JSONModel.class);
 		Model model = Model.createModel(jmodel);
 
-		String toHash = jsonString + (new Date()).toString();
+		String toHash = jsonString + (new Date()).getTime();
 		int calculationId = toHash.hashCode();
 
-		Path calculationPath = Paths.get(Const.getConst().get("ApplicationPath") + File.separatorChar + idUser
-				+ File.separatorChar + "" + calculationId + "_" + model.getName());
-		Files.createDirectories(calculationPath);
-
 		ThreadHandler th = new ThreadHandler();
+		
+		th.getCalculation().setCalculation((new Date()).getTime(), 0, 0, model.getExecTime(), calculationId, model.getName(), 0);
 
-		CalculationHandler ch = new CalculationHandler(th, model, idUser, calculationId);
+		CalculationHandler ch = new CalculationHandler(th, model, username, calculationId);
 
 		Thread t = new Thread(() -> {
 
@@ -84,47 +101,37 @@ public class Master {
 		}
 
 	}
+	
+	public boolean isRunning(int cid) {
+		return threadMap.containsKey(cid);
+	}
 
-	public void updateCalculation(Calculation cal, String userId) {
-		ThreadHandler th = threadMap.get(cal.getId());
+	public void updateCalculation(Calculation cal, String username) {
+		ThreadHandler th = null;
+		synchronized (threadMap) {
+			th = threadMap.get(cal.getId());
+		}
 		if (th != null) {
 			// IsRunning
-			try {
-				th.masterToThread("state");
-
-				// Format: epoch_iterationNumber_lastIterationSaved_maxIteration_fitness
-				String[] state = th.masterFromThread().split("_");
-				try {
-					cal.setCalculation(Long.valueOf(state[0]), Integer.valueOf(state[1]), Integer.valueOf(state[2]),
-							Integer.valueOf(state[3]), cal.getId(), cal.getName(), Integer.valueOf(state[4]));
-				} catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-					throw new InternalError("Problem with calculation format informations");
-				}
-				cal.setRunning(true);
-			} catch (InterruptedException e) {
-				// Master will be closed
-				Thread.currentThread().interrupt();
-			}
+			Calculation cSaved = th.getCalculation();
+			cal.setCalculation(cSaved.getStartTimestamp(), cSaved.getIterationNumber(), cSaved.getLastIterationSaved(), cSaved.getMaxIteration(), cSaved.getId(), cSaved.getName(), cSaved.getFitnessSaved());
+			cal.setRunning(true);
 		} else {
 			try {
-				String pathName = Const.getConst().get("ApplicationPath") + File.separator + userId + File.separator
-						+ cal.getId() + "_" + cal.getName() + File.separatorChar + "state.json";
+				String pathName = FileUtils.getCalculationStatePath(username, cal.getId(), cal.getName());
 				Calculation tmpCal = (Calculation) Parser.parseJsonFile(Paths.get(pathName), Calculation.class);
-				cal.setStartTimestamp(tmpCal.getStartTimestamp());
-				cal.setIterationNumber(tmpCal.getIterationNumber());
-				cal.setLastIterationSaved(tmpCal.getLastIterationSaved());
-				cal.setMaxIteration(tmpCal.getMaxIteration());
-				cal.setFitnessSaved(tmpCal.getFitnessSaved());
+				cal.setCalculation(tmpCal.getStartTimestamp(), tmpCal.getIterationNumber(),
+						tmpCal.getLastIterationSaved(), tmpCal.getMaxIteration(), cal.getId(), cal.getName(),
+						tmpCal.getFitnessSaved());
 				cal.setRunning(false);
 			} catch (IllegalAccessException | UnmarshalException | IOException e) {
-				System.err.println("Problem to read the calculation ");
+				log.error("Problem to read the calculation ");
 			}
 		}
 	}
 
-	// TODO connection with Thread
-	public boolean interruptCalculation(int calculationId) {
-		ThreadHandler th = threadMap.get(calculationId);
+	public boolean interruptCalculation(int cid) {
+		ThreadHandler th = threadMap.get(cid);
 		if (th != null) {
 			// IsRunning
 			try {

@@ -4,6 +4,10 @@ import org.ordogene.algorithme.models.Action;
 
 import io.jenetics.Gene;
 
+/**
+ * @author darwinners team
+ *
+ */
 public class ActionGene implements Gene<Action, ActionGene> {
 
 	private final Action action;
@@ -18,7 +22,6 @@ public class ActionGene implements Gene<Action, ActionGene> {
 	@Override
 	public boolean isValid() {
 		return true;
-		// return model.workable(action, currentEnvironment);
 	}
 
 	@Override
@@ -48,5 +51,7 @@ public class ActionGene implements Gene<Action, ActionGene> {
 	public int getStartTime() {
 		return startTime;
 	}
+	
+	
 
 }
