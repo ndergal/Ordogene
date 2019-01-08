@@ -17,7 +17,7 @@ public class ActionSelector {
 	private long lowerWeight = 0;
 	private List<SimpleEntry<Action, Long>> actions = new ArrayList<>();
 	
-	public boolean isReset() {
+	public boolean isEmpty() {
 		return actions.isEmpty();
 	}
 	

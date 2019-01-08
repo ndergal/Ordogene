@@ -8,7 +8,7 @@ import org.ordogene.file.parser.Validable;
 public class JSONFitness implements Validable {
 	
 	private Type type;
-	private Integer value;
+	private Long value;
 	private List<JSONOperand> operands;
 
 	@Override
@@ -23,11 +23,11 @@ public class JSONFitness implements Validable {
 		return false;
 	}
 	
-	public Integer getValue() {
+	public Long getValue() {
 		return value;
 	}
 
-	public void setValue(int value) {
+	public void setValue(long value) {
 		this.value = value;
 	}
 

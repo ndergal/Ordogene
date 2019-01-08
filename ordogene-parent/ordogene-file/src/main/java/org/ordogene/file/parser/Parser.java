@@ -3,11 +3,8 @@ package org.ordogene.file.parser;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import javax.xml.bind.UnmarshalException;
-
-import org.ordogene.file.JSONModel;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -39,13 +36,6 @@ public class Parser {
 			throw new UnmarshalException("Missing fields in the JSON");
 		}
 		return instance;
-	}
-
-	public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException,
-			InstantiationException, IllegalAccessException, UnmarshalException {
-		System.out.println(Parser.parseJsonFile(Paths.get(
-				"/home/ordogene/git/ordogene/ordogene-parent/ordogene-file/src/main/java/org/ordogene/file/testJson/fitness1.json"),
-				JSONModel.class));
 	}
 
 }

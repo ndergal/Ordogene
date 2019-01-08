@@ -212,7 +212,7 @@ public class CalculationController {
 			if (calcul.isPresent()) {
 
 				try {
-					Path imgPath = Paths.get(FileService.getCalculationPath(id, calcul.get()));
+					Path imgPath = Paths.get(FileService.getCalculationPngPath(id, calcul.get()));
 					String base64img = FileService.encodeImage(imgPath);
 					return new ResponseEntity<ApiJsonResponse>(
 							new ApiJsonResponse(id, calculationid, null, null, base64img), HttpStatus.OK);

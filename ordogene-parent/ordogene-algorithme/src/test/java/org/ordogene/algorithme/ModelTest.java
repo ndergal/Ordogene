@@ -405,6 +405,7 @@ public class ModelTest {
 		Entity e1 = mock(Entity.class);
 		Fitness f = mock(Fitness.class);
 		Action a = mock(Action.class);
+		Action a1 = mock(Action.class);
 		Input i = mock(Input.class);
 		
 		Set<Entity> entityEnv = new HashSet<>();
@@ -412,6 +413,7 @@ public class ModelTest {
 		
 		Set<Action> actions = new HashSet<>();
 		actions.add(a);
+		actions.add(a1);
 		
 		Set<Input> inputs = new HashSet<>();
 		inputs.add(i);
@@ -430,18 +432,24 @@ public class ModelTest {
 		when(a.getName()).thenReturn("action");
 		when(a.getTime()).thenReturn(5);
 		
+		when(a1.getOutputs()).thenReturn(outputs);
+		when(a1.getInputs()).thenReturn(inputs);
+		when(a1.getName()).thenReturn("action1");
+		when(a1.getTime()).thenReturn(5);
+		
 		when(i.getName()).thenReturn("e1");
 		when(i.getQuantity()).thenReturn(1);
 		when(i.getRelation()).thenReturn(Relation.c);
 		
 		when(f.eval(a)).thenReturn(Long.valueOf(1));
+		when(f.eval(a1)).thenReturn(Long.valueOf(1));
 		
 		Model m = new Model(Collections.emptyList(), "model", 100, 20, env, actions, f);
 		
+		assertEquals(a1, m.getWorkableAction(env, 0));
 		assertEquals(a, m.getWorkableAction(env, 0));
-		assertEquals(Action.EMPTY(), m.getWorkableAction(env, 0));
-		assertEquals(Action.EMPTY(), m.getWorkableAction(env, 0));
 		assertEquals(a, m.getWorkableAction(env, 0));
+		assertEquals(a1, m.getWorkableAction(env, 0));
 	}
 
 	@Test

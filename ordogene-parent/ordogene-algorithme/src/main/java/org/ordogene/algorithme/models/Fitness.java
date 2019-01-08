@@ -10,14 +10,14 @@ import org.ordogene.file.models.Type;
 
 public class Fitness {
 	private final Type type;
-	private Integer value;
+	private Long value;
 	private final HashMap<String, Long> operands = new HashMap<>();
 
 	public Fitness(Type type, HashMap<String, Long> operands) {
 		this(type, operands, null);
 	}
 	
-	public Fitness(Type type, HashMap<String, Long> operands, Integer value) {
+	public Fitness(Type type, HashMap<String, Long> operands, Long value) {
 		this.type = Objects.requireNonNull(type);
 		Objects.requireNonNull(operands);
 		for(Entry<String, Long> e : operands.entrySet()) {
@@ -81,7 +81,7 @@ public class Fitness {
 		return type;
 	}
 
-	public Integer getValue() {
+	public Long getValue() {
 		return value;
 	}
 

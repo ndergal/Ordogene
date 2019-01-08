@@ -2,6 +2,8 @@ package org.ordogene.algorithme.master;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
 import java.util.HashMap;
@@ -11,6 +13,7 @@ import java.util.Objects;
 import javax.xml.bind.UnmarshalException;
 
 import org.ordogene.algorithme.Model;
+import org.ordogene.algorithme.jenetics.CalculationHandler;
 import org.ordogene.file.JSONModel;
 import org.ordogene.file.parser.Parser;
 import org.ordogene.file.utils.Calculation;
@@ -30,7 +33,7 @@ public class Master {
 	}
 
 	public Master(int maxThread) {
-		if(maxThread <= 0) {
+		if (maxThread <= 0) {
 			throw new IllegalArgumentException("The max Thread can not be zero or negative");
 		}
 		this.maxThread = maxThread;
@@ -41,7 +44,7 @@ public class Master {
 
 		Objects.requireNonNull(idUser);
 		Objects.requireNonNull(jsonString);
-		
+
 		synchronized (threadMap) {
 			if (currentThread == maxThread) {
 				return null;
@@ -54,6 +57,10 @@ public class Master {
 
 		String toHash = jsonString + (new Date()).toString();
 		int calculationId = toHash.hashCode();
+
+		Path calculationPath = Paths.get(Const.getConst().get("ApplicationPath") + File.separatorChar + idUser
+				+ File.separatorChar + "" + calculationId + "_" + model.getName());
+		Files.createDirectories(calculationPath);
 
 		ThreadHandler th = new ThreadHandler();
 
