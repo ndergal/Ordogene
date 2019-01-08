@@ -1,0 +1,133 @@
+{
+    "name" : "fibonacci_cached.json",
+    "slots" : 300,
+    "exec_time" : 10000,
+    "environment" : [
+	{"name" : "CPUcore", "quantity" : 1},
+	{"name" : "Fibo0", "quantity" : 0},
+	{"name" : "Fibo1", "quantity" : 0},
+	{"name" : "Fibo2", "quantity" : 0},
+	{"name" : "Fibo3", "quantity" : 0},
+	{"name" : "Fibo4", "quantity" : 0},
+	{"name" : "Fibo5", "quantity" : 0},
+	{"name" : "Fibo6", "quantity" : 0},
+	{"name" : "Fibo7", "quantity" : 0},
+	{"name" : "Fibo8", "quantity" : 0},
+	{"name" : "Fibo9", "quantity" : 0},
+	{"name" : "Fibo10", "quantity" : 0}
+    ],
+    "actions" : [
+	{"name" : "Compute_Fibo0", "time" : 1,
+	 "input" : [
+	     { "name" : "CPUcore", "quantity" : 1, "relation" : "p" }
+	 ],
+	 "output" : [
+	     {"name" : "Fibo0", "quantity" : 1}
+	 ]
+	},
+	{"name" : "Compute_Fibo1", "time" : 1,
+	 "input" : [
+	     { "name" : "CPUcore", "quantity" : 1, "relation" : "p" }
+	 ],
+	 "output" : [
+	     {"name" : "Fibo1", "quantity" : 1}
+	 ]
+	},
+	{"name" : "Compute_Fibo2", "time" : 1,
+	 "input" : [
+	     { "name" : "CPUcore", "quantity" : 1, "relation" : "p" },
+	     { "name" : "Fibo0", "quantity" : 1, "relation" : "r" },
+	     { "name" : "Fibo1", "quantity" : 1, "relation" : "r" }
+	 ],
+	 "output" : [
+	     {"name" : "Fibo2", "quantity" : 1}
+	 ]
+	},
+	{"name" : "Compute_Fibo3", "time" : 1,
+	 "input" : [
+	     { "name" : "CPUcore", "quantity" : 1, "relation" : "p" },
+	     { "name" : "Fibo1", "quantity" : 1, "relation" : "r" },
+	     { "name" : "Fibo2", "quantity" : 1, "relation" : "r" }
+	 ],
+	 "output" : [
+	     {"name" : "Fibo3", "quantity" : 1}
+	 ]
+	},
+	{"name" : "Compute_Fibo4", "time" : 1,
+	 "input" : [
+	     { "name" : "CPUcore", "quantity" : 1, "relation" : "p" },
+	     { "name" : "Fibo2", "quantity" : 1, "relation" : "r" },
+	     { "name" : "Fibo3", "quantity" : 1, "relation" : "r" }
+	 ],
+	 "output" : [
+	     {"name" : "Fibo4", "quantity" : 1}
+	 ]
+	},
+	{"name" : "Compute_Fibo5", "time" : 1,
+	 "input" : [
+	     { "name" : "CPUcore", "quantity" : 1, "relation" : "p" },
+	     { "name" : "Fibo3", "quantity" : 1, "relation" : "r" },
+	     { "name" : "Fibo4", "quantity" : 1, "relation" : "r" }
+	 ],
+	 "output" : [
+	     {"name" : "Fibo5", "quantity" : 1}
+	 ]
+	},
+	{"name" : "Compute_Fibo6", "time" : 1,
+	 "input" : [
+	     { "name" : "CPUcore", "quantity" : 1, "relation" : "p" },
+	     { "name" : "Fibo4", "quantity" : 1, "relation" : "r" },
+	     { "name" : "Fibo5", "quantity" : 1, "relation" : "r" }
+	 ],
+	 "output" : [
+	     {"name" : "Fibo6", "quantity" : 1}
+	 ]
+	},
+	{"name" : "Compute_Fibo7", "time" : 1,
+	 "input" : [
+	     { "name" : "CPUcore", "quantity" : 1, "relation" : "p" },
+	     { "name" : "Fibo5", "quantity" : 1, "relation" : "r" },
+	     { "name" : "Fibo6", "quantity" : 1, "relation" : "r" }
+	 ],
+	 "output" : [
+	     {"name" : "Fibo7", "quantity" : 1}
+	 ]
+	},
+	{"name" : "Compute_Fibo8", "time" : 1,
+	 "input" : [
+	     { "name" : "CPUcore", "quantity" : 1, "relation" : "p" },
+	     { "name" : "Fibo6", "quantity" : 1, "relation" : "r" },
+	     { "name" : "Fibo7", "quantity" : 1, "relation" : "r" }
+	 ],
+	 "output" : [
+	     {"name" : "Fibo8", "quantity" : 1}
+	 ]
+	},
+	{"name" : "Compute_Fibo9", "time" : 1,
+	 "input" : [
+	     { "name" : "CPUcore", "quantity" : 1, "relation" : "p" },
+	     { "name" : "Fibo7", "quantity" : 1, "relation" : "r" },
+	     { "name" : "Fibo8", "quantity" : 1, "relation" : "r" }
+	 ],
+	 "output" : [
+	     {"name" : "Fibo9", "quantity" : 1}
+	 ]
+	},
+	{"name" : "Compute_Fibo10", "time" : 1,
+	 "input" : [
+	     { "name" : "CPUcore", "quantity" : 1, "relation" : "p" },
+	     { "name" : "Fibo8", "quantity" : 1, "relation" : "r" },
+	     { "name" : "Fibo9", "quantity" : 1, "relation" : "r" }
+	 ],
+	 "output" : [
+	     {"name" : "Fibo10", "quantity" : 1}
+	 ]
+	}
+    ],
+    "fitness" : {
+	"type" : "max",
+	"operands" : [
+	    {"name" : "Fibo10", "coef" : 10}
+	]
+    }
+}
